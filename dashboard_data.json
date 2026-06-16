@@ -10,7 +10,10 @@
                 "avg_kp": 3.86,
                 "avg_util": 3.17,
                 "avg_cc": 2.76,
-                "avg_tank": 3.14
+                "avg_tank": 3.14,
+                "god_count": 4,
+                "alpha_count": 4,
+                "cono_count": 0
             },
             {
                 "name": "AmsterdamK#LAS",
@@ -21,7 +24,10 @@
                 "avg_kp": 3.42,
                 "avg_util": 2.76,
                 "avg_cc": 2.94,
-                "avg_tank": 2.55
+                "avg_tank": 2.55,
+                "god_count": 4,
+                "alpha_count": 3,
+                "cono_count": 1
             },
             {
                 "name": "Nabuegixi#LAS",
@@ -32,7 +38,10 @@
                 "avg_kp": 3.59,
                 "avg_util": 2.95,
                 "avg_cc": 3.36,
-                "avg_tank": 2.36
+                "avg_tank": 2.36,
+                "god_count": 2,
+                "alpha_count": 1,
+                "cono_count": 1
             },
             {
                 "name": "matuque#0000",
@@ -43,7 +52,10 @@
                 "avg_kp": 3.36,
                 "avg_util": 3.45,
                 "avg_cc": 3.0,
-                "avg_tank": 3.73
+                "avg_tank": 3.73,
+                "god_count": 3,
+                "alpha_count": 0,
+                "cono_count": 1
             },
             {
                 "name": "L3blanc James#LAS",
@@ -54,7 +66,10 @@
                 "avg_kp": 2.84,
                 "avg_util": 3.19,
                 "avg_cc": 2.87,
-                "avg_tank": 3.52
+                "avg_tank": 3.52,
+                "god_count": 2,
+                "alpha_count": 1,
+                "cono_count": 1
             },
             {
                 "name": "Einherjar#LAS",
@@ -65,7 +80,10 @@
                 "avg_kp": 3.5,
                 "avg_util": 2.67,
                 "avg_cc": 3.17,
-                "avg_tank": 2.67
+                "avg_tank": 2.67,
+                "god_count": 0,
+                "alpha_count": 0,
+                "cono_count": 0
             },
             {
                 "name": "UN CONO#LAS",
@@ -76,7 +94,10 @@
                 "avg_kp": 3.17,
                 "avg_util": 2.91,
                 "avg_cc": 3.7,
-                "avg_tank": 2.7
+                "avg_tank": 2.7,
+                "god_count": 0,
+                "alpha_count": 1,
+                "cono_count": 1
             },
             {
                 "name": "Fipus#ACLRV",
@@ -87,7 +108,10 @@
                 "avg_kp": 1.67,
                 "avg_util": 3.48,
                 "avg_cc": 3.29,
-                "avg_tank": 3.81
+                "avg_tank": 3.81,
+                "god_count": 1,
+                "alpha_count": 0,
+                "cono_count": 13
             }
         ],
         "hall_of_fame": {
@@ -202,7 +226,10 @@
                 "avg_kp": 3.7,
                 "avg_util": 2.91,
                 "avg_cc": 2.52,
-                "avg_tank": 2.96
+                "avg_tank": 2.96,
+                "god_count": 1,
+                "alpha_count": 3,
+                "cono_count": 0
             },
             {
                 "name": "AmsterdamK#LAS",
@@ -213,7 +240,10 @@
                 "avg_kp": 3.25,
                 "avg_util": 3.0,
                 "avg_cc": 3.11,
-                "avg_tank": 2.68
+                "avg_tank": 2.68,
+                "god_count": 4,
+                "alpha_count": 1,
+                "cono_count": 1
             },
             {
                 "name": "Nabuegixi#LAS",
@@ -224,7 +254,10 @@
                 "avg_kp": 3.54,
                 "avg_util": 3.0,
                 "avg_cc": 3.38,
-                "avg_tank": 2.62
+                "avg_tank": 2.62,
+                "god_count": 1,
+                "alpha_count": 0,
+                "cono_count": 1
             },
             {
                 "name": "L3blanc James#LAS",
@@ -235,7 +268,10 @@
                 "avg_kp": 2.91,
                 "avg_util": 3.09,
                 "avg_cc": 2.77,
-                "avg_tank": 3.45
+                "avg_tank": 3.45,
+                "god_count": 2,
+                "alpha_count": 1,
+                "cono_count": 1
             },
             {
                 "name": "matuque#0000",
@@ -246,7 +282,10 @@
                 "avg_kp": 3.17,
                 "avg_util": 3.42,
                 "avg_cc": 2.92,
-                "avg_tank": 3.75
+                "avg_tank": 3.75,
+                "god_count": 1,
+                "alpha_count": 0,
+                "cono_count": 1
             },
             {
                 "name": "Einherjar#LAS",
@@ -257,7 +296,10 @@
                 "avg_kp": 3.4,
                 "avg_util": 3.0,
                 "avg_cc": 3.6,
-                "avg_tank": 3.0
+                "avg_tank": 3.0,
+                "god_count": 0,
+                "alpha_count": 0,
+                "cono_count": 0
             },
             {
                 "name": "UN CONO#LAS",
@@ -268,7 +310,10 @@
                 "avg_kp": 2.88,
                 "avg_util": 2.81,
                 "avg_cc": 3.56,
-                "avg_tank": 2.69
+                "avg_tank": 2.69,
+                "god_count": 0,
+                "alpha_count": 0,
+                "cono_count": 1
             },
             {
                 "name": "Fipus#ACLRV",
@@ -279,7 +324,10 @@
                 "avg_kp": 2.0,
                 "avg_util": 3.75,
                 "avg_cc": 3.5,
-                "avg_tank": 4.08
+                "avg_tank": 4.08,
+                "god_count": 1,
+                "alpha_count": 0,
+                "cono_count": 6
             }
         ],
         "hall_of_fame": {
