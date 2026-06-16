@@ -333,7 +333,24 @@ function renderRanking(elementId,ranking){
   let html=`<table><thead><tr><th>#</th><th>Jugador</th><th>Games</th><th>Total</th><th>AVG</th><th>DMG</th><th>KP</th><th>UTIL</th><th>CC</th><th>TANK</th></tr></thead><tbody>`;
   ranking.forEach((r,i)=>{
 const rankClass = i < 3 ? `rank-${i+1}` : "";
-html+=`<tr class="${rankClass}"><td>${i+1}</td><td>${r.name}</td><td>${r.games}</td><td>${r.total}</td><td>${r.avg}</td><td>${r.avg_dmg}</td><td>${r.avg_kp}</td><td>${r.avg_util}</td><td>${r.avg_cc}</td><td>${r.avg_tank}</td></tr>`;
+html+=`<tr class="${rankClass}">
+<td>${i+1}</td>
+<td>
+${r.name}
+<br>
+😈${r.god_count}
+🏅${r.alpha_count}
+🍦${r.cono_count}
+</td>
+<td>${r.games}</td>
+<td>${r.total}</td>
+<td>${r.avg}</td>
+<td>${r.avg_dmg}</td>
+<td>${r.avg_kp}</td>
+<td>${r.avg_util}</td>
+<td>${r.avg_cc}</td>
+<td>${r.avg_tank}</td>
+</tr>`;
   });
   html+=`</tbody></table>`;
   el.innerHTML=html;
@@ -352,7 +369,7 @@ const titleImages = {
   
     "MVP:SworDanc3#LAS":
         "assets/SworDanc3_mvp.png",
-   
+    
     "GOD:SworDanc3#LAS":
         "assets/SworDanc3_god.png",      
 };
