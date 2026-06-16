@@ -3,25 +3,25 @@
         "ranking": [
             {
                 "name": "SworDanc3#LAS",
-                "games": 28,
-                "total": 317,
-                "avg": 11.32,
-                "avg_dmg": 4.32,
+                "games": 29,
+                "total": 330,
+                "avg": 11.38,
+                "avg_dmg": 4.34,
                 "avg_kp": 3.86,
-                "avg_util": 3.14,
-                "avg_cc": 2.75,
+                "avg_util": 3.17,
+                "avg_cc": 2.76,
                 "avg_tank": 3.14
             },
             {
                 "name": "AmsterdamK#LAS",
-                "games": 32,
-                "total": 344,
-                "avg": 10.75,
-                "avg_dmg": 4.5,
-                "avg_kp": 3.47,
-                "avg_util": 2.78,
-                "avg_cc": 2.91,
-                "avg_tank": 2.59
+                "games": 33,
+                "total": 351,
+                "avg": 10.64,
+                "avg_dmg": 4.45,
+                "avg_kp": 3.42,
+                "avg_util": 2.76,
+                "avg_cc": 2.94,
+                "avg_tank": 2.55
             },
             {
                 "name": "Nabuegixi#LAS",
@@ -80,14 +80,14 @@
             },
             {
                 "name": "Fipus#ACLRV",
-                "games": 20,
-                "total": 120,
-                "avg": 6.0,
-                "avg_dmg": 1.1,
-                "avg_kp": 1.5,
-                "avg_util": 3.4,
-                "avg_cc": 3.2,
-                "avg_tank": 3.75
+                "games": 21,
+                "total": 132,
+                "avg": 6.29,
+                "avg_dmg": 1.14,
+                "avg_kp": 1.67,
+                "avg_util": 3.48,
+                "avg_cc": 3.29,
+                "avg_tank": 3.81
             }
         ],
         "hall_of_fame": {
@@ -105,7 +105,7 @@
             },
             "mvp": {
                 "player": "SworDanc3#LAS",
-                "value": 11.32
+                "value": 11.38
             },
             "titles": [
                 {
@@ -119,12 +119,12 @@
                         {
                             "title": "Playmaker",
                             "emoji": "🧠",
-                            "value": 8.18
+                            "value": 8.2
                         },
                         {
                             "title": "Juggernaut",
                             "emoji": "🦏",
-                            "value": 7.46
+                            "value": 7.48
                         }
                     ]
                 },
@@ -134,12 +134,12 @@
                         {
                             "title": "Artillery",
                             "emoji": "💥",
-                            "value": 4.5
+                            "value": 4.45
                         },
                         {
                             "title": "Suppressor",
                             "emoji": "🔒",
-                            "value": 7.41
+                            "value": 7.39
                         }
                     ]
                 },
@@ -149,12 +149,12 @@
                         {
                             "title": "Fortress",
                             "emoji": "🏰",
-                            "value": 3.75
+                            "value": 3.81
                         },
                         {
                             "title": "Guardian",
                             "emoji": "🛡️",
-                            "value": 6.95
+                            "value": 7.1
                         }
                     ]
                 },
@@ -195,25 +195,25 @@
         "ranking": [
             {
                 "name": "SworDanc3#LAS",
-                "games": 22,
-                "total": 239,
-                "avg": 10.86,
-                "avg_dmg": 4.32,
-                "avg_kp": 3.68,
-                "avg_util": 2.86,
-                "avg_cc": 2.5,
-                "avg_tank": 2.95
+                "games": 23,
+                "total": 252,
+                "avg": 10.96,
+                "avg_dmg": 4.35,
+                "avg_kp": 3.7,
+                "avg_util": 2.91,
+                "avg_cc": 2.52,
+                "avg_tank": 2.96
             },
             {
                 "name": "AmsterdamK#LAS",
-                "games": 27,
-                "total": 288,
-                "avg": 10.67,
-                "avg_dmg": 4.33,
-                "avg_kp": 3.3,
-                "avg_util": 3.04,
-                "avg_cc": 3.07,
-                "avg_tank": 2.74
+                "games": 28,
+                "total": 295,
+                "avg": 10.54,
+                "avg_dmg": 4.29,
+                "avg_kp": 3.25,
+                "avg_util": 3.0,
+                "avg_cc": 3.11,
+                "avg_tank": 2.68
             },
             {
                 "name": "Nabuegixi#LAS",
@@ -272,14 +272,14 @@
             },
             {
                 "name": "Fipus#ACLRV",
-                "games": 11,
-                "total": 72,
-                "avg": 6.55,
-                "avg_dmg": 1.18,
-                "avg_kp": 1.73,
-                "avg_util": 3.64,
-                "avg_cc": 3.36,
-                "avg_tank": 4.0
+                "games": 12,
+                "total": 84,
+                "avg": 7.0,
+                "avg_dmg": 1.25,
+                "avg_kp": 2.0,
+                "avg_util": 3.75,
+                "avg_cc": 3.5,
+                "avg_tank": 4.08
             }
         ],
         "hall_of_fame": {
@@ -297,41 +297,31 @@
             },
             "mvp": {
                 "player": "SworDanc3#LAS",
-                "value": 10.86
+                "value": 10.96
             },
             "titles": [
                 {
                     "player": "SworDanc3#LAS",
                     "titles": [
                         {
+                            "title": "Artillery",
+                            "emoji": "💥",
+                            "value": 4.35
+                        },
+                        {
                             "title": "Instigator",
                             "emoji": "🔥",
-                            "value": 3.68
+                            "value": 3.7
                         },
                         {
                             "title": "Playmaker",
                             "emoji": "🧠",
-                            "value": 8.0
+                            "value": 8.05
                         },
                         {
                             "title": "Juggernaut",
                             "emoji": "🦏",
-                            "value": 7.27
-                        }
-                    ]
-                },
-                {
-                    "player": "AmsterdamK#LAS",
-                    "titles": [
-                        {
-                            "title": "Artillery",
-                            "emoji": "💥",
-                            "value": 4.33
-                        },
-                        {
-                            "title": "Suppressor",
-                            "emoji": "🔒",
-                            "value": 7.4
+                            "value": 7.31
                         }
                     ]
                 },
@@ -356,12 +346,22 @@
                         {
                             "title": "Fortress",
                             "emoji": "🏰",
-                            "value": 4.0
+                            "value": 4.08
                         },
                         {
                             "title": "Guardian",
                             "emoji": "🛡️",
-                            "value": 7.36
+                            "value": 7.58
+                        }
+                    ]
+                },
+                {
+                    "player": "AmsterdamK#LAS",
+                    "titles": [
+                        {
+                            "title": "Suppressor",
+                            "emoji": "🔒",
+                            "value": 7.4
                         }
                     ]
                 },
@@ -573,6 +573,6 @@
         }
     },
     "stats": {
-        "total_matches": 44
+        "total_matches": 45
     }
 }
