@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>ARAM Engine Dashboard</title>
+<style>
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:
+        radial-gradient(circle at top left, #1e3a8a 0, transparent 28%),
+        linear-gradient(180deg, #020617 0%, #111827 45%, #020617 100%);
+    color:#f9fafb;
+}
+
+header{
+    padding:32px 24px;
+    background:rgba(2,6,23,0.88);
+    border-bottom:1px solid #374151;
+    box-shadow:0 10px 30px rgba(0,0,0,0.35);
+}
+
+main{
+    padding:24px;
+    display:grid;
+    gap:24px;
+    max-width:1400px;
+    margin:0 auto;
+}
+
+section{
+    background:rgba(31,41,55,0.92);
+    border:1px solid #374151;
+    border-radius:16px;
+    padding:22px;
+    box-shadow:0 12px 30px rgba(0,0,0,0.28);
+}
+h1,h2{
+    margin-top:0;
+}
+
+h1{
+    margin-bottom:8px;
+    font-size:34px;
+    letter-spacing:-0.03em;
+}
+
+h2{
+    border-bottom:1px solid rgba(55,65,81,0.9);
+    padding-bottom:12px;
+    margin-bottom:16px;
+    font-size:22px;
+    letter-spacing:-0.02em;
+}
+
+header p{
+    margin:0;
+    color:#cbd5e1;
+    font-size:15px;
+}
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:12px;
+}
+
+.summary-cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:16px;
+}
+
+.summary-card{
+    background:rgba(17,24,39,0.92);
+    border:1px solid rgba(75,85,99,0.85);
+    border-radius:14px;
+    padding:18px;
+    text-align:center;
+}
+
+.summary-value{
+    font-size:32px;
+    font-weight:bold;
+    margin-top:8px;
+}
+
+.summary-label{
+    color:#cbd5e1;
+    font-size:14px;
+}
+.card,.title-group{
+    background:rgba(17,24,39,0.92);
+    border:1px solid rgba(75,85,99,0.85);
+    border-radius:14px;
+    padding:16px;
+    margin-top:12px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.22);
+    transition:transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card:hover,.title-group:hover{
+    transform:translateY(-2px);
+    border-color:rgba(147,197,253,0.75);
+    box-shadow:0 12px 28px rgba(0,0,0,0.32);
+}
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:14px;
+    overflow:hidden;
+}
+
+th,td{
+    padding:12px 10px;
+    border-bottom:1px solid rgba(55,65,81,0.85);
+    text-align:left;
+}
+
+th{
+    color:#93c5fd;
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    background:rgba(15,23,42,0.75);
+}
+
+tbody tr{
+    transition:background 0.15s ease;
+}
+
+tbody tr:hover{
+    background:rgba(59,130,246,0.10);
+}
+
+td:first-child{
+    color:#fbbf24;
+    font-weight:bold;
+}
+
+td:nth-child(2){
+    font-weight:bold;
+    color:#f9fafb;
+}
+.meta{color:#d1d5db;font-size:14px;margin-top:6px}
+.god{color:#f87171;font-weight:bold}
+.alpha{color:#c084fc;font-weight:bold}
+.cono{color:#d97706;font-weight:bold}
+.error{color:#fca5a5;font-weight:bold}
+.legend-image {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+@media (max-width: 900px){
+    section{
+        overflow-x:auto;
+    }
+
+    table{
+        min-width:850px;
+    }
+
+    main{
+        padding:16px;
+    }
+
+    header{
+        padding:24px 16px;
+    }
+
+    h1{
+        font-size:28px;
+    }
+}
+#historical-hof .card,
+#split-hof .card{
+    position:relative;
+    overflow:hidden;
+}
+
+#historical-hof .card strong,
+#split-hof .card strong{
+    display:block;
+    font-size:18px;
+    letter-spacing:0.04em;
+    margin-bottom:8px;
+}
+
+#historical-hof .card .meta,
+#split-hof .card .meta{
+    margin-top:12px;
+    padding-top:10px;
+    border-top:1px solid rgba(55,65,81,0.75);
+    font-size:15px;
+}
+.rank-1{
+    background:rgba(251,191,36,0.10);
+}
+
+.rank-2{
+    background:rgba(203,213,225,0.08);
+}
+
+.rank-3{
+    background:rgba(217,119,6,0.10);
+}
+#historical-hof .card:has(.god),
+#split-hof .card:has(.god){
+    border-color:rgba(248,113,113,0.65);
+    box-shadow:0 0 24px rgba(248,113,113,0.14);
+}
+
+#historical-hof .card:has(.alpha),
+#split-hof .card:has(.alpha){
+    border-color:rgba(192,132,252,0.65);
+    box-shadow:0 0 24px rgba(192,132,252,0.14);
+}
+
+#historical-hof .card:has(.cono),
+#split-hof .card:has(.cono){
+    border-color:rgba(217,119,6,0.65);
+    box-shadow:0 0 24px rgba(217,119,6,0.14);
+}
+
+#historical-hof .card:has(strong:not(.god):not(.alpha):not(.cono)),
+#split-hof .card:has(strong:not(.god):not(.alpha):not(.cono)){
+    border-color:rgba(251,191,36,0.65);
+    box-shadow:0 0 24px rgba(251,191,36,0.14);
+}
+</style>
+</head>
+<body>
+<header>
+<h1>🔥 ARAM Engine Dashboard</h1>
+<p>Histórico · Hall of Fame · Split Actual</p>
+</header>
+
+<<main>
+<section>
+  <h2>📊 Resumen General</h2>
+  <div id="dashboard-summary"></div>
+</section>
+
+<section><h2>📚 Histórico</h2><div id="historical-ranking"></div></section>
+<section><h2>🏛️ Hall of Fame Histórico</h2><div id="historical-hof"></div></section>
+<section><h2>⚔️ Split Actual</h2><div id="split-ranking"></div></section>
+<section><h2>🏛️ Hall of Fame Split Actual</h2><div id="split-hof"></div></section>
+<section><h2>🏁 Splits Archivados</h2><div id="archived-splits"></div></section>
+</main>
+
+<script>
+async function loadDashboard(){
+  try{
+    const response=await fetch("dashboard_data.json");
+    if(!response.ok) throw new Error("No se pudo cargar dashboard_data.json");
+    const data=await response.json();
+    renderSummary(data);
+    renderRanking("historical-ranking",data.historical.ranking);
+    renderHallOfFame("historical-hof",data.historical.hall_of_fame);
+    renderRanking("split-ranking",data.current_split.ranking);
+    renderHallOfFame("split-hof",data.current_split.hall_of_fame);
+    renderArchivedSplits("archived-splits",data.archived_splits);
+  }catch(error){
+    document.body.innerHTML+=`<main><section><p class="error">${error.message}</p><p>Verificá que index.html y dashboard_data.json estén en la misma carpeta.</p></section></main>`;
+  }
+}
+
+function renderSummary(data){
+
+  const el = document.getElementById("dashboard-summary");
+
+  const historicalPlayers =
+      data.historical.ranking.length;
+
+  const historicalGames =
+    data.stats.total_matches;
+
+  const splitPlayers =
+      data.current_split.ranking.length;
+
+  const archivedSplits =
+      Object.keys(
+          data.archived_splits.splits || {}
+      ).length;
+
+  el.innerHTML = `
+    <div class="summary-cards">
+
+      <div class="summary-card">
+        <div class="summary-label">
+          Jugadores Históricos
+        </div>
+        <div class="summary-value">
+          ${historicalPlayers}
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-label">
+          Partidas Registradas
+        </div>
+        <div class="summary-value">
+          ${historicalGames}
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-label">
+          Jugadores en Split
+        </div>
+        <div class="summary-value">
+          ${splitPlayers}
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-label">
+          Splits Archivados
+        </div>
+        <div class="summary-value">
+          ${archivedSplits}
+        </div>
+      </div>
+
+    </div>
+  `;
+}
+function renderRanking(elementId,ranking){
+  const el=document.getElementById(elementId);
+  if(!ranking||ranking.length===0){el.innerHTML="<p>No hay datos.</p>";return;}
+  let html=`<table><thead><tr><th>#</th><th>Jugador</th><th>Games</th><th>Total</th><th>AVG</th><th>DMG</th><th>KP</th><th>UTIL</th><th>CC</th><th>TANK</th></tr></thead><tbody>`;
+  ranking.forEach((r,i)=>{
+const rankClass = i < 3 ? `rank-${i+1}` : "";
+html+=`<tr class="${rankClass}"><td>${i+1}</td><td>${r.name}</td><td>${r.games}</td><td>${r.total}</td><td>${r.avg}</td><td>${r.avg_dmg}</td><td>${r.avg_kp}</td><td>${r.avg_util}</td><td>${r.avg_cc}</td><td>${r.avg_tank}</td></tr>`;
+  });
+  html+=`</tbody></table>`;
+  el.innerHTML=html;
+}
+
+const titleImages = {
+
+    "CONO:Fipus#ACLRV":
+        "assets/fipus_cono.jpeg",
+
+    "ALPHA:SworDanc3#LAS":
+        "assets/SworDanc3_alpha.jpeg",
+
+    "GOD:AmsterdamK#LAS":
+        "assets/AmsterdamK_god.jpeg",
+  
+    "MVP:SworDanc3#LAS":
+        "assets/SworDanc3_mvp.png"      
+
+};
+
+function renderHallOfFame(elementId,hof){
+  const el=document.getElementById(elementId);
+  if(!hof||Object.keys(hof).length===0){el.innerHTML="<p>No hay Hall of Fame.</p>";return;}
+  let html=`<div class="cards">
+    <div class="card">
+
+      <strong class="god">
+          😈 GOD
+      </strong>
+
+      ${
+          titleImages[
+              "GOD:" + hof.god.player
+          ]
+          ?
+          `<img
+              src="${
+                  titleImages[
+                      "GOD:" + hof.god.player
+                  ]
+              }"
+              style="
+                width:100%;
+                height:450px;
+                object-fit:cover;
+                margin-top:10px;
+                border-radius:10px;
+            "
+          >`
+          :
+          ""
+      }
+
+      <div class="meta">
+          ${hof.god.player}
+          (x${hof.god.value})
+      </div>
+
+</div>
+    <div class="card">
+
+      <strong class="alpha">
+          🏅 ALPHA
+      </strong>
+
+      ${
+          titleImages[
+              "ALPHA:" + hof.alpha.player
+          ]
+          ?
+          `<img
+              src="${
+                  titleImages[
+                      "ALPHA:" + hof.alpha.player
+                  ]
+              }"
+              style="
+                width:100%;
+                height:450px;
+                object-fit:cover;
+                margin-top:10px;
+                border-radius:10px;
+            "
+          >`
+          :
+          ""
+      }
+
+      <div class="meta">
+          ${hof.alpha.player}
+          (x${hof.alpha.value})
+      </div>
+
+  </div>
+    <div class="card">
+
+      <strong class="cono">
+          🍦 CONO
+      </strong>
+
+      ${
+          titleImages[
+              "CONO:" + hof.cono.player
+          ]
+          ?
+          `<img
+              src="${
+                  titleImages[
+                      "CONO:" + hof.cono.player
+                  ]
+              }"
+              style="
+                width:100%;
+                height:450px;
+                object-fit:cover;
+                margin-top:10px;
+                border-radius:10px;
+            "
+          >`
+          :
+          ""
+      }
+
+      <div class="meta">
+          ${hof.cono.player}
+          (x${hof.cono.value})
+      </div>
+
+  </div>
+      <div class="card">
+
+      <strong>
+          👑 MVP PROMEDIO
+      </strong>
+
+      ${
+          titleImages[
+              "MVP:" + hof.mvp.player
+          ]
+          ?
+          `<img
+              src="${
+                  titleImages[
+                      "MVP:" + hof.mvp.player
+                  ]
+              }"
+              style="
+                width:100%;
+                height:450px;
+                object-fit:cover;
+                margin-top:10px;
+                border-radius:10px;
+            "
+          >`
+          :
+          ""
+      }
+
+      <div class="meta">
+          ${hof.mvp.player}
+          (AVG ${hof.mvp.value})
+      </div>
+
+</div>
+  </div><h3>Títulos</h3>`;
+  hof.titles.forEach(group=>{
+    html+=`<div class="title-group"><strong>${group.player}</strong>`;
+    group.titles.forEach(t=>{html+=`<div>${t.emoji} ${t.title} (${t.value})</div>`;});
+    html+=`</div>`;
+  });
+  el.innerHTML=html;
+}
+
+function renderArchivedSplits(elementId,archive){
+  const el=document.getElementById(elementId);
+  if(!archive||!archive.splits||Object.keys(archive.splits).length===0){el.innerHTML="<p>No hay splits archivados.</p>";return;}
+  let html="";
+  Object.entries(archive.splits).forEach(([name,split])=>{
+    html+=`<div class="card"><strong>${name}</strong><div class="meta">Inicio: ${split.start} · Fin: ${split.end} · Partidas: ${split.matches}</div></div>`;
+  });
+  el.innerHTML=html;
+}
+loadDashboard();
+</script>
+</body>
+</html>
