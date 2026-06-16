@@ -229,6 +229,26 @@ td:nth-child(2){
     border-color:rgba(251,191,36,0.65);
     box-shadow:0 0 24px rgba(251,191,36,0.14);
 }
+
+.parallel-world{
+    text-align:center;
+    margin-top:10px;
+}
+
+.parallel-images{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:16px;
+}
+
+.parallel-images img{
+    width:100%;
+    aspect-ratio:2 / 3;
+    object-fit:cover;
+    border-radius:14px;
+    box-shadow:0 10px 24px rgba(0,0,0,0.35);
+}
+
 </style>
 </head>
 <body>
@@ -248,6 +268,16 @@ td:nth-child(2){
 <section><h2>⚔️ Split Actual</h2><div id="split-ranking"></div></section>
 <section><h2>🏛️ Hall of Fame Split Actual</h2><div id="split-hof"></div></section>
 <section><h2>🏁 Splits Archivados</h2><div id="archived-splits"></div></section>
+<section class="parallel-world">
+    <h2>🌌 EN UN MUNDO PARALELO...</h2>
+
+    <div class="parallel-images">
+        <img src="assets/Fipus_god.png">
+        <img src="assets/Fipus_alpha.png">
+        <img src="assets/Nabuegixi_cono.jpeg">
+        <img src="assets/Fipus_mvp.png">
+    </div>
+</section>
 </main>
 
 <script>
@@ -369,9 +399,21 @@ const titleImages = {
   
     "MVP:SworDanc3#LAS":
         "assets/SworDanc3_mvp.png",
-    
-    "GOD:SworDanc3#LAS":
-        "assets/SworDanc3_god.png",      
+        
+     "GOD:SworDanc3#LAS":
+        "assets/SworDanc3_god.png",
+
+    "ALPHA:Fipus#ACLRV":
+        "assets/Fipus_alpha.png",
+
+    "GOD:Fipus#ACLRV":
+        "assets/Fipus_god.png",
+  
+    "MVP:Fipus#ACLRV":
+        "assets/Fipus_mvp.png",
+        
+    "CONO:Nabuegixi#LAS":
+        "assets/Nabuegixi_cono.jpeg",
 };
 
 function renderHallOfFame(elementId,hof){
@@ -539,4 +581,4 @@ function renderArchivedSplits(elementId,archive){
 loadDashboard();
 </script>
 </body>
-</html>
+</html>   
