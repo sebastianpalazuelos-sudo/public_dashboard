@@ -16,43 +16,43 @@
                 "cono_count": 0
             },
             {
-                "name": "AmsterdamK#LAS",
-                "games": 36,
-                "total": 383,
-                "avg": 10.64,
-                "avg_dmg": 4.47,
-                "avg_kp": 3.39,
-                "avg_util": 2.78,
-                "avg_cc": 2.94,
-                "avg_tank": 2.58,
-                "god_count": 4,
-                "alpha_count": 3,
+                "name": "Nabuegixi#LAS",
+                "games": 24,
+                "total": 254,
+                "avg": 10.58,
+                "avg_dmg": 4.08,
+                "avg_kp": 3.67,
+                "avg_util": 2.83,
+                "avg_cc": 3.21,
+                "avg_tank": 2.33,
+                "god_count": 2,
+                "alpha_count": 2,
                 "cono_count": 1
             },
             {
-                "name": "Nabuegixi#LAS",
-                "games": 22,
-                "total": 228,
-                "avg": 10.36,
-                "avg_dmg": 3.82,
-                "avg_kp": 3.59,
-                "avg_util": 2.95,
-                "avg_cc": 3.36,
-                "avg_tank": 2.36,
-                "god_count": 2,
-                "alpha_count": 1,
-                "cono_count": 1
+                "name": "AmsterdamK#LAS",
+                "games": 38,
+                "total": 395,
+                "avg": 10.39,
+                "avg_dmg": 4.37,
+                "avg_kp": 3.29,
+                "avg_util": 2.74,
+                "avg_cc": 2.92,
+                "avg_tank": 2.55,
+                "god_count": 4,
+                "alpha_count": 3,
+                "cono_count": 2
             },
             {
                 "name": "matuque#0000",
-                "games": 25,
-                "total": 253,
-                "avg": 10.12,
-                "avg_dmg": 3.12,
-                "avg_kp": 3.56,
+                "games": 27,
+                "total": 276,
+                "avg": 10.22,
+                "avg_dmg": 3.11,
+                "avg_kp": 3.67,
                 "avg_util": 3.44,
-                "avg_cc": 3.08,
-                "avg_tank": 3.64,
+                "avg_cc": 3.11,
+                "avg_tank": 3.63,
                 "god_count": 4,
                 "alpha_count": 1,
                 "cono_count": 1
@@ -87,16 +87,16 @@
             },
             {
                 "name": "UN CONO#LAS",
-                "games": 23,
-                "total": 185,
-                "avg": 8.04,
-                "avg_dmg": 1.96,
-                "avg_kp": 3.17,
-                "avg_util": 2.91,
-                "avg_cc": 3.7,
-                "avg_tank": 2.7,
+                "games": 25,
+                "total": 208,
+                "avg": 8.32,
+                "avg_dmg": 2.0,
+                "avg_kp": 3.24,
+                "avg_util": 3.08,
+                "avg_cc": 3.8,
+                "avg_tank": 2.8,
                 "god_count": 0,
-                "alpha_count": 1,
+                "alpha_count": 2,
                 "cono_count": 1
             },
             {
@@ -153,21 +153,6 @@
                     ]
                 },
                 {
-                    "player": "AmsterdamK#LAS",
-                    "titles": [
-                        {
-                            "title": "Artillery",
-                            "emoji": "💥",
-                            "value": 4.47
-                        },
-                        {
-                            "title": "Suppressor",
-                            "emoji": "🔒",
-                            "value": 7.41
-                        }
-                    ]
-                },
-                {
                     "player": "Fipus#ACLRV",
                     "titles": [
                         {
@@ -183,22 +168,37 @@
                     ]
                 },
                 {
-                    "player": "Nabuegixi#LAS",
-                    "titles": [
-                        {
-                            "title": "Initiator",
-                            "emoji": "⚔️",
-                            "value": 6.95
-                        }
-                    ]
-                },
-                {
                     "player": "UN CONO#LAS",
                     "titles": [
                         {
                             "title": "Controller",
                             "emoji": "♟️",
-                            "value": 3.7
+                            "value": 3.8
+                        },
+                        {
+                            "title": "Initiator",
+                            "emoji": "⚔️",
+                            "value": 7.04
+                        }
+                    ]
+                },
+                {
+                    "player": "AmsterdamK#LAS",
+                    "titles": [
+                        {
+                            "title": "Artillery",
+                            "emoji": "💥",
+                            "value": 4.37
+                        }
+                    ]
+                },
+                {
+                    "player": "Nabuegixi#LAS",
+                    "titles": [
+                        {
+                            "title": "Suppressor",
+                            "emoji": "🔒",
+                            "value": 7.29
                         }
                     ]
                 },
@@ -208,7 +208,7 @@
                         {
                             "title": "Vanguard",
                             "emoji": "🗡️",
-                            "value": 7.2
+                            "value": 7.3
                         }
                     ]
                 }
@@ -233,17 +233,17 @@
             },
             {
                 "name": "AmsterdamK#LAS",
-                "games": 31,
-                "total": 327,
-                "avg": 10.55,
-                "avg_dmg": 4.32,
-                "avg_kp": 3.23,
-                "avg_util": 3.0,
-                "avg_cc": 3.1,
-                "avg_tank": 2.71,
+                "games": 33,
+                "total": 339,
+                "avg": 10.27,
+                "avg_dmg": 4.21,
+                "avg_kp": 3.12,
+                "avg_util": 2.94,
+                "avg_cc": 3.06,
+                "avg_tank": 2.67,
                 "god_count": 4,
                 "alpha_count": 1,
-                "cono_count": 1
+                "cono_count": 2
             },
             {
                 "name": "Nabuegixi#LAS",
@@ -261,14 +261,14 @@
             },
             {
                 "name": "matuque#0000",
-                "games": 15,
-                "total": 145,
-                "avg": 9.67,
-                "avg_dmg": 2.73,
-                "avg_kp": 3.53,
-                "avg_util": 3.4,
-                "avg_cc": 3.07,
-                "avg_tank": 3.6,
+                "games": 17,
+                "total": 168,
+                "avg": 9.88,
+                "avg_dmg": 2.76,
+                "avg_kp": 3.71,
+                "avg_util": 3.41,
+                "avg_cc": 3.12,
+                "avg_tank": 3.59,
                 "god_count": 2,
                 "alpha_count": 1,
                 "cono_count": 1
@@ -332,8 +332,8 @@
         ],
         "hall_of_fame": {
             "god": {
-                "player": "matuque#0000",
-                "value": 2
+                "player": "AmsterdamK#LAS",
+                "value": 4
             },
             "alpha": {
                 "player": "SworDanc3#LAS",
@@ -355,11 +355,6 @@
                             "title": "Artillery",
                             "emoji": "💥",
                             "value": 4.35
-                        },
-                        {
-                            "title": "Instigator",
-                            "emoji": "🔥",
-                            "value": 3.7
                         },
                         {
                             "title": "Playmaker",
@@ -404,22 +399,27 @@
                     ]
                 },
                 {
+                    "player": "matuque#0000",
+                    "titles": [
+                        {
+                            "title": "Instigator",
+                            "emoji": "🔥",
+                            "value": 3.71
+                        },
+                        {
+                            "title": "Vanguard",
+                            "emoji": "🗡️",
+                            "value": 7.3
+                        }
+                    ]
+                },
+                {
                     "player": "AmsterdamK#LAS",
                     "titles": [
                         {
                             "title": "Suppressor",
                             "emoji": "🔒",
-                            "value": 7.42
-                        }
-                    ]
-                },
-                {
-                    "player": "matuque#0000",
-                    "titles": [
-                        {
-                            "title": "Vanguard",
-                            "emoji": "🗡️",
-                            "value": 7.13
+                            "value": 7.27
                         }
                     ]
                 }
@@ -621,6 +621,6 @@
         }
     },
     "stats": {
-        "total_matches": 48
+        "total_matches": 52
     }
 }
