@@ -377,7 +377,7 @@ function renderSummary(data){
 function renderRanking(elementId,ranking){
   const el=document.getElementById(elementId);
   if(!ranking||ranking.length===0){el.innerHTML="<p>No hay datos.</p>";return;}
-  let html=`<table><thead><tr><th>#</th><th>Jugador</th><th>Games</th><th>Total</th><th>AVG</th><th>DMG</th><th>KP</th><th>UTIL</th><th>CC</th><th>TANK</th></tr></thead><tbody>`;
+  let html=`<table><thead><tr><th>#</th><th>Jugador</th><th>Games</th><th>Total</th><th>AVG</th><th>DMG</th><th>KP</th><th>UTIL</th><th>CC</th><th>DEF</th></tr></thead><tbody>`;
   ranking.forEach((r,i)=>{
 const rankClass = i < 3 ? `rank-${i+1}` : "";
 html+=`<tr class="${rankClass}">
