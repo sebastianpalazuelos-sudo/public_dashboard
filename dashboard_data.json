@@ -3,15 +3,15 @@
         "ranking": [
             {
                 "name": "SworDanc3#LAS",
-                "games": 29,
-                "total": 330,
-                "avg": 11.38,
-                "avg_dmg": 4.34,
-                "avg_kp": 3.86,
-                "avg_util": 3.17,
-                "avg_cc": 2.76,
-                "avg_tank": 3.14,
-                "god_count": 4,
+                "games": 31,
+                "total": 361,
+                "avg": 11.65,
+                "avg_dmg": 4.52,
+                "avg_kp": 3.87,
+                "avg_util": 3.26,
+                "avg_cc": 2.9,
+                "avg_tank": 3.16,
+                "god_count": 5,
                 "alpha_count": 4,
                 "cono_count": 0
             },
@@ -31,73 +31,73 @@
             },
             {
                 "name": "AmsterdamK#LAS",
-                "games": 39,
-                "total": 407,
-                "avg": 10.44,
-                "avg_dmg": 4.36,
-                "avg_kp": 3.28,
-                "avg_util": 2.79,
-                "avg_cc": 2.92,
-                "avg_tank": 2.62,
+                "games": 45,
+                "total": 473,
+                "avg": 10.51,
+                "avg_dmg": 4.42,
+                "avg_kp": 3.31,
+                "avg_util": 2.78,
+                "avg_cc": 2.84,
+                "avg_tank": 2.6,
                 "god_count": 4,
-                "alpha_count": 3,
+                "alpha_count": 4,
                 "cono_count": 2
             },
             {
                 "name": "matuque#0000",
-                "games": 28,
-                "total": 289,
-                "avg": 10.32,
-                "avg_dmg": 3.25,
-                "avg_kp": 3.68,
-                "avg_util": 3.39,
-                "avg_cc": 3.14,
-                "avg_tank": 3.54,
-                "god_count": 4,
-                "alpha_count": 1,
+                "games": 30,
+                "total": 314,
+                "avg": 10.47,
+                "avg_dmg": 3.23,
+                "avg_kp": 3.73,
+                "avg_util": 3.5,
+                "avg_cc": 3.27,
+                "avg_tank": 3.6,
+                "god_count": 5,
+                "alpha_count": 2,
                 "cono_count": 1
             },
             {
                 "name": "Einherjar#LAS",
-                "games": 6,
-                "total": 54,
-                "avg": 9.0,
-                "avg_dmg": 2.83,
+                "games": 12,
+                "total": 110,
+                "avg": 9.17,
+                "avg_dmg": 2.67,
                 "avg_kp": 3.5,
-                "avg_util": 2.67,
-                "avg_cc": 3.17,
-                "avg_tank": 2.67,
+                "avg_util": 3.0,
+                "avg_cc": 3.08,
+                "avg_tank": 3.17,
                 "god_count": 0,
                 "alpha_count": 0,
                 "cono_count": 0
             },
             {
                 "name": "L3blanc James#LAS",
-                "games": 35,
-                "total": 313,
-                "avg": 8.94,
-                "avg_dmg": 2.94,
-                "avg_kp": 2.71,
-                "avg_util": 3.29,
-                "avg_cc": 2.91,
-                "avg_tank": 3.57,
+                "games": 41,
+                "total": 365,
+                "avg": 8.9,
+                "avg_dmg": 2.88,
+                "avg_kp": 2.76,
+                "avg_util": 3.27,
+                "avg_cc": 3.0,
+                "avg_tank": 3.46,
                 "god_count": 2,
                 "alpha_count": 1,
-                "cono_count": 1
+                "cono_count": 2
             },
             {
                 "name": "UN CONO#LAS",
-                "games": 25,
-                "total": 208,
-                "avg": 8.32,
-                "avg_dmg": 2.0,
-                "avg_kp": 3.24,
-                "avg_util": 3.08,
-                "avg_cc": 3.8,
-                "avg_tank": 2.8,
+                "games": 27,
+                "total": 217,
+                "avg": 8.04,
+                "avg_dmg": 1.96,
+                "avg_kp": 3.07,
+                "avg_util": 3.0,
+                "avg_cc": 3.7,
+                "avg_tank": 2.81,
                 "god_count": 0,
                 "alpha_count": 2,
-                "cono_count": 1
+                "cono_count": 2
             },
             {
                 "name": "Fipus#ACLRV",
@@ -117,7 +117,7 @@
         "hall_of_fame": {
             "god": {
                 "player": "matuque#0000",
-                "value": 4
+                "value": 5
             },
             "alpha": {
                 "player": "SworDanc3#LAS",
@@ -129,26 +129,36 @@
             },
             "mvp": {
                 "player": "SworDanc3#LAS",
-                "value": 11.38
+                "value": 11.65
             },
             "titles": [
                 {
                     "player": "SworDanc3#LAS",
                     "titles": [
                         {
+                            "title": "Artillery",
+                            "emoji": "💥",
+                            "value": 4.52
+                        },
+                        {
                             "title": "Instigator",
                             "emoji": "🔥",
-                            "value": 3.86
+                            "value": 3.87
                         },
                         {
                             "title": "Playmaker",
                             "emoji": "🧠",
-                            "value": 8.2
+                            "value": 8.39
+                        },
+                        {
+                            "title": "Suppressor",
+                            "emoji": "🔒",
+                            "value": 7.42
                         },
                         {
                             "title": "Juggernaut",
                             "emoji": "🦏",
-                            "value": 7.48
+                            "value": 7.68
                         }
                     ]
                 },
@@ -168,47 +178,27 @@
                     ]
                 },
                 {
+                    "player": "matuque#0000",
+                    "titles": [
+                        {
+                            "title": "Initiator",
+                            "emoji": "⚔️",
+                            "value": 7.0
+                        },
+                        {
+                            "title": "Vanguard",
+                            "emoji": "🗡️",
+                            "value": 7.33
+                        }
+                    ]
+                },
+                {
                     "player": "UN CONO#LAS",
                     "titles": [
                         {
                             "title": "Controller",
                             "emoji": "♟️",
-                            "value": 3.8
-                        },
-                        {
-                            "title": "Initiator",
-                            "emoji": "⚔️",
-                            "value": 7.04
-                        }
-                    ]
-                },
-                {
-                    "player": "AmsterdamK#LAS",
-                    "titles": [
-                        {
-                            "title": "Artillery",
-                            "emoji": "💥",
-                            "value": 4.36
-                        }
-                    ]
-                },
-                {
-                    "player": "Nabuegixi#LAS",
-                    "titles": [
-                        {
-                            "title": "Suppressor",
-                            "emoji": "🔒",
-                            "value": 7.29
-                        }
-                    ]
-                },
-                {
-                    "player": "matuque#0000",
-                    "titles": [
-                        {
-                            "title": "Vanguard",
-                            "emoji": "🗡️",
-                            "value": 7.22
+                            "value": 3.7
                         }
                     ]
                 }
@@ -219,44 +209,44 @@
         "ranking": [
             {
                 "name": "SworDanc3#LAS",
-                "games": 23,
-                "total": 252,
-                "avg": 10.96,
-                "avg_dmg": 4.35,
-                "avg_kp": 3.7,
-                "avg_util": 2.91,
-                "avg_cc": 2.52,
-                "avg_tank": 2.96,
-                "god_count": 1,
+                "games": 25,
+                "total": 283,
+                "avg": 11.32,
+                "avg_dmg": 4.56,
+                "avg_kp": 3.72,
+                "avg_util": 3.04,
+                "avg_cc": 2.72,
+                "avg_tank": 3.0,
+                "god_count": 2,
                 "alpha_count": 3,
                 "cono_count": 0
             },
             {
                 "name": "AmsterdamK#LAS",
-                "games": 34,
-                "total": 351,
-                "avg": 10.32,
-                "avg_dmg": 4.21,
-                "avg_kp": 3.12,
-                "avg_util": 3.0,
-                "avg_cc": 3.06,
-                "avg_tank": 2.74,
+                "games": 40,
+                "total": 417,
+                "avg": 10.43,
+                "avg_dmg": 4.3,
+                "avg_kp": 3.17,
+                "avg_util": 2.95,
+                "avg_cc": 2.95,
+                "avg_tank": 2.7,
                 "god_count": 4,
-                "alpha_count": 1,
+                "alpha_count": 2,
                 "cono_count": 2
             },
             {
                 "name": "matuque#0000",
-                "games": 18,
-                "total": 181,
-                "avg": 10.06,
+                "games": 20,
+                "total": 206,
+                "avg": 10.3,
                 "avg_dmg": 3.0,
-                "avg_kp": 3.72,
-                "avg_util": 3.33,
-                "avg_cc": 3.17,
-                "avg_tank": 3.44,
-                "god_count": 2,
-                "alpha_count": 1,
+                "avg_kp": 3.8,
+                "avg_util": 3.5,
+                "avg_cc": 3.35,
+                "avg_tank": 3.55,
+                "god_count": 3,
+                "alpha_count": 2,
                 "cono_count": 1
             },
             {
@@ -274,46 +264,46 @@
                 "cono_count": 1
             },
             {
-                "name": "L3blanc James#LAS",
-                "games": 26,
-                "total": 234,
-                "avg": 9.0,
-                "avg_dmg": 3.04,
-                "avg_kp": 2.73,
-                "avg_util": 3.23,
-                "avg_cc": 2.85,
-                "avg_tank": 3.54,
-                "god_count": 2,
-                "alpha_count": 1,
-                "cono_count": 1
-            },
-            {
                 "name": "Einherjar#LAS",
-                "games": 5,
-                "total": 44,
-                "avg": 8.8,
-                "avg_dmg": 2.4,
-                "avg_kp": 3.4,
-                "avg_util": 3.0,
-                "avg_cc": 3.6,
-                "avg_tank": 3.0,
+                "games": 11,
+                "total": 100,
+                "avg": 9.09,
+                "avg_dmg": 2.45,
+                "avg_kp": 3.45,
+                "avg_util": 3.18,
+                "avg_cc": 3.27,
+                "avg_tank": 3.36,
                 "god_count": 0,
                 "alpha_count": 0,
                 "cono_count": 0
             },
             {
+                "name": "L3blanc James#LAS",
+                "games": 32,
+                "total": 286,
+                "avg": 8.94,
+                "avg_dmg": 2.94,
+                "avg_kp": 2.78,
+                "avg_util": 3.22,
+                "avg_cc": 2.97,
+                "avg_tank": 3.41,
+                "god_count": 2,
+                "alpha_count": 1,
+                "cono_count": 2
+            },
+            {
                 "name": "UN CONO#LAS",
-                "games": 16,
-                "total": 125,
-                "avg": 7.81,
-                "avg_dmg": 2.12,
-                "avg_kp": 2.88,
-                "avg_util": 2.81,
-                "avg_cc": 3.56,
-                "avg_tank": 2.69,
+                "games": 18,
+                "total": 134,
+                "avg": 7.44,
+                "avg_dmg": 2.06,
+                "avg_kp": 2.67,
+                "avg_util": 2.72,
+                "avg_cc": 3.44,
+                "avg_tank": 2.72,
                 "god_count": 0,
                 "alpha_count": 0,
-                "cono_count": 1
+                "cono_count": 2
             },
             {
                 "name": "Fipus#ACLRV",
@@ -332,8 +322,8 @@
         ],
         "hall_of_fame": {
             "god": {
-                "player": "AmsterdamK#LAS",
-                "value": 4
+                "player": "matuque#0000",
+                "value": 3
             },
             "alpha": {
                 "player": "SworDanc3#LAS",
@@ -345,7 +335,7 @@
             },
             "mvp": {
                 "player": "SworDanc3#LAS",
-                "value": 10.96
+                "value": 11.32
             },
             "titles": [
                 {
@@ -354,32 +344,42 @@
                         {
                             "title": "Artillery",
                             "emoji": "💥",
-                            "value": 4.35
+                            "value": 4.56
                         },
                         {
                             "title": "Playmaker",
                             "emoji": "🧠",
-                            "value": 8.05
+                            "value": 8.28
+                        },
+                        {
+                            "title": "Suppressor",
+                            "emoji": "🔒",
+                            "value": 7.28
                         },
                         {
                             "title": "Juggernaut",
                             "emoji": "🦏",
-                            "value": 7.31
+                            "value": 7.56
                         }
                     ]
                 },
                 {
-                    "player": "Einherjar#LAS",
+                    "player": "matuque#0000",
                     "titles": [
                         {
-                            "title": "Controller",
-                            "emoji": "♟️",
-                            "value": 3.6
+                            "title": "Instigator",
+                            "emoji": "🔥",
+                            "value": 3.8
                         },
                         {
                             "title": "Initiator",
                             "emoji": "⚔️",
-                            "value": 7.0
+                            "value": 7.15
+                        },
+                        {
+                            "title": "Vanguard",
+                            "emoji": "🗡️",
+                            "value": 7.35
                         }
                     ]
                 },
@@ -399,27 +399,12 @@
                     ]
                 },
                 {
-                    "player": "matuque#0000",
+                    "player": "UN CONO#LAS",
                     "titles": [
                         {
-                            "title": "Instigator",
-                            "emoji": "🔥",
-                            "value": 3.72
-                        },
-                        {
-                            "title": "Vanguard",
-                            "emoji": "🗡️",
-                            "value": 7.16
-                        }
-                    ]
-                },
-                {
-                    "player": "AmsterdamK#LAS",
-                    "titles": [
-                        {
-                            "title": "Suppressor",
-                            "emoji": "🔒",
-                            "value": 7.27
+                            "title": "Controller",
+                            "emoji": "♟️",
+                            "value": 3.44
                         }
                     ]
                 }
@@ -430,6 +415,6 @@
         "splits": {}
     },
     "stats": {
-        "total_matches": 53
+        "total_matches": 61
     }
 }
