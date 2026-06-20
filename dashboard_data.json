@@ -139,57 +139,32 @@
             },
             "titles": [
                 {
-                    "player": "SworDanc3#LAS",
+                    "player": "Fipus#ACLRV",
                     "titles": [
                         {
-                            "title": "Artillery",
-                            "emoji": "💥",
-                            "value": 3.94
-                        },
-                        {
-                            "title": "Instigator",
-                            "emoji": "🔥",
-                            "value": 3.89
-                        },
-                        {
-                            "title": "Playmaker",
-                            "emoji": "🧠",
-                            "value": 7.83
-                        },
-                        {
-                            "title": "Initiator",
-                            "emoji": "⚔️",
-                            "value": 6.92
-                        },
-                        {
-                            "title": "Suppressor",
-                            "emoji": "🔒",
-                            "value": 6.97
-                        },
-                        {
-                            "title": "Juggernaut",
-                            "emoji": "🦏",
-                            "value": 7.13
-                        },
-                        {
-                            "title": "Vanguard",
-                            "emoji": "🗡️",
-                            "value": 7.08
+                            "title": "Guardian",
+                            "emoji": "🛡️",
+                            "value": "56.7% (17/30)"
                         }
                     ]
                 },
                 {
-                    "player": "Fipus#ACLRV",
+                    "player": "Nabuegixi#LAS",
                     "titles": [
                         {
-                            "title": "Fortress",
-                            "emoji": "🏰",
-                            "value": 3.73
-                        },
+                            "title": "Playmaker",
+                            "emoji": "🧠",
+                            "value": "31.2% (10/32)"
+                        }
+                    ]
+                },
+                {
+                    "player": "SworDanc3#LAS",
+                    "titles": [
                         {
-                            "title": "Guardian",
-                            "emoji": "🛡️",
-                            "value": 6.93
+                            "title": "Playmaker",
+                            "emoji": "🧠",
+                            "value": "33.3% (12/36)"
                         }
                     ]
                 },
@@ -197,9 +172,9 @@
                     "player": "UN CONO#LAS",
                     "titles": [
                         {
-                            "title": "Controller",
-                            "emoji": "♟️",
-                            "value": 3.83
+                            "title": "Initiator",
+                            "emoji": "⚔️",
+                            "value": "31.4% (11/35)"
                         }
                     ]
                 }
@@ -346,52 +321,12 @@
             },
             "titles": [
                 {
-                    "player": "SworDanc3#LAS",
-                    "titles": [
-                        {
-                            "title": "Artillery",
-                            "emoji": "💥",
-                            "value": 4.0
-                        },
-                        {
-                            "title": "Instigator",
-                            "emoji": "🔥",
-                            "value": 3.77
-                        },
-                        {
-                            "title": "Playmaker",
-                            "emoji": "🧠",
-                            "value": 7.77
-                        },
-                        {
-                            "title": "Juggernaut",
-                            "emoji": "🦏",
-                            "value": 7.07
-                        }
-                    ]
-                },
-                {
                     "player": "Fipus#ACLRV",
                     "titles": [
                         {
-                            "title": "Fortress",
-                            "emoji": "🏰",
-                            "value": 3.86
-                        },
-                        {
                             "title": "Guardian",
                             "emoji": "🛡️",
-                            "value": 7.15
-                        }
-                    ]
-                },
-                {
-                    "player": "AmsterdamK#LAS",
-                    "titles": [
-                        {
-                            "title": "Suppressor",
-                            "emoji": "🔒",
-                            "value": 6.93
+                            "value": "42.9% (9/21)"
                         }
                     ]
                 },
@@ -399,29 +334,19 @@
                     "player": "Nabuegixi#LAS",
                     "titles": [
                         {
-                            "title": "Initiator",
-                            "emoji": "⚔️",
-                            "value": 6.81
+                            "title": "Playmaker",
+                            "emoji": "🧠",
+                            "value": "33.3% (7/21)"
                         }
                     ]
                 },
                 {
-                    "player": "UN CONO#LAS",
+                    "player": "SworDanc3#LAS",
                     "titles": [
                         {
-                            "title": "Controller",
-                            "emoji": "♟️",
-                            "value": 3.69
-                        }
-                    ]
-                },
-                {
-                    "player": "matuque#0000",
-                    "titles": [
-                        {
-                            "title": "Vanguard",
-                            "emoji": "🗡️",
-                            "value": 7.0
+                            "title": "Playmaker",
+                            "emoji": "🧠",
+                            "value": "40.0% (12/30)"
                         }
                     ]
                 }
