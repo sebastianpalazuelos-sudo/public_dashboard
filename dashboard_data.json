@@ -117,15 +117,21 @@
         "hall_of_fame": {
             "god": {
                 "player": "SworDanc3#LAS",
-                "value": 7
+                "value": 7,
+                "games": 36,
+                "rate": 19.4
             },
             "alpha": {
                 "player": "AmsterdamK#LAS",
-                "value": 9
+                "value": 9,
+                "games": 67,
+                "rate": 13.4
             },
             "cono": {
                 "player": "Fipus#ACLRV",
-                "value": 16
+                "value": 16,
+                "games": 30,
+                "rate": 53.3
             },
             "mvp": {
                 "player": "SworDanc3#LAS",
@@ -318,15 +324,21 @@
         "hall_of_fame": {
             "god": {
                 "player": "SworDanc3#LAS",
-                "value": 4
+                "value": 4,
+                "games": 30,
+                "rate": 13.3
             },
             "alpha": {
                 "player": "AmsterdamK#LAS",
-                "value": 7
+                "value": 7,
+                "games": 62,
+                "rate": 11.3
             },
             "cono": {
                 "player": "Fipus#ACLRV",
-                "value": 9
+                "value": 9,
+                "games": 21,
+                "rate": 42.9
             },
             "mvp": {
                 "player": "SworDanc3#LAS",

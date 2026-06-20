@@ -385,9 +385,9 @@ html+=`<tr class="${rankClass}">
 <td>
 ${r.name}
 <br>
-😈${r.god_count}
-🏅${r.alpha_count}
-🍦${r.cono_count}
+😈${r.god_count} (${r.god_count}/${r.games})
+🏅${r.alpha_count} (${r.alpha_count}/${r.games})
+🍦${r.cono_count} (${r.cono_count}/${r.games})
 </td>
 <td>${r.games}</td>
 <td>${r.total}</td>
@@ -470,8 +470,8 @@ function renderHallOfFame(elementId,hof){
       }
 
       <div class="meta">
-          ${hof.god.player}
-          (x${hof.god.value})
+        ${hof.god.player}
+        ${hof.god.rate}% (${hof.god.value}/${hof.god.games})
       </div>
 
 </div>
@@ -506,7 +506,7 @@ function renderHallOfFame(elementId,hof){
 
       <div class="meta">
           ${hof.alpha.player}
-          (x${hof.alpha.value})
+          ${hof.alpha.rate}% (${hof.alpha.value}/${hof.alpha.games})
       </div>
 
   </div>
@@ -541,7 +541,7 @@ function renderHallOfFame(elementId,hof){
 
       <div class="meta">
           ${hof.cono.player}
-          (x${hof.cono.value})
+          ${hof.cono.rate}% (${hof.cono.value}/${hof.cono.games})
       </div>
 
   </div>
