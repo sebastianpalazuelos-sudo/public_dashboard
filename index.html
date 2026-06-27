@@ -257,7 +257,7 @@ td:nth-child(2){
 <p>Histórico · Hall of Fame · Split Actual</p>
 </header>
 
-<<main>
+<main>
 <section>
   <h2>📊 Resumen General</h2>
   <div id="dashboard-summary"></div>
@@ -580,12 +580,7 @@ function renderHallOfFame(elementId,hof){
       </div>
 
 </div>
-  </div><h3>Títulos</h3>`;
-  hof.titles.forEach(group=>{
-    html+=`<div class="title-group"><strong>${group.player}</strong>`;
-    group.titles.forEach(t=>{html+=`<div>${t.emoji} ${t.title} (${t.value})</div>`;});
-    html+=`</div>`;
-  });
+  </div>`;
   el.innerHTML=html;
 }
 
