@@ -140,20 +140,6 @@
                 "global_cono_count": 0
             },
             {
-                "name": "Einherjar#LAS",
-                "games": 1,
-                "global_total": 19.5,
-                "global_avg": 19.5,
-                "global_avg_dmg": 3.0,
-                "global_avg_kp": 7.0,
-                "global_avg_util": 9.5,
-                "global_avg_cc": 9.0,
-                "global_avg_tank": 10.0,
-                "global_god_count": 0,
-                "global_alpha_count": 0,
-                "global_cono_count": 0
-            },
-            {
                 "name": "AmsterdamK#LAS",
                 "games": 43,
                 "global_total": 814.5,
@@ -380,20 +366,6 @@
                 "global_cono_count": 0
             },
             {
-                "name": "Einherjar#LAS",
-                "games": 1,
-                "global_total": 19.5,
-                "global_avg": 19.5,
-                "global_avg_dmg": 3.0,
-                "global_avg_kp": 7.0,
-                "global_avg_util": 9.5,
-                "global_avg_cc": 9.0,
-                "global_avg_tank": 10.0,
-                "global_god_count": 0,
-                "global_alpha_count": 0,
-                "global_cono_count": 0
-            },
-            {
                 "name": "AmsterdamK#LAS",
                 "games": 43,
                 "global_total": 814.5,
@@ -496,20 +468,6 @@
                 "global_cono_count": 0
             },
             {
-                "name": "Einherjar#LAS",
-                "games": 1,
-                "global_total": 19.5,
-                "global_avg": 19.5,
-                "global_avg_dmg": 3.0,
-                "global_avg_kp": 7.0,
-                "global_avg_util": 9.5,
-                "global_avg_cc": 9.0,
-                "global_avg_tank": 10.0,
-                "global_god_count": 0,
-                "global_alpha_count": 0,
-                "global_cono_count": 0
-            },
-            {
                 "name": "AmsterdamK#LAS",
                 "games": 43,
                 "global_total": 814.5,
@@ -607,20 +565,6 @@
                 "global_avg_tank": 6.13,
                 "global_god_count": 3,
                 "global_alpha_count": 6,
-                "global_cono_count": 0
-            },
-            {
-                "name": "Einherjar#LAS",
-                "games": 1,
-                "global_total": 19.5,
-                "global_avg": 19.5,
-                "global_avg_dmg": 3.0,
-                "global_avg_kp": 7.0,
-                "global_avg_util": 9.5,
-                "global_avg_cc": 9.0,
-                "global_avg_tank": 10.0,
-                "global_god_count": 0,
-                "global_alpha_count": 0,
                 "global_cono_count": 0
             },
             {
