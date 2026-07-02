@@ -23,7 +23,6 @@ async function loadDashboard(){
     const data=await response.json();
     dashboardData = data;
     renderGlobalRanking("home-global-split-ranking", data.current_split.global_ranking);
-    renderRanking("home-friend-split-ranking", data.current_split.ranking);
 
     loadPlayersSelect();
     loadChampionsSelect();
@@ -138,18 +137,31 @@ function renderChampionPlayerTable(championProfile){
 
         <table>
             <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Player</th>
-                    <th>Games</th>
-                    <th class="score-stat">Score</th>
-                    <th>DMG</th>
-                    <th>KP</th>
-                    <th>UTIL</th>
-                    <th class="secondary-stat">CC</th>
-                    <th class="secondary-stat">TANK</th>
-                </tr>
-            </thead>
+        <tr>
+            <th rowspan="2">#</th>
+            <th rowspan="2">Player</th>
+            <th rowspan="2">Games</th>
+            <th rowspan="2" class="score-stat">Score</th>
+
+            <th class="metric-group" colspan="2">DMG</th>
+
+            <th rowspan="2">KP</th>
+            <th rowspan="2">UTIL</th>
+
+            <th class="metric-group secondary-stat" colspan="2">CC</th>
+            <th class="metric-group secondary-stat" colspan="2">TANK</th>
+        </tr>
+        <tr>
+            <th class="metric-block-left">DMG</th>
+            <th class="metric-block-right metric-share">Share</th>
+
+            <th class="metric-block-left secondary-stat">CC</th>
+            <th class="metric-block-right secondary-stat">Share</th>
+
+            <th class="metric-block-left secondary-stat">TANK</th>
+            <th class="metric-block-right secondary-stat">Share</th>
+        </tr>
+    </thead>
             <tbody>
     `;
 
@@ -169,10 +181,13 @@ function renderChampionPlayerTable(championProfile){
                     <td>${player.global_games}</td>
                     <td class="score-stat">${player.global_avg}</td>
                     <td>${player.global_avg_dmg}</td>
+                    <td>${player.avg_dmg_share.toFixed(1)}%</td>
                     <td>${player.global_avg_kp}</td>
                     <td>${player.global_avg_util}</td>
                     <td class="secondary-stat">${player.global_avg_cc}</td>
+                    <td class="secondary-stat">${player.avg_cc_share.toFixed(1)}%</td>
                     <td class="secondary-stat">${player.global_avg_tank}</td>
+                    <td class="secondary-stat">${player.avg_tank_share.toFixed(1)}%</td>
                 </tr>
             `;
         });
@@ -180,66 +195,9 @@ function renderChampionPlayerTable(championProfile){
     html += `
             </tbody>
         </table>
-
-        <h3>Friend Team Only Ranking</h3>
-        <div id="champions-friend-table"></div>
 `;
 
     document.getElementById("champions-player-table").innerHTML = html;
-    renderChampionFriendTable(championProfile);
-
-}
-
-function renderChampionFriendTable(championProfile){
-
-    let html = `
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Player</th>
-                    <th>Games</th>
-                    <th class="score-stat">Score</th>
-                    <th>DMG</th>
-                    <th>KP</th>
-                    <th>UTIL</th>
-                    <th class="secondary-stat">CC</th>
-                    <th class="secondary-stat">TANK</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
-
-    championProfile
-        .sort((a, b) => b.avg - a.avg)
-        .forEach((player, index) => {
-            html += `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td>
-                        ${player.name}
-                        <br>
-                        😈${player.god ?? 0}
-                        🏅${player.alpha ?? 0}
-                        🍦${player.cono ?? 0}
-                    </td>
-                    <td>${player.games}</td>
-                    <td class="score-stat">${player.avg}</td>
-                    <td>${player.avg_dmg}</td>
-                    <td>${player.avg_kp}</td>
-                    <td>${player.avg_util}</td>
-                    <td class="secondary-stat">${player.avg_cc}</td>
-                    <td class="secondary-stat">${player.avg_tank}</td>
-                </tr>
-            `;
-        });
-
-    html += `
-            </tbody>
-        </table>
-    `;
-
-    document.getElementById("champions-friend-table").innerHTML = html;
 
 }
 
