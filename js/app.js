@@ -301,8 +301,7 @@ function renderPlayerChampionTable(playerProfile){
                     <th>#</th>
                     <th>Champion</th>
                     <th>Games</th>
-                    <th>Friend Team AVG</th>
-                    <th>All Match Players AVG</th>
+                    <th>Score</th>
                 </tr>
             </thead>
             <tbody>
@@ -314,11 +313,6 @@ function renderPlayerChampionTable(playerProfile){
                 <td>${index + 1}</td>
                 <td>${champion.champion}</td>
                 <td>${champion.games}</td>
-                <td>
-                    <strong>${champion.avg}</strong>
-                    (${champion.god ?? 0}😈 ${champion.alpha ?? 0}🏅 ${champion.cono ?? 0}🍦)
-                </td>
-
                 <td>
                     <strong>${champion.global_avg}</strong>
                     (${champion.global_god ?? 0}😈 ${champion.global_alpha ?? 0}🏅 ${champion.global_cono ?? 0}🍦)
@@ -359,26 +353,9 @@ function renderPlayerChampionDetail(champion){
         <h3>${champion.champion}</h3>
 
         <div class="summary-cards">
-
             <div class="summary-card">
                 <div class="summary-label">
-                    Friend Team Only AVG
-                </div>
-                <div class="summary-value">
-                    ${champion.avg}
-                </div>
-                <div class="meta">
-                    DMG ${champion.avg_dmg} · KP ${champion.avg_kp} · UTIL ${champion.avg_util}
-                    <br>
-                    CC ${champion.avg_cc} · TANK ${champion.avg_tank}
-                    <br>
-                    😈${champion.god ?? 0} 🏅${champion.alpha ?? 0} 🍦${champion.cono ?? 0}
-                </div>
-            </div>
-
-            <div class="summary-card">
-                <div class="summary-label">
-                    All Match Players AVG
+                    Score
                 </div>
                 <div class="summary-value">
                     ${champion.global_avg}
