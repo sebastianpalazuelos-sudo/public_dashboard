@@ -251,7 +251,7 @@ function renderPlayerProfile(playerName){
 
                 <div class="summary-card">
                     <div class="summary-label">
-                        Score
+                        Avg Score
                     </div>
                     <div class="summary-value">
                         ${allMatchAvg}
