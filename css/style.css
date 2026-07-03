@@ -247,3 +247,32 @@ table td {
 .metric-share {
     text-align: center;
 }
+
+.contribution-table-card {
+    min-width: 420px;
+}
+
+.contribution-mini-table {
+    margin-top: 12px;
+    width: 100%;
+}
+
+.contribution-mini-table th,
+.contribution-mini-table td {
+    padding: 8px 10px;
+    text-align: center;
+}
+
+.contribution-mini-table td:first-child {
+    color: #f9fafb;
+    font-weight: normal;
+}
+
+.player-champion-score-card .summary-value {
+    font-size: 44px;
+}
+
+.player-champion-score-card .meta {
+    font-size: 20px;
+    margin-top: 12px;
+}

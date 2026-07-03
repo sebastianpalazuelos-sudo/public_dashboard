@@ -133,35 +133,33 @@ function renderChampionProfile(championName){
 function renderChampionPlayerTable(championProfile){
 
     let html = `
-        <h3>All Match Players Ranking</h3>
+        <h3>Champion Ranking</h3>
 
         <table>
-            <thead>
-        <tr>
-            <th rowspan="2">#</th>
-            <th rowspan="2">Player</th>
-            <th rowspan="2">Games</th>
-            <th rowspan="2" class="score-stat">Score</th>
+        <thead>
+            <tr>
+                <th rowspan="2">#</th>
+                <th rowspan="2">Player</th>
+                <th rowspan="2">Games</th>
+                <th rowspan="2" class="score-stat">Score</th>
 
-            <th class="metric-group" colspan="2">DMG</th>
+                <th rowspan="2">KP</th>
+                <th class="metric-group" colspan="2">DMG</th>
+                <th rowspan="2">UTIL</th>
+                <th class="metric-group secondary-stat" colspan="2">CC</th>
+                <th class="metric-group secondary-stat" colspan="2">TANK</th>
+            </tr>
+            <tr>
+                <th class="metric-block-left">DMG</th>
+                <th class="metric-block-right metric-share">Share</th>
 
-            <th rowspan="2">KP</th>
-            <th rowspan="2">UTIL</th>
+                <th class="metric-block-left secondary-stat">CC</th>
+                <th class="metric-block-right secondary-stat">Share</th>
 
-            <th class="metric-group secondary-stat" colspan="2">CC</th>
-            <th class="metric-group secondary-stat" colspan="2">TANK</th>
-        </tr>
-        <tr>
-            <th class="metric-block-left">DMG</th>
-            <th class="metric-block-right metric-share">Share</th>
-
-            <th class="metric-block-left secondary-stat">CC</th>
-            <th class="metric-block-right secondary-stat">Share</th>
-
-            <th class="metric-block-left secondary-stat">TANK</th>
-            <th class="metric-block-right secondary-stat">Share</th>
-        </tr>
-    </thead>
+                <th class="metric-block-left secondary-stat">TANK</th>
+                <th class="metric-block-right secondary-stat">Share</th>
+            </tr>
+        </thead>
             <tbody>
     `;
 
@@ -180,15 +178,19 @@ function renderChampionPlayerTable(championProfile){
                     </td>
                     <td>${player.global_games}</td>
                     <td class="score-stat">${player.global_avg}</td>
-                    <td>${player.global_avg_dmg}</td>
-                    <td>${player.avg_dmg_share.toFixed(1)}%</td>
                     <td>${player.global_avg_kp}</td>
+
+                    <td class="metric-block-left">${player.global_avg_dmg}</td>
+                    <td class="metric-block-right">${player.avg_dmg_share.toFixed(1)}%</td>
+
                     <td>${player.global_avg_util}</td>
-                    <td class="secondary-stat">${player.global_avg_cc}</td>
-                    <td class="secondary-stat">${player.avg_cc_share.toFixed(1)}%</td>
-                    <td class="secondary-stat">${player.global_avg_tank}</td>
-                    <td class="secondary-stat">${player.avg_tank_share.toFixed(1)}%</td>
-                </tr>
+
+                    <td class="metric-block-left secondary-stat">${player.global_avg_cc}</td>
+                    <td class="metric-block-right secondary-stat">${player.avg_cc_share.toFixed(1)}%</td>
+
+                    <td class="metric-block-left secondary-stat">${player.global_avg_tank}</td>
+                    <td class="metric-block-right secondary-stat">${player.avg_tank_share.toFixed(1)}%</td>
+                    </tr>
             `;
         });
 
@@ -216,16 +218,6 @@ function renderPlayerProfile(playerName){
             (a, b) => b.global_avg - a.global_avg
         );
 
-    const friendGames =
-        champions.reduce((sum, champion) => sum + champion.games, 0);
-
-    const friendTotal =
-        champions.reduce((sum, champion) => sum + champion.total, 0);
-
-    const friendAvg =
-        friendGames > 0
-            ? (friendTotal / friendGames).toFixed(2)
-            : "0.00";
     const allMatchGames =
         champions.reduce((sum, champion) => sum + champion.global_games, 0);
 
@@ -259,16 +251,7 @@ function renderPlayerProfile(playerName){
 
                 <div class="summary-card">
                     <div class="summary-label">
-                        Friend Team Only Avg
-                    </div>
-                    <div class="summary-value">
-                        ${friendAvg}
-                    </div>
-                </div>
-
-                <div class="summary-card">
-                    <div class="summary-label">
-                        All Match Players Avg
+                        Score
                     </div>
                     <div class="summary-value">
                         ${allMatchAvg}
@@ -353,7 +336,7 @@ function renderPlayerChampionDetail(champion){
         <h3>${champion.champion}</h3>
 
         <div class="summary-cards">
-            <div class="summary-card">
+            <div class="summary-card player-champion-score-card">
                 <div class="summary-label">
                     Score
                 </div>
@@ -361,16 +344,59 @@ function renderPlayerChampionDetail(champion){
                     ${champion.global_avg}
                 </div>
                 <div class="meta">
-                    DMG ${champion.global_avg_dmg} · KP ${champion.global_avg_kp} · UTIL ${champion.global_avg_util}
-                    <br>
-                    CC ${champion.global_avg_cc} · TANK ${champion.global_avg_tank}
-                    <br>
                     😈${champion.global_god ?? 0} 🏅${champion.global_alpha ?? 0} 🍦${champion.global_cono ?? 0}
                 </div>
-            </div>
+                       </div>
 
-        </div>
-    `;
+                        <div class="summary-card contribution-table-card">
+                                <div class="summary-label">
+                                    Breakdown
+                                </div>
+
+                                <table class="contribution-mini-table">
+                                    <thead>
+                                        <tr>
+                                            <th rowspan="2">KP</th>
+                                            <th class="metric-group" colspan="2">DMG</th>
+                                            <th rowspan="2">UTIL</th>
+                                            <th class="metric-group secondary-stat" colspan="2">CC</th>
+                                            <th class="metric-group secondary-stat" colspan="2">TANK</th>
+                                        </tr>
+                                        <tr>
+                                            <th class="metric-block-left">DMG</th>
+                                            <th class="metric-block-right metric-share">Share</th>
+
+                                            <th class="metric-block-left secondary-stat">CC</th>
+                                            <th class="metric-block-right secondary-stat">Share</th>
+
+                                            <th class="metric-block-left secondary-stat">TANK</th>
+                                            <th class="metric-block-right secondary-stat">Share</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>${champion.global_avg_kp}</td>
+
+                                            <td class="metric-block-left">${champion.global_avg_dmg}</td>
+                                            <td class="metric-block-right">${champion.avg_dmg_share.toFixed(1)}%</td>
+
+                                            <td>${champion.global_avg_util}</td>
+
+                                            <td class="metric-block-left secondary-stat">${champion.global_avg_cc}</td>
+                                            <td class="metric-block-right secondary-stat">${champion.avg_cc_share.toFixed(1)}%</td>
+
+                                            <td class="metric-block-left secondary-stat">${champion.global_avg_tank}</td>
+                                            <td class="metric-block-right secondary-stat">${champion.avg_tank_share.toFixed(1)}%</td>
+                                        </tr>
+                                    </tbody>
+                                    </table>
+                            </div>
+                            </div>
+                        
+                        </div>
+
+                    </div>
+                `;
 
 }
 
