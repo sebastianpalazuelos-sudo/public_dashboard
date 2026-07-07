@@ -2,6 +2,7 @@ const views = {
     home: document.getElementById("view-home"),
     players: document.getElementById("view-players"),
     champions: document.getElementById("view-champions"),
+    matches: document.getElementById("view-matches"),
     splits: document.getElementById("view-splits"),
 };
 
@@ -28,6 +29,7 @@ async function loadDashboard(){
     loadChampionsSelect();
     loadChampionRepresentativeSelect();
     loadChampionTendenciesSelect();
+    loadMatchExplorerSelect();
 
     document.getElementById("current-split-matches").textContent =
         `${data.current_split.match_count} Matches Played`; 
@@ -692,6 +694,139 @@ function renderGlobalRanking(elementId, ranking){
   `;
 
   el.innerHTML = html;
+}
+
+function loadMatchExplorerSelect(){
+
+    const select =
+        document.getElementById("match-select");
+
+    dashboardData.match_explorer.forEach(match => {
+
+        select.innerHTML += `
+            <option value="${match.match_id}">
+                ${match.match_id}
+            </option>
+        `;
+
+    });
+
+    select.addEventListener("change", () => {
+
+        renderMatchExplorer(select.value);
+
+    });
+
+}
+
+
+function renderMatchExplorer(matchId){
+
+    const match =
+        dashboardData
+            .match_explorer
+            .find(m => m.match_id == matchId);
+
+    if(!match){
+
+        document.getElementById("match-results").innerHTML = "";
+
+        return;
+
+    }
+
+    let html = `
+
+    <h3>${match.match_id}</h3>
+
+    <table>
+
+    <thead>
+
+    <tr>
+
+    <th>Player</th>
+    <th>Champion</th>
+    <th>Titles</th>
+
+    <th>Score</th>
+
+    <th>Kill%</th>
+
+    <th>KP</th>
+
+    <th>KP%</th>
+
+    <th>DMG</th>
+    <th>DMG%</th>
+
+    <th>UTIL</th>
+
+    <th>CC</th>
+    <th>CC%</th>
+
+    <th>TANK</th>
+    <th>TANK%</th>
+
+    </tr>
+
+    </thead>
+
+    <tbody>
+
+    `;
+
+    match.players.forEach(player => {
+
+        html += `
+
+        <tr>
+
+        <td>${player.name}</td>
+
+        <td>${player.champion}</td>
+
+        <td>${player.titles.join(" ")}</td>
+
+        <td class="score-stat">${player.score}</td>
+
+        <td>${player.kill_pct}%</td>
+
+        <td>${player.kp_score}</td>
+
+        <td>${player.kp_pct}%</td>
+
+        <td>${player.dmg_score}</td>
+
+        <td>${player.dmg_share}%</td>
+
+        <td>${player.utility_score}</td>
+
+        <td>${player.cc_score}</td>
+
+        <td>${player.cc_share}%</td>
+
+        <td>${player.tank_score}</td>
+
+        <td>${player.tank_share}%</td>
+
+        </tr>
+
+        `;
+
+    });
+
+    html += `
+
+    </tbody>
+
+    </table>
+
+    `;
+
+    document.getElementById("match-results").innerHTML =
+        html;
+
 }
 
 loadDashboard();
