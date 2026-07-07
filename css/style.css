@@ -227,6 +227,12 @@ td.score-stat{
     text-align:center;
 }
 
+th.specialization-stat,
+td.specialization-stat{
+    color:#fbbf24;
+    font-weight:700;
+}
+
 table th,
 table td {
     white-space: nowrap;

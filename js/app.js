@@ -26,6 +26,8 @@ async function loadDashboard(){
 
     loadPlayersSelect();
     loadChampionsSelect();
+    loadChampionRepresentativeSelect();
+    loadChampionTendenciesSelect();
 
     document.getElementById("current-split-matches").textContent =
         `${data.current_split.match_count} Matches Played`; 
@@ -96,6 +98,212 @@ function loadChampionsSelect(){
         renderChampionProfile(championName);
     });
 
+}
+
+function loadChampionRepresentativeSelect(){
+
+    const metricSelect =
+        document.getElementById("champion-representative-metric-select");
+
+    if(!metricSelect){
+        return;
+    }
+
+    metricSelect.addEventListener("change", () => {
+        const metricName = metricSelect.value;
+
+        renderChampionRepresentatives(metricName);
+    });
+
+}
+
+
+function renderChampionRepresentatives(metricName){
+
+    const el =
+        document.getElementById("champion-representative-results");
+
+    if(!metricName){
+        el.innerHTML = "";
+        return;
+    }
+
+    const representatives =
+        dashboardData
+            .champion_engine
+            .champion_functional_representatives;
+
+    const rows = [];
+
+    Object.keys(representatives).forEach(championName => {
+
+        const representative =
+            representatives[championName][metricName];
+
+        if(!representative){
+            return;
+        }
+
+        rows.push({
+            champion: championName,
+            ...representative
+        });
+
+    });
+
+    rows.sort(
+        (a, b) => b.selected_metric - a.selected_metric
+    );
+
+    if(rows.length === 0){
+        el.innerHTML = "<p>No hay datos suficientes.</p>";
+        return;
+    }
+
+    let html = `
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Champion</th>
+                    <th>Player</th>
+                    <th>Games</th>
+                    <th>Score</th>
+                    <th class="${metricName === "kp" ? "specialization-stat" : ""}">KP%</th>
+                    <th class="${metricName === "kill" ? "specialization-stat" : ""}">Kill%</th>
+                    <th class="${metricName === "dmg_share" ? "specialization-stat" : ""}">Damage</th>
+                    <th class="${metricName === "cc_share" ? "specialization-stat" : ""}">Control</th>
+                    <th class="${metricName === "tank_share" ? "specialization-stat" : ""}">Tank</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    rows.forEach((r, index) => {
+
+        html += `
+            <tr>
+                <td>${index + 1}</td>
+                <td>${r.champion}</td>
+                <td>${r.name}</td>
+                <td>${r.games}</td>
+                <td>${r.score}</td>
+                <td class="${metricName === "kp" ? "specialization-stat" : ""}">${r.kp.toFixed(1)}%</td>
+                <td class="${metricName === "kill" ? "specialization-stat" : ""}">${r.kill.toFixed(1)}%</td>
+                <td class="${metricName === "dmg_share" ? "specialization-stat" : ""}">${r.dmg_share.toFixed(1)}%</td>
+                <td class="${metricName === "cc_share" ? "specialization-stat" : ""}">${r.cc_share.toFixed(1)}%</td>
+                <td class="${metricName === "tank_share" ? "specialization-stat" : ""}">${r.tank_share.toFixed(1)}%</td>
+            </tr>
+        `;
+
+    });
+
+        html += `
+            </tbody>
+        </table>
+    `;
+
+    el.innerHTML = html;
+}
+
+function loadChampionTendenciesSelect(){
+
+    const metricSelect =
+        document.getElementById("champion-tendencies-metric-select");
+
+    if(!metricSelect){
+        return;
+    }
+
+    metricSelect.addEventListener("change", () => {
+        const metricName = metricSelect.value;
+
+        renderChampionTendencies(metricName);
+    });
+
+}
+
+
+function renderChampionTendencies(metricName){
+
+    const el =
+        document.getElementById("champion-tendencies-results");
+
+    if(!metricName){
+        el.innerHTML = "";
+        return;
+    }
+
+    const tendencies =
+        dashboardData
+            .champion_engine    
+            .champion_tendencies;
+
+    const rows = [];
+
+    Object.keys(tendencies).forEach(championName => {
+
+        const tendency =
+            tendencies[championName];
+
+        rows.push({
+            champion: championName,
+            ...tendency
+        });
+
+    });
+
+    rows.sort(
+        (a, b) => b[metricName] - a[metricName]
+    );
+
+    if(rows.length === 0){
+        el.innerHTML = "<p>No hay datos suficientes.</p>";
+        return;
+    }
+
+    let html = `
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Champion</th>
+                    <th>Players</th>
+                    <th>Score</th>
+                    <th class="${metricName === "kp" ? "specialization-stat" : ""}">KP%</th>
+                    <th class="${metricName === "kill" ? "specialization-stat" : ""}">Kill%</th>
+                    <th class="${metricName === "dmg_share" ? "specialization-stat" : ""}">Damage</th>
+                    <th class="${metricName === "cc_share" ? "specialization-stat" : ""}">Control</th>
+                    <th class="${metricName === "tank_share" ? "specialization-stat" : ""}">Tank</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    rows.forEach((r, index) => {
+
+        html += `
+            <tr>
+                <td>${index + 1}</td>
+                <td>${r.champion}</td>
+                <td>${r.players}</td>
+                <td>${r.score}</td>
+                <td class="${metricName === "kp" ? "specialization-stat" : ""}">${r.kp.toFixed(1)}%</td>
+                <td class="${metricName === "kill" ? "specialization-stat" : ""}">${r.kill.toFixed(1)}%</td>
+                <td class="${metricName === "dmg_share" ? "specialization-stat" : ""}">${r.dmg_share.toFixed(1)}%</td>
+                <td class="${metricName === "cc_share" ? "specialization-stat" : ""}">${r.cc_share.toFixed(1)}%</td>
+                <td class="${metricName === "tank_share" ? "specialization-stat" : ""}">${r.tank_share.toFixed(1)}%</td>
+            </tr>
+        `;
+
+    });
+
+    html += `
+            </tbody>
+        </table>
+    `;
+
+    el.innerHTML = html;
 }
 
 function renderChampionProfile(championName){

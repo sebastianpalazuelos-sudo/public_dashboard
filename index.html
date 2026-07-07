@@ -31,23 +31,54 @@
   <h2>👥 Players</h2>
 
   <select id="players-player-select">
-    <option value="">Seleccionar jugador...</option>
+    <option value="">Select Player...</option>
   </select>
 
   <div id="players-player-results"></div>
 </section>
 
 </div>
+
 <div id="view-champions" class="app-view">
 
 <section>
   <h2>⚔️ Champions</h2>
 
   <select id="champions-champion-select">
-    <option value="">Seleccionar campeón...</option>
+    <option value="">Select Champion..</option>
   </select>
 
   <div id="champions-champion-results"></div>
+
+  <hr>
+
+  <h3> Champion Specialization </h3>
+
+  <select id="champion-representative-metric-select">
+    <option value="">Select Specialization..</option>
+    <option value="dmg_share">DMG </option>
+    <option value="cc_share">CC </option>
+    <option value="tank_share">Tank </option>
+    <option value="kp">KP% </option>
+    <option value="kill">Kill% </option>
+  </select>
+
+  <div id="champion-representative-results"></div>
+
+  <hr>
+
+<h3>Champion Tendencies</h3>
+
+<select id="champion-tendencies-metric-select">
+  <option value="">Select criterion...</option>
+  <option value="dmg_share">Damage</option>
+  <option value="cc_share">Control</option>
+  <option value="tank_share">Tank</option>
+  <option value="kp">KP%</option>
+  <option value="kill">Kill%</option>
+</select>
+
+<div id="champion-tendencies-results"></div>
 </section>
 
 </div>
@@ -77,4 +108,4 @@
 
 <script src="js/app.js"></script>
 </body>
-</html>   
+</html>
