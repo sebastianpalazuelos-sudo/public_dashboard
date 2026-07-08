@@ -699,7 +699,7 @@ function renderGlobalRanking(elementId, ranking){
 function loadMatchExplorerSelect(){
 
     const select =
-        document.getElementById("match-select");
+    document.getElementById("match-select");
 
     dashboardData.match_explorer.forEach(match => {
 
@@ -714,6 +714,22 @@ function loadMatchExplorerSelect(){
     select.addEventListener("change", () => {
 
         renderMatchExplorer(select.value);
+
+    });
+
+    const searchInput =
+        document.getElementById("match-search-input");
+
+    if(!searchInput){
+        return;
+    }
+
+    searchInput.addEventListener("input", () => {
+
+        const matchId =
+            searchInput.value.trim();
+
+        renderMatchExplorer(matchId);
 
     });
 
@@ -762,11 +778,11 @@ function renderMatchExplorer(matchId){
 
     <th>UTIL</th>
 
-    <th>CC</th>
-    <th>CC%</th>
+    <th class="secondary-stat">CC</th>
+    <th class="secondary-stat">CC%</th>
 
-    <th>TANK</th>
-    <th>TANK%</th>
+    <th class="secondary-stat">TANK</th>
+    <th class="secondary-stat">TANK%</th>
 
     </tr>
 
@@ -802,13 +818,13 @@ function renderMatchExplorer(matchId){
 
         <td>${player.utility_score}</td>
 
-        <td>${player.cc_score}</td>
+        <td class="secondary-stat">${player.cc_score}</td>
 
-        <td>${player.cc_share}%</td>
+        <td class="secondary-stat">${player.cc_share}%</td>
 
-        <td>${player.tank_score}</td>
+        <td class="secondary-stat">${player.tank_score}</td>
 
-        <td>${player.tank_share}%</td>
+        <td class="secondary-stat">${player.tank_share}%</td>
 
         </tr>
 
