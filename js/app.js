@@ -624,37 +624,35 @@ function renderPlayerChampionDetail(champion){
                                 <table class="contribution-mini-table">
                                     <thead>
                                         <tr>
-                                            <th rowspan="2">KP</th>
-                                            <th class="metric-group" colspan="2">DMG</th>
-                                            <th rowspan="2">UTIL</th>
-                                            <th class="metric-group secondary-stat" colspan="2">CC</th>
-                                            <th class="metric-group secondary-stat" colspan="2">TANK</th>
-                                        </tr>
-                                        <tr>
-                                            <th class="metric-block-left">DMG</th>
-                                            <th class="metric-block-right metric-share">Share</th>
-
-                                            <th class="metric-block-left secondary-stat">CC</th>
-                                            <th class="metric-block-right secondary-stat">Share</th>
-
-                                            <th class="metric-block-left secondary-stat">TANK</th>
-                                            <th class="metric-block-right secondary-stat">Share</th>
+                                            <th>Kill%</th>
+                                            <th>KP</th>
+                                            <th>KP%</th>
+                                            <th>DMG</th>
+                                            <th>DMG%</th>
+                                            <th>UTIL</th>
+                                            <th class="secondary-stat">CC</th>
+                                            <th class="secondary-stat">CC%</th>
+                                            <th class="secondary-stat">TANK</th>
+                                            <th class="secondary-stat">TANK%</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td>${champion.global_avg_kp}</td>
+                                            <td>${champion.avg_kill_pct.toFixed(1)}%</td>
 
-                                            <td class="metric-block-left">${champion.global_avg_dmg}</td>
-                                            <td class="metric-block-right">${champion.avg_dmg_share.toFixed(1)}%</td>
+                                            <td>${champion.global_avg_kp}</td>
+                                            <td>${champion.avg_kp_pct.toFixed(1)}%</td>
+
+                                            <td>${champion.global_avg_dmg}</td>
+                                            <td>${champion.avg_dmg_share.toFixed(1)}%</td>
 
                                             <td>${champion.global_avg_util}</td>
 
-                                            <td class="metric-block-left secondary-stat">${champion.global_avg_cc}</td>
-                                            <td class="metric-block-right secondary-stat">${champion.avg_cc_share.toFixed(1)}%</td>
+                                            <td class="secondary-stat">${champion.global_avg_cc}</td>
+                                            <td class="secondary-stat">${champion.avg_cc_share.toFixed(1)}%</td>
 
-                                            <td class="metric-block-left secondary-stat">${champion.global_avg_tank}</td>
-                                            <td class="metric-block-right secondary-stat">${champion.avg_tank_share.toFixed(1)}%</td>
+                                            <td class="secondary-stat">${champion.global_avg_tank}</td>
+                                            <td class="secondary-stat">${champion.avg_tank_share.toFixed(1)}%</td>
                                         </tr>
                                     </tbody>
                                     </table>

@@ -254,8 +254,13 @@ table td {
     text-align: center;
 }
 
-.contribution-table-card {
-    min-width: 420px;
+.player-champion-score-card{
+    flex:0.6;
+}
+
+.contribution-table-card{
+    flex:3.4;
+    min-width:0;
 }
 
 .contribution-mini-table {
@@ -265,8 +270,9 @@ table td {
 
 .contribution-mini-table th,
 .contribution-mini-table td {
-    padding: 8px 10px;
+    padding: 8px 4px;
     text-align: center;
+    font-size: 0.82em;
 }
 
 .contribution-mini-table td:first-child {
