@@ -11,9 +11,9 @@
                 "global_avg_util": 5.42,
                 "global_avg_cc": 5.37,
                 "global_avg_tank": 5.48,
-                "global_god_count": 6,
-                "global_alpha_count": 10,
-                "global_cono_count": 1
+                "global_god_count": 12,
+                "global_alpha_count": 5,
+                "global_cono_count": 0
             },
             {
                 "name": "AmsterdamK#LAS",
@@ -25,9 +25,9 @@
                 "global_avg_util": 5.58,
                 "global_avg_cc": 5.79,
                 "global_avg_tank": 5.38,
-                "global_god_count": 2,
-                "global_alpha_count": 5,
-                "global_cono_count": 1
+                "global_god_count": 6,
+                "global_alpha_count": 4,
+                "global_cono_count": 2
             },
             {
                 "name": "Nabuegixi#LAS",
@@ -39,8 +39,8 @@
                 "global_avg_util": 4.79,
                 "global_avg_cc": 4.64,
                 "global_avg_tank": 4.94,
-                "global_god_count": 0,
-                "global_alpha_count": 6,
+                "global_god_count": 3,
+                "global_alpha_count": 4,
                 "global_cono_count": 1
             },
             {
@@ -53,9 +53,9 @@
                 "global_avg_util": 6.38,
                 "global_avg_cc": 6.42,
                 "global_avg_tank": 6.35,
-                "global_god_count": 4,
-                "global_alpha_count": 6,
-                "global_cono_count": 4
+                "global_god_count": 7,
+                "global_alpha_count": 4,
+                "global_cono_count": 3
             },
             {
                 "name": "Groppeta#LAS",
@@ -67,8 +67,8 @@
                 "global_avg_util": 7.88,
                 "global_avg_cc": 8.0,
                 "global_avg_tank": 7.75,
-                "global_god_count": 0,
-                "global_alpha_count": 1,
+                "global_god_count": 1,
+                "global_alpha_count": 0,
                 "global_cono_count": 0
             },
             {
@@ -82,8 +82,8 @@
                 "global_avg_cc": 5.5,
                 "global_avg_tank": 6.17,
                 "global_god_count": 0,
-                "global_alpha_count": 0,
-                "global_cono_count": 0
+                "global_alpha_count": 1,
+                "global_cono_count": 1
             },
             {
                 "name": "UN CONO#LAS",
@@ -96,8 +96,8 @@
                 "global_avg_cc": 7.26,
                 "global_avg_tank": 6.09,
                 "global_god_count": 0,
-                "global_alpha_count": 1,
-                "global_cono_count": 4
+                "global_alpha_count": 2,
+                "global_cono_count": 2
             },
             {
                 "name": "L3blanc James#LAS",
@@ -111,7 +111,7 @@
                 "global_avg_tank": 5.91,
                 "global_god_count": 0,
                 "global_alpha_count": 0,
-                "global_cono_count": 5
+                "global_cono_count": 2
             },
             {
                 "name": "Fipus#ACLRV",
@@ -125,7 +125,7 @@
                 "global_avg_tank": 7.4,
                 "global_god_count": 1,
                 "global_alpha_count": 0,
-                "global_cono_count": 10
+                "global_cono_count": 9
             },
             {
                 "name": "Einherjar#LAS",
@@ -139,7 +139,7 @@
                 "global_avg_tank": 5.75,
                 "global_god_count": 0,
                 "global_alpha_count": 0,
-                "global_cono_count": 2
+                "global_cono_count": 0
             }
         ]
     },
@@ -159,9 +159,9 @@
                 "global_avg_util": 5.42,
                 "global_avg_cc": 5.37,
                 "global_avg_tank": 5.48,
-                "global_god_count": 6,
-                "global_alpha_count": 10,
-                "global_cono_count": 1
+                "global_god_count": 12,
+                "global_alpha_count": 5,
+                "global_cono_count": 0
             },
             {
                 "name": "AmsterdamK#LAS",
@@ -173,9 +173,9 @@
                 "global_avg_util": 5.58,
                 "global_avg_cc": 5.79,
                 "global_avg_tank": 5.38,
-                "global_god_count": 2,
-                "global_alpha_count": 5,
-                "global_cono_count": 1
+                "global_god_count": 6,
+                "global_alpha_count": 4,
+                "global_cono_count": 2
             },
             {
                 "name": "Nabuegixi#LAS",
@@ -187,8 +187,8 @@
                 "global_avg_util": 4.79,
                 "global_avg_cc": 4.64,
                 "global_avg_tank": 4.94,
-                "global_god_count": 0,
-                "global_alpha_count": 6,
+                "global_god_count": 3,
+                "global_alpha_count": 4,
                 "global_cono_count": 1
             },
             {
@@ -201,9 +201,9 @@
                 "global_avg_util": 6.38,
                 "global_avg_cc": 6.42,
                 "global_avg_tank": 6.35,
-                "global_god_count": 4,
-                "global_alpha_count": 6,
-                "global_cono_count": 4
+                "global_god_count": 7,
+                "global_alpha_count": 4,
+                "global_cono_count": 3
             },
             {
                 "name": "Groppeta#LAS",
@@ -215,8 +215,8 @@
                 "global_avg_util": 7.88,
                 "global_avg_cc": 8.0,
                 "global_avg_tank": 7.75,
-                "global_god_count": 0,
-                "global_alpha_count": 1,
+                "global_god_count": 1,
+                "global_alpha_count": 0,
                 "global_cono_count": 0
             },
             {
@@ -230,8 +230,8 @@
                 "global_avg_cc": 5.5,
                 "global_avg_tank": 6.17,
                 "global_god_count": 0,
-                "global_alpha_count": 0,
-                "global_cono_count": 0
+                "global_alpha_count": 1,
+                "global_cono_count": 1
             },
             {
                 "name": "UN CONO#LAS",
@@ -244,8 +244,8 @@
                 "global_avg_cc": 7.26,
                 "global_avg_tank": 6.09,
                 "global_god_count": 0,
-                "global_alpha_count": 1,
-                "global_cono_count": 4
+                "global_alpha_count": 2,
+                "global_cono_count": 2
             },
             {
                 "name": "L3blanc James#LAS",
@@ -259,7 +259,7 @@
                 "global_avg_tank": 5.91,
                 "global_god_count": 0,
                 "global_alpha_count": 0,
-                "global_cono_count": 5
+                "global_cono_count": 2
             },
             {
                 "name": "Fipus#ACLRV",
@@ -273,7 +273,7 @@
                 "global_avg_tank": 7.4,
                 "global_god_count": 1,
                 "global_alpha_count": 0,
-                "global_cono_count": 10
+                "global_cono_count": 9
             },
             {
                 "name": "Einherjar#LAS",
@@ -287,7 +287,7 @@
                 "global_avg_tank": 5.75,
                 "global_god_count": 0,
                 "global_alpha_count": 0,
-                "global_cono_count": 2
+                "global_cono_count": 0
             }
         ]
     },
@@ -316,11 +316,11 @@
                     "global_avg_util": 2.75,
                     "global_avg_cc": 1.0,
                     "global_avg_tank": 4.5,
-                    "god": 0,
-                    "alpha": 1,
+                    "god": 1,
+                    "alpha": 0,
                     "cono": 0,
-                    "global_god": 0,
-                    "global_alpha": 1,
+                    "global_god": 1,
+                    "global_alpha": 0,
                     "global_cono": 0
                 },
                 {
@@ -407,10 +407,10 @@
                     "global_avg_tank": 10.0,
                     "god": 0,
                     "alpha": 0,
-                    "cono": 0,
+                    "cono": 1,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 0
+                    "global_cono": 1
                 }
             ],
             "Vex": [
@@ -765,10 +765,10 @@
                     "global_avg_tank": 4.5,
                     "god": 0,
                     "alpha": 0,
-                    "cono": 1,
+                    "cono": 0,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 1
+                    "global_cono": 0
                 },
                 {
                     "name": "Nabuegixi#LAS",
@@ -912,10 +912,10 @@
                     "global_avg_util": 4.17,
                     "global_avg_cc": 5.0,
                     "global_avg_tank": 3.33,
-                    "god": 0,
+                    "god": 1,
                     "alpha": 1,
                     "cono": 0,
-                    "global_god": 0,
+                    "global_god": 1,
                     "global_alpha": 1,
                     "global_cono": 0
                 },
@@ -1092,11 +1092,11 @@
                     "global_avg_util": 3.5,
                     "global_avg_cc": 1.0,
                     "global_avg_tank": 6.0,
-                    "god": 1,
-                    "alpha": 1,
+                    "god": 2,
+                    "alpha": 0,
                     "cono": 0,
-                    "global_god": 1,
-                    "global_alpha": 1,
+                    "global_god": 2,
+                    "global_alpha": 0,
                     "global_cono": 0
                 },
                 {
@@ -1423,11 +1423,11 @@
                     "global_avg_util": 4.0,
                     "global_avg_cc": 5.0,
                     "global_avg_tank": 3.0,
-                    "god": 0,
-                    "alpha": 1,
+                    "god": 1,
+                    "alpha": 0,
                     "cono": 0,
-                    "global_god": 0,
-                    "global_alpha": 1,
+                    "global_god": 1,
+                    "global_alpha": 0,
                     "global_cono": 0
                 },
                 {
@@ -1485,10 +1485,10 @@
                     "global_avg_tank": 6.67,
                     "god": 0,
                     "alpha": 0,
-                    "cono": 1,
+                    "cono": 0,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 1
+                    "global_cono": 0
                 }
             ],
             "Hecarim": [
@@ -1754,10 +1754,10 @@
                     "global_avg_tank": 2.0,
                     "god": 0,
                     "alpha": 0,
-                    "cono": 1,
+                    "cono": 0,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 1
+                    "global_cono": 0
                 },
                 {
                     "name": "matuque#0000",
@@ -1812,10 +1812,10 @@
                     "global_avg_tank": 1.0,
                     "god": 0,
                     "alpha": 0,
-                    "cono": 1,
+                    "cono": 0,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 1
+                    "global_cono": 0
                 }
             ],
             "Poppy": [
@@ -1871,10 +1871,10 @@
                     "global_avg_cc": 6.5,
                     "global_avg_tank": 9.0,
                     "god": 0,
-                    "alpha": 0,
+                    "alpha": 1,
                     "cono": 0,
                     "global_god": 0,
-                    "global_alpha": 0,
+                    "global_alpha": 1,
                     "global_cono": 0
                 }
             ],
@@ -2019,11 +2019,11 @@
                     "global_avg_util": 4.62,
                     "global_avg_cc": 5.75,
                     "global_avg_tank": 3.5,
-                    "god": 0,
-                    "alpha": 2,
+                    "god": 1,
+                    "alpha": 1,
                     "cono": 0,
-                    "global_god": 0,
-                    "global_alpha": 2,
+                    "global_god": 1,
+                    "global_alpha": 1,
                     "global_cono": 0
                 },
                 {
@@ -2108,11 +2108,11 @@
                     "global_avg_util": 8.0,
                     "global_avg_cc": 7.0,
                     "global_avg_tank": 9.0,
-                    "god": 0,
-                    "alpha": 1,
+                    "god": 1,
+                    "alpha": 0,
                     "cono": 0,
-                    "global_god": 0,
-                    "global_alpha": 1,
+                    "global_god": 1,
+                    "global_alpha": 0,
                     "global_cono": 0
                 },
                 {
@@ -2317,10 +2317,10 @@
                     "global_avg_tank": 3.67,
                     "god": 0,
                     "alpha": 0,
-                    "cono": 0,
+                    "cono": 1,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 0
+                    "global_cono": 1
                 }
             ],
             "Vayne": [
@@ -2406,10 +2406,10 @@
                     "global_avg_util": 9.75,
                     "global_avg_cc": 9.5,
                     "global_avg_tank": 10.0,
-                    "god": 0,
+                    "god": 1,
                     "alpha": 0,
                     "cono": 0,
-                    "global_god": 0,
+                    "global_god": 1,
                     "global_alpha": 0,
                     "global_cono": 0
                 },
@@ -2436,10 +2436,10 @@
                     "global_avg_cc": 10.0,
                     "global_avg_tank": 9.0,
                     "god": 0,
-                    "alpha": 1,
+                    "alpha": 0,
                     "cono": 0,
                     "global_god": 0,
-                    "global_alpha": 1,
+                    "global_alpha": 0,
                     "global_cono": 0
                 },
                 {
@@ -2495,11 +2495,11 @@
                     "global_avg_util": 3.25,
                     "global_avg_cc": 2.75,
                     "global_avg_tank": 3.75,
-                    "god": 0,
-                    "alpha": 2,
+                    "god": 2,
+                    "alpha": 0,
                     "cono": 0,
-                    "global_god": 0,
-                    "global_alpha": 2,
+                    "global_god": 2,
+                    "global_alpha": 0,
                     "global_cono": 0
                 },
                 {
@@ -2617,11 +2617,11 @@
                     "global_avg_util": 5.17,
                     "global_avg_cc": 7.33,
                     "global_avg_tank": 3.0,
-                    "god": 0,
-                    "alpha": 2,
+                    "god": 1,
+                    "alpha": 1,
                     "cono": 0,
-                    "global_god": 0,
-                    "global_alpha": 2,
+                    "global_god": 1,
+                    "global_alpha": 1,
                     "global_cono": 0
                 },
                 {
@@ -2797,11 +2797,11 @@
                     "global_avg_util": 3.5,
                     "global_avg_cc": 3.67,
                     "global_avg_tank": 3.33,
-                    "god": 0,
-                    "alpha": 1,
+                    "god": 1,
+                    "alpha": 0,
                     "cono": 0,
-                    "global_god": 0,
-                    "global_alpha": 1,
+                    "global_god": 1,
+                    "global_alpha": 0,
                     "global_cono": 0
                 },
                 {
@@ -2888,10 +2888,10 @@
                     "global_avg_tank": 6.0,
                     "god": 0,
                     "alpha": 0,
-                    "cono": 1,
+                    "cono": 0,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 1
+                    "global_cono": 0
                 },
                 {
                     "name": "SworDanc3#LAS",
@@ -2917,10 +2917,10 @@
                     "global_avg_tank": 5.0,
                     "god": 0,
                     "alpha": 0,
-                    "cono": 1,
+                    "cono": 0,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 1
+                    "global_cono": 0
                 }
             ],
             "Lissandra": [
@@ -2977,10 +2977,10 @@
                     "global_avg_tank": 6.0,
                     "god": 0,
                     "alpha": 0,
-                    "cono": 1,
+                    "cono": 0,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 1
+                    "global_cono": 0
                 }
             ],
             "Viktor": [
@@ -3397,11 +3397,11 @@
                     "global_avg_util": 4.5,
                     "global_avg_cc": 5.0,
                     "global_avg_tank": 4.0,
-                    "god": 0,
-                    "alpha": 1,
+                    "god": 1,
+                    "alpha": 0,
                     "cono": 0,
-                    "global_god": 0,
-                    "global_alpha": 1,
+                    "global_god": 1,
+                    "global_alpha": 0,
                     "global_cono": 0
                 },
                 {
@@ -3665,10 +3665,10 @@
                     "global_avg_cc": 10.0,
                     "global_avg_tank": 5.0,
                     "god": 0,
-                    "alpha": 0,
+                    "alpha": 1,
                     "cono": 0,
                     "global_god": 0,
-                    "global_alpha": 0,
+                    "global_alpha": 1,
                     "global_cono": 0
                 },
                 {
@@ -3724,10 +3724,10 @@
                     "global_avg_tank": 4.33,
                     "god": 0,
                     "alpha": 0,
-                    "cono": 1,
+                    "cono": 0,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 1
+                    "global_cono": 0
                 }
             ],
             "Rakan": [
@@ -4141,10 +4141,10 @@
                     "global_avg_cc": 9.0,
                     "global_avg_tank": 5.0,
                     "god": 0,
-                    "alpha": 0,
+                    "alpha": 1,
                     "cono": 0,
                     "global_god": 0,
-                    "global_alpha": 0,
+                    "global_alpha": 1,
                     "global_cono": 0
                 }
             ],
@@ -4172,10 +4172,10 @@
                     "global_avg_cc": 4.0,
                     "global_avg_tank": 3.0,
                     "god": 0,
-                    "alpha": 0,
+                    "alpha": 1,
                     "cono": 0,
                     "global_god": 0,
-                    "global_alpha": 0,
+                    "global_alpha": 1,
                     "global_cono": 0
                 },
                 {
@@ -4320,10 +4320,10 @@
                     "global_avg_tank": 3.0,
                     "god": 0,
                     "alpha": 0,
-                    "cono": 1,
+                    "cono": 0,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 1
+                    "global_cono": 0
                 }
             ],
             "Singed": [
@@ -4411,10 +4411,10 @@
                     "global_avg_tank": 6.0,
                     "god": 0,
                     "alpha": 0,
-                    "cono": 1,
+                    "cono": 0,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 1
+                    "global_cono": 0
                 }
             ],
             "Veigar": [
@@ -4589,11 +4589,11 @@
                     "global_avg_util": 4.5,
                     "global_avg_cc": 6.0,
                     "global_avg_tank": 3.0,
-                    "god": 0,
-                    "alpha": 1,
+                    "god": 1,
+                    "alpha": 0,
                     "cono": 0,
-                    "global_god": 0,
-                    "global_alpha": 1,
+                    "global_god": 1,
+                    "global_alpha": 0,
                     "global_cono": 0
                 },
                 {
@@ -4707,11 +4707,11 @@
                     "global_avg_util": 3.0,
                     "global_avg_cc": 3.0,
                     "global_avg_tank": 3.0,
-                    "god": 0,
-                    "alpha": 1,
+                    "god": 1,
+                    "alpha": 0,
                     "cono": 0,
-                    "global_god": 0,
-                    "global_alpha": 1,
+                    "global_god": 1,
+                    "global_alpha": 0,
                     "global_cono": 0
                 }
             ],
@@ -4947,11 +4947,11 @@
                     "global_avg_util": 3.33,
                     "global_avg_cc": 2.33,
                     "global_avg_tank": 4.33,
-                    "god": 0,
-                    "alpha": 1,
+                    "god": 1,
+                    "alpha": 0,
                     "cono": 0,
-                    "global_god": 0,
-                    "global_alpha": 1,
+                    "global_god": 1,
+                    "global_alpha": 0,
                     "global_cono": 0
                 }
             ],
@@ -4978,11 +4978,11 @@
                     "global_avg_util": 4.0,
                     "global_avg_cc": 4.0,
                     "global_avg_tank": 4.0,
-                    "god": 0,
-                    "alpha": 1,
+                    "god": 1,
+                    "alpha": 0,
                     "cono": 0,
-                    "global_god": 0,
-                    "global_alpha": 1,
+                    "global_god": 1,
+                    "global_alpha": 0,
                     "global_cono": 0
                 }
             ],
@@ -5040,10 +5040,10 @@
                     "global_avg_util": 9.0,
                     "global_avg_cc": 9.5,
                     "global_avg_tank": 8.5,
-                    "god": 0,
+                    "god": 1,
                     "alpha": 0,
                     "cono": 0,
-                    "global_god": 0,
+                    "global_god": 1,
                     "global_alpha": 0,
                     "global_cono": 0
                 }
@@ -5072,10 +5072,10 @@
                     "global_avg_cc": 9.5,
                     "global_avg_tank": 3.0,
                     "god": 1,
-                    "alpha": 0,
+                    "alpha": 1,
                     "cono": 0,
                     "global_god": 1,
-                    "global_alpha": 0,
+                    "global_alpha": 1,
                     "global_cono": 0
                 },
                 {
@@ -5194,10 +5194,10 @@
                     "global_avg_cc": 6.0,
                     "global_avg_tank": 6.5,
                     "god": 0,
-                    "alpha": 0,
+                    "alpha": 1,
                     "cono": 0,
                     "global_god": 0,
-                    "global_alpha": 0,
+                    "global_alpha": 1,
                     "global_cono": 0
                 }
             ],
@@ -5378,10 +5378,10 @@
                     "global_avg_cc": 6.0,
                     "global_avg_tank": 10.0,
                     "god": 0,
-                    "alpha": 0,
+                    "alpha": 1,
                     "cono": 0,
                     "global_god": 0,
-                    "global_alpha": 0,
+                    "global_alpha": 1,
                     "global_cono": 0
                 },
                 {
@@ -5590,10 +5590,10 @@
                     "global_avg_tank": 9.0,
                     "god": 0,
                     "alpha": 0,
-                    "cono": 1,
+                    "cono": 0,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 1
+                    "global_cono": 0
                 }
             ],
             "Graves": [
@@ -6412,10 +6412,10 @@
                     "global_avg_cc": 9.0,
                     "global_avg_tank": 3.0,
                     "god": 0,
-                    "alpha": 1,
+                    "alpha": 0,
                     "cono": 0,
                     "global_god": 0,
-                    "global_alpha": 1,
+                    "global_alpha": 0,
                     "global_cono": 0
                 },
                 {
@@ -6810,10 +6810,10 @@
                     "global_avg_tank": 2.0,
                     "god": 0,
                     "alpha": 0,
-                    "cono": 0,
+                    "cono": 1,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 0
+                    "global_cono": 1
                 }
             ],
             "Jhin": [
@@ -7229,7 +7229,7 @@
                     "dmg_share": 29.8,
                     "cc_share": 17.36,
                     "tank_share": 12.64,
-                    "global_god": 0,
+                    "global_god": 1,
                     "global_alpha": 1,
                     "global_cono": 0
                 },
@@ -7243,7 +7243,7 @@
                     "dmg_share": 29.8,
                     "cc_share": 17.36,
                     "tank_share": 12.64,
-                    "global_god": 0,
+                    "global_god": 1,
                     "global_alpha": 1,
                     "global_cono": 0
                 },
@@ -7257,7 +7257,7 @@
                     "dmg_share": 29.8,
                     "cc_share": 17.36,
                     "tank_share": 12.64,
-                    "global_god": 0,
+                    "global_god": 1,
                     "global_alpha": 1,
                     "global_cono": 0
                 },
@@ -7271,7 +7271,7 @@
                     "dmg_share": 29.8,
                     "cc_share": 17.36,
                     "tank_share": 12.64,
-                    "global_god": 0,
+                    "global_god": 1,
                     "global_alpha": 1,
                     "global_cono": 0
                 },
@@ -7285,7 +7285,7 @@
                     "dmg_share": 29.8,
                     "cc_share": 17.36,
                     "tank_share": 12.64,
-                    "global_god": 0,
+                    "global_god": 1,
                     "global_alpha": 1,
                     "global_cono": 0
                 }
@@ -7375,7 +7375,7 @@
                     "tank_share": 15.12,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 1
+                    "global_cono": 0
                 },
                 "cc_share": {
                     "name": "L3blanc James#LAS",
@@ -7389,7 +7389,7 @@
                     "tank_share": 15.12,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 1
+                    "global_cono": 0
                 },
                 "tank_share": {
                     "name": "L3blanc James#LAS",
@@ -7403,7 +7403,7 @@
                     "tank_share": 15.12,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 1
+                    "global_cono": 0
                 },
                 "kp": {
                     "name": "L3blanc James#LAS",
@@ -7417,7 +7417,7 @@
                     "tank_share": 15.12,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 1
+                    "global_cono": 0
                 },
                 "kill": {
                     "name": "L3blanc James#LAS",
@@ -7431,7 +7431,7 @@
                     "tank_share": 15.12,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 1
+                    "global_cono": 0
                 }
             },
             "Shen": {
@@ -7517,8 +7517,8 @@
                     "dmg_share": 28.67,
                     "cc_share": 19.11,
                     "tank_share": 12.88,
-                    "global_god": 0,
-                    "global_alpha": 2,
+                    "global_god": 1,
+                    "global_alpha": 1,
                     "global_cono": 0
                 },
                 "cc_share": {
@@ -7531,8 +7531,8 @@
                     "dmg_share": 28.67,
                     "cc_share": 19.11,
                     "tank_share": 12.88,
-                    "global_god": 0,
-                    "global_alpha": 2,
+                    "global_god": 1,
+                    "global_alpha": 1,
                     "global_cono": 0
                 },
                 "tank_share": {
@@ -7545,8 +7545,8 @@
                     "dmg_share": 28.67,
                     "cc_share": 19.11,
                     "tank_share": 12.88,
-                    "global_god": 0,
-                    "global_alpha": 2,
+                    "global_god": 1,
+                    "global_alpha": 1,
                     "global_cono": 0
                 },
                 "kp": {
@@ -7559,8 +7559,8 @@
                     "dmg_share": 28.67,
                     "cc_share": 19.11,
                     "tank_share": 12.88,
-                    "global_god": 0,
-                    "global_alpha": 2,
+                    "global_god": 1,
+                    "global_alpha": 1,
                     "global_cono": 0
                 },
                 "kill": {
@@ -7573,8 +7573,8 @@
                     "dmg_share": 28.67,
                     "cc_share": 19.11,
                     "tank_share": 12.88,
-                    "global_god": 0,
-                    "global_alpha": 2,
+                    "global_god": 1,
+                    "global_alpha": 1,
                     "global_cono": 0
                 }
             },
@@ -7735,7 +7735,7 @@
                     "tank_share": 15.06,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 0
+                    "global_cono": 1
                 },
                 "cc_share": {
                     "name": "AmsterdamK#LAS",
@@ -7749,7 +7749,7 @@
                     "tank_share": 15.06,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 0
+                    "global_cono": 1
                 },
                 "tank_share": {
                     "name": "AmsterdamK#LAS",
@@ -7763,7 +7763,7 @@
                     "tank_share": 15.06,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 0
+                    "global_cono": 1
                 },
                 "kp": {
                     "name": "AmsterdamK#LAS",
@@ -7777,7 +7777,7 @@
                     "tank_share": 15.06,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 0
+                    "global_cono": 1
                 },
                 "kill": {
                     "name": "AmsterdamK#LAS",
@@ -7791,7 +7791,7 @@
                     "tank_share": 15.06,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 0
+                    "global_cono": 1
                 }
             },
             "Twitch": {
@@ -7805,8 +7805,8 @@
                     "dmg_share": 29.34,
                     "cc_share": 4.11,
                     "tank_share": 11.71,
-                    "global_god": 0,
-                    "global_alpha": 2,
+                    "global_god": 2,
+                    "global_alpha": 0,
                     "global_cono": 0
                 },
                 "cc_share": {
@@ -7847,8 +7847,8 @@
                     "dmg_share": 29.34,
                     "cc_share": 4.11,
                     "tank_share": 11.71,
-                    "global_god": 0,
-                    "global_alpha": 2,
+                    "global_god": 2,
+                    "global_alpha": 0,
                     "global_cono": 0
                 },
                 "kill": {
@@ -7861,8 +7861,8 @@
                     "dmg_share": 29.34,
                     "cc_share": 4.11,
                     "tank_share": 11.71,
-                    "global_god": 0,
-                    "global_alpha": 2,
+                    "global_god": 2,
+                    "global_alpha": 0,
                     "global_cono": 0
                 }
             },
@@ -7949,8 +7949,8 @@
                     "dmg_share": 27.02,
                     "cc_share": 25.22,
                     "tank_share": 12.84,
-                    "global_god": 0,
-                    "global_alpha": 2,
+                    "global_god": 1,
+                    "global_alpha": 1,
                     "global_cono": 0
                 },
                 "cc_share": {
@@ -7963,8 +7963,8 @@
                     "dmg_share": 27.02,
                     "cc_share": 25.22,
                     "tank_share": 12.84,
-                    "global_god": 0,
-                    "global_alpha": 2,
+                    "global_god": 1,
+                    "global_alpha": 1,
                     "global_cono": 0
                 },
                 "tank_share": {
@@ -7977,8 +7977,8 @@
                     "dmg_share": 27.02,
                     "cc_share": 25.22,
                     "tank_share": 12.84,
-                    "global_god": 0,
-                    "global_alpha": 2,
+                    "global_god": 1,
+                    "global_alpha": 1,
                     "global_cono": 0
                 },
                 "kp": {
@@ -7991,8 +7991,8 @@
                     "dmg_share": 27.02,
                     "cc_share": 25.22,
                     "tank_share": 12.84,
-                    "global_god": 0,
-                    "global_alpha": 2,
+                    "global_god": 1,
+                    "global_alpha": 1,
                     "global_cono": 0
                 },
                 "kill": {
@@ -8005,8 +8005,8 @@
                     "dmg_share": 27.02,
                     "cc_share": 25.22,
                     "tank_share": 12.84,
-                    "global_god": 0,
-                    "global_alpha": 2,
+                    "global_god": 1,
+                    "global_alpha": 1,
                     "global_cono": 0
                 }
             },
@@ -8021,8 +8021,8 @@
                     "dmg_share": 26.3,
                     "cc_share": 15.04,
                     "tank_share": 11.13,
-                    "global_god": 0,
-                    "global_alpha": 1,
+                    "global_god": 1,
+                    "global_alpha": 0,
                     "global_cono": 0
                 },
                 "cc_share": {
@@ -8035,8 +8035,8 @@
                     "dmg_share": 26.3,
                     "cc_share": 15.04,
                     "tank_share": 11.13,
-                    "global_god": 0,
-                    "global_alpha": 1,
+                    "global_god": 1,
+                    "global_alpha": 0,
                     "global_cono": 0
                 },
                 "tank_share": {
@@ -8049,8 +8049,8 @@
                     "dmg_share": 26.3,
                     "cc_share": 15.04,
                     "tank_share": 11.13,
-                    "global_god": 0,
-                    "global_alpha": 1,
+                    "global_god": 1,
+                    "global_alpha": 0,
                     "global_cono": 0
                 },
                 "kp": {
@@ -8063,8 +8063,8 @@
                     "dmg_share": 26.3,
                     "cc_share": 15.04,
                     "tank_share": 11.13,
-                    "global_god": 0,
-                    "global_alpha": 1,
+                    "global_god": 1,
+                    "global_alpha": 0,
                     "global_cono": 0
                 },
                 "kill": {
@@ -8077,8 +8077,8 @@
                     "dmg_share": 26.3,
                     "cc_share": 15.04,
                     "tank_share": 11.13,
-                    "global_god": 0,
-                    "global_alpha": 1,
+                    "global_god": 1,
+                    "global_alpha": 0,
                     "global_cono": 0
                 }
             },
@@ -8167,7 +8167,7 @@
                     "tank_share": 13.26,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 1
+                    "global_cono": 0
                 },
                 "cc_share": {
                     "name": "UN CONO#LAS",
@@ -8181,7 +8181,7 @@
                     "tank_share": 13.26,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 1
+                    "global_cono": 0
                 },
                 "tank_share": {
                     "name": "UN CONO#LAS",
@@ -8195,7 +8195,7 @@
                     "tank_share": 13.26,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 1
+                    "global_cono": 0
                 },
                 "kp": {
                     "name": "UN CONO#LAS",
@@ -8209,7 +8209,7 @@
                     "tank_share": 13.26,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 1
+                    "global_cono": 0
                 },
                 "kill": {
                     "name": "UN CONO#LAS",
@@ -8223,7 +8223,7 @@
                     "tank_share": 13.26,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 1
+                    "global_cono": 0
                 }
             },
             "Rell": {
@@ -8309,8 +8309,8 @@
                     "dmg_share": 33.09,
                     "cc_share": 5.36,
                     "tank_share": 15.12,
-                    "global_god": 0,
-                    "global_alpha": 1,
+                    "global_god": 1,
+                    "global_alpha": 0,
                     "global_cono": 0
                 },
                 "cc_share": {
@@ -8323,8 +8323,8 @@
                     "dmg_share": 33.09,
                     "cc_share": 5.36,
                     "tank_share": 15.12,
-                    "global_god": 0,
-                    "global_alpha": 1,
+                    "global_god": 1,
+                    "global_alpha": 0,
                     "global_cono": 0
                 },
                 "tank_share": {
@@ -8337,8 +8337,8 @@
                     "dmg_share": 33.09,
                     "cc_share": 5.36,
                     "tank_share": 15.12,
-                    "global_god": 0,
-                    "global_alpha": 1,
+                    "global_god": 1,
+                    "global_alpha": 0,
                     "global_cono": 0
                 },
                 "kp": {
@@ -8351,8 +8351,8 @@
                     "dmg_share": 33.09,
                     "cc_share": 5.36,
                     "tank_share": 15.12,
-                    "global_god": 0,
-                    "global_alpha": 1,
+                    "global_god": 1,
+                    "global_alpha": 0,
                     "global_cono": 0
                 },
                 "kill": {
@@ -8365,8 +8365,8 @@
                     "dmg_share": 33.09,
                     "cc_share": 5.36,
                     "tank_share": 15.12,
-                    "global_god": 0,
-                    "global_alpha": 1,
+                    "global_god": 1,
+                    "global_alpha": 0,
                     "global_cono": 0
                 }
             },
@@ -8893,11 +8893,11 @@
                     "global_avg_util": 4.0,
                     "global_avg_cc": 5.0,
                     "global_avg_tank": 3.0,
-                    "god": 0,
-                    "alpha": 1,
+                    "god": 1,
+                    "alpha": 0,
                     "cono": 0,
-                    "global_god": 0,
-                    "global_alpha": 1,
+                    "global_god": 1,
+                    "global_alpha": 0,
                     "global_cono": 0
                 },
                 {
@@ -8983,11 +8983,11 @@
                     "global_avg_util": 4.5,
                     "global_avg_cc": 5.0,
                     "global_avg_tank": 4.0,
-                    "god": 0,
-                    "alpha": 1,
+                    "god": 1,
+                    "alpha": 0,
                     "cono": 0,
-                    "global_god": 0,
-                    "global_alpha": 1,
+                    "global_god": 1,
+                    "global_alpha": 0,
                     "global_cono": 0
                 },
                 {
@@ -9044,10 +9044,10 @@
                     "global_avg_cc": 4.0,
                     "global_avg_tank": 3.0,
                     "god": 0,
-                    "alpha": 0,
+                    "alpha": 1,
                     "cono": 0,
                     "global_god": 0,
-                    "global_alpha": 0,
+                    "global_alpha": 1,
                     "global_cono": 0
                 },
                 {
@@ -9223,11 +9223,11 @@
                     "global_avg_util": 2.75,
                     "global_avg_cc": 1.0,
                     "global_avg_tank": 4.5,
-                    "god": 0,
-                    "alpha": 1,
+                    "god": 1,
+                    "alpha": 0,
                     "cono": 0,
-                    "global_god": 0,
-                    "global_alpha": 1,
+                    "global_god": 1,
+                    "global_alpha": 0,
                     "global_cono": 0
                 },
                 {
@@ -9585,11 +9585,11 @@
                     "global_avg_util": 8.0,
                     "global_avg_cc": 7.0,
                     "global_avg_tank": 9.0,
-                    "god": 0,
-                    "alpha": 1,
+                    "god": 1,
+                    "alpha": 0,
                     "cono": 0,
-                    "global_god": 0,
-                    "global_alpha": 1,
+                    "global_god": 1,
+                    "global_alpha": 0,
                     "global_cono": 0
                 },
                 {
@@ -9616,10 +9616,10 @@
                     "global_avg_cc": 9.0,
                     "global_avg_tank": 5.0,
                     "god": 0,
-                    "alpha": 0,
+                    "alpha": 1,
                     "cono": 0,
                     "global_god": 0,
-                    "global_alpha": 0,
+                    "global_alpha": 1,
                     "global_cono": 0
                 },
                 {
@@ -9795,11 +9795,11 @@
                     "global_avg_util": 4.0,
                     "global_avg_cc": 4.0,
                     "global_avg_tank": 4.0,
-                    "god": 0,
-                    "alpha": 1,
+                    "god": 1,
+                    "alpha": 0,
                     "cono": 0,
-                    "global_god": 0,
-                    "global_alpha": 1,
+                    "global_god": 1,
+                    "global_alpha": 0,
                     "global_cono": 0
                 },
                 {
@@ -9825,10 +9825,10 @@
                     "global_avg_util": 9.75,
                     "global_avg_cc": 9.5,
                     "global_avg_tank": 10.0,
-                    "god": 0,
+                    "god": 1,
                     "alpha": 0,
                     "cono": 0,
-                    "global_god": 0,
+                    "global_god": 1,
                     "global_alpha": 0,
                     "global_cono": 0
                 },
@@ -9855,11 +9855,11 @@
                     "global_avg_util": 5.17,
                     "global_avg_cc": 7.33,
                     "global_avg_tank": 3.0,
-                    "god": 0,
-                    "alpha": 2,
+                    "god": 1,
+                    "alpha": 1,
                     "cono": 0,
-                    "global_god": 0,
-                    "global_alpha": 2,
+                    "global_god": 1,
+                    "global_alpha": 1,
                     "global_cono": 0
                 },
                 {
@@ -10366,10 +10366,10 @@
                     "global_avg_cc": 6.5,
                     "global_avg_tank": 9.0,
                     "god": 0,
-                    "alpha": 0,
+                    "alpha": 1,
                     "cono": 0,
                     "global_god": 0,
-                    "global_alpha": 0,
+                    "global_alpha": 1,
                     "global_cono": 0
                 },
                 {
@@ -10727,10 +10727,10 @@
                     "global_avg_tank": 3.67,
                     "god": 0,
                     "alpha": 0,
-                    "cono": 0,
+                    "cono": 1,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 0
+                    "global_cono": 1
                 },
                 {
                     "champion": "Kalista",
@@ -10847,10 +10847,10 @@
                     "global_avg_tank": 2.0,
                     "god": 0,
                     "alpha": 0,
-                    "cono": 0,
+                    "cono": 1,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 0
+                    "global_cono": 1
                 },
                 {
                     "champion": "Kassadin",
@@ -10967,10 +10967,10 @@
                     "global_avg_tank": 6.0,
                     "god": 0,
                     "alpha": 0,
-                    "cono": 1,
+                    "cono": 0,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 1
+                    "global_cono": 0
                 },
                 {
                     "champion": "Naafiri",
@@ -11088,10 +11088,10 @@
                     "global_avg_cc": 9.5,
                     "global_avg_tank": 3.0,
                     "god": 1,
-                    "alpha": 0,
+                    "alpha": 1,
                     "cono": 0,
                     "global_god": 1,
-                    "global_alpha": 0,
+                    "global_alpha": 1,
                     "global_cono": 0
                 },
                 {
@@ -11147,11 +11147,11 @@
                     "global_avg_util": 3.5,
                     "global_avg_cc": 1.0,
                     "global_avg_tank": 6.0,
-                    "god": 1,
-                    "alpha": 1,
+                    "god": 2,
+                    "alpha": 0,
                     "cono": 0,
-                    "global_god": 1,
-                    "global_alpha": 1,
+                    "global_god": 2,
+                    "global_alpha": 0,
                     "global_cono": 0
                 },
                 {
@@ -11178,10 +11178,10 @@
                     "global_avg_cc": 9.0,
                     "global_avg_tank": 3.0,
                     "god": 0,
-                    "alpha": 1,
+                    "alpha": 0,
                     "cono": 0,
                     "global_god": 0,
-                    "global_alpha": 1,
+                    "global_alpha": 0,
                     "global_cono": 0
                 },
                 {
@@ -11237,10 +11237,10 @@
                     "global_avg_util": 4.17,
                     "global_avg_cc": 5.0,
                     "global_avg_tank": 3.33,
-                    "god": 0,
+                    "god": 1,
                     "alpha": 1,
                     "cono": 0,
-                    "global_god": 0,
+                    "global_god": 1,
                     "global_alpha": 1,
                     "global_cono": 0
                 },
@@ -11267,11 +11267,11 @@
                     "global_avg_util": 4.62,
                     "global_avg_cc": 5.75,
                     "global_avg_tank": 3.5,
-                    "god": 0,
-                    "alpha": 2,
+                    "god": 1,
+                    "alpha": 1,
                     "cono": 0,
-                    "global_god": 0,
-                    "global_alpha": 2,
+                    "global_god": 1,
+                    "global_alpha": 1,
                     "global_cono": 0
                 },
                 {
@@ -11417,11 +11417,11 @@
                     "global_avg_util": 3.0,
                     "global_avg_cc": 3.0,
                     "global_avg_tank": 3.0,
-                    "god": 0,
-                    "alpha": 1,
+                    "god": 1,
+                    "alpha": 0,
                     "cono": 0,
-                    "global_god": 0,
-                    "global_alpha": 1,
+                    "global_god": 1,
+                    "global_alpha": 0,
                     "global_cono": 0
                 },
                 {
@@ -11597,11 +11597,11 @@
                     "global_avg_util": 3.25,
                     "global_avg_cc": 2.75,
                     "global_avg_tank": 3.75,
-                    "god": 0,
-                    "alpha": 2,
+                    "god": 2,
+                    "alpha": 0,
                     "cono": 0,
-                    "global_god": 0,
-                    "global_alpha": 2,
+                    "global_god": 2,
+                    "global_alpha": 0,
                     "global_cono": 0
                 },
                 {
@@ -12139,10 +12139,10 @@
                     "global_avg_tank": 5.0,
                     "god": 0,
                     "alpha": 0,
-                    "cono": 1,
+                    "cono": 0,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 1
+                    "global_cono": 0
                 }
             ],
             "Mondiolita#LAS": [
@@ -12170,10 +12170,10 @@
                     "global_avg_cc": 6.0,
                     "global_avg_tank": 10.0,
                     "god": 0,
-                    "alpha": 0,
+                    "alpha": 1,
                     "cono": 0,
                     "global_god": 0,
-                    "global_alpha": 0,
+                    "global_alpha": 1,
                     "global_cono": 0
                 },
                 {
@@ -12261,10 +12261,10 @@
                     "global_avg_tank": 10.0,
                     "god": 0,
                     "alpha": 0,
-                    "cono": 0,
+                    "cono": 1,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 0
+                    "global_cono": 1
                 }
             ],
             "matuque#0000": [
@@ -12382,10 +12382,10 @@
                     "global_avg_cc": 10.0,
                     "global_avg_tank": 9.0,
                     "god": 0,
-                    "alpha": 1,
+                    "alpha": 0,
                     "cono": 0,
                     "global_god": 0,
-                    "global_alpha": 1,
+                    "global_alpha": 0,
                     "global_cono": 0
                 },
                 {
@@ -12532,10 +12532,10 @@
                     "global_avg_cc": 10.0,
                     "global_avg_tank": 5.0,
                     "god": 0,
-                    "alpha": 0,
+                    "alpha": 1,
                     "cono": 0,
                     "global_god": 0,
-                    "global_alpha": 0,
+                    "global_alpha": 1,
                     "global_cono": 0
                 },
                 {
@@ -12561,11 +12561,11 @@
                     "global_avg_util": 3.33,
                     "global_avg_cc": 2.33,
                     "global_avg_tank": 4.33,
-                    "god": 0,
-                    "alpha": 1,
+                    "god": 1,
+                    "alpha": 0,
                     "cono": 0,
-                    "global_god": 0,
-                    "global_alpha": 1,
+                    "global_god": 1,
+                    "global_alpha": 0,
                     "global_cono": 0
                 },
                 {
@@ -12711,11 +12711,11 @@
                     "global_avg_util": 3.5,
                     "global_avg_cc": 3.67,
                     "global_avg_tank": 3.33,
-                    "god": 0,
-                    "alpha": 1,
+                    "god": 1,
+                    "alpha": 0,
                     "cono": 0,
-                    "global_god": 0,
-                    "global_alpha": 1,
+                    "global_god": 1,
+                    "global_alpha": 0,
                     "global_cono": 0
                 },
                 {
@@ -12741,10 +12741,10 @@
                     "global_avg_util": 9.0,
                     "global_avg_cc": 9.5,
                     "global_avg_tank": 8.5,
-                    "god": 0,
+                    "god": 1,
                     "alpha": 0,
                     "cono": 0,
-                    "global_god": 0,
+                    "global_god": 1,
                     "global_alpha": 0,
                     "global_cono": 0
                 },
@@ -13253,10 +13253,10 @@
                     "global_avg_tank": 9.0,
                     "god": 0,
                     "alpha": 0,
-                    "cono": 1,
+                    "cono": 0,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 1
+                    "global_cono": 0
                 },
                 {
                     "champion": "Malzahar",
@@ -13344,10 +13344,10 @@
                     "global_avg_cc": 6.0,
                     "global_avg_tank": 6.5,
                     "god": 0,
-                    "alpha": 0,
+                    "alpha": 1,
                     "cono": 0,
                     "global_god": 0,
-                    "global_alpha": 0,
+                    "global_alpha": 1,
                     "global_cono": 0
                 },
                 {
@@ -13915,10 +13915,10 @@
                     "global_avg_tank": 4.33,
                     "god": 0,
                     "alpha": 0,
-                    "cono": 1,
+                    "cono": 0,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 1
+                    "global_cono": 0
                 },
                 {
                     "champion": "Rakan",
@@ -14095,10 +14095,10 @@
                     "global_avg_tank": 1.0,
                     "god": 0,
                     "alpha": 0,
-                    "cono": 1,
+                    "cono": 0,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 1
+                    "global_cono": 0
                 },
                 {
                     "champion": "Varus",
@@ -14667,10 +14667,10 @@
                     "global_avg_tank": 6.67,
                     "god": 0,
                     "alpha": 0,
-                    "cono": 1,
+                    "cono": 0,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 1
+                    "global_cono": 0
                 },
                 {
                     "champion": "Volibear",
@@ -14727,10 +14727,10 @@
                     "global_avg_tank": 4.5,
                     "god": 0,
                     "alpha": 0,
-                    "cono": 1,
+                    "cono": 0,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 1
+                    "global_cono": 0
                 },
                 {
                     "champion": "Malzahar",
@@ -14757,10 +14757,10 @@
                     "global_avg_tank": 2.0,
                     "god": 0,
                     "alpha": 0,
-                    "cono": 1,
+                    "cono": 0,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 1
+                    "global_cono": 0
                 },
                 {
                     "champion": "Thresh",
@@ -14999,10 +14999,10 @@
                     "global_avg_tank": 3.0,
                     "god": 0,
                     "alpha": 0,
-                    "cono": 1,
+                    "cono": 0,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 1
+                    "global_cono": 0
                 },
                 {
                     "champion": "Rengar",
@@ -15029,10 +15029,10 @@
                     "global_avg_tank": 6.0,
                     "god": 0,
                     "alpha": 0,
-                    "cono": 1,
+                    "cono": 0,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 1
+                    "global_cono": 0
                 }
             ],
             "Fipus#ACLRV": [
@@ -15241,10 +15241,10 @@
                     "global_avg_tank": 6.0,
                     "god": 0,
                     "alpha": 0,
-                    "cono": 1,
+                    "cono": 0,
                     "global_god": 0,
                     "global_alpha": 0,
-                    "global_cono": 1
+                    "global_cono": 0
                 },
                 {
                     "champion": "Hecarim",
@@ -15481,11 +15481,11 @@
                     "global_avg_util": 4.5,
                     "global_avg_cc": 6.0,
                     "global_avg_tank": 3.0,
-                    "god": 0,
-                    "alpha": 1,
+                    "god": 1,
+                    "alpha": 0,
                     "cono": 0,
-                    "global_god": 0,
-                    "global_alpha": 1,
+                    "global_god": 1,
+                    "global_alpha": 0,
                     "global_cono": 0
                 },
                 {
@@ -15753,7 +15753,9 @@
                 {
                     "name": "Mondiolita#LAS",
                     "champion": "Sion",
-                    "titles": [],
+                    "titles": [
+                        "ALPHA"
+                    ],
                     "score": 24.0,
                     "kill_pct": 26.67,
                     "kp_score": 7,
@@ -15769,9 +15771,7 @@
                 {
                     "name": "SworDanc3#LAS",
                     "champion": "Morgana",
-                    "titles": [
-                        "ALPHA"
-                    ],
+                    "titles": [],
                     "score": 23.0,
                     "kill_pct": 28.33,
                     "kp_score": 10,
@@ -15826,7 +15826,9 @@
                 {
                     "name": "Mondiolita#LAS",
                     "champion": "Dr. Mundo",
-                    "titles": [],
+                    "titles": [
+                        "CONO"
+                    ],
                     "score": 11.0,
                     "kill_pct": 7.27,
                     "kp_score": 3,
@@ -15975,7 +15977,9 @@
                 {
                     "name": "AmsterdamK#LAS",
                     "champion": "Hwei",
-                    "titles": [],
+                    "titles": [
+                        "CONO"
+                    ],
                     "score": 12.5,
                     "kill_pct": 9.43,
                     "kp_score": 6,
@@ -16200,7 +16204,7 @@
                     "name": "SworDanc3#LAS",
                     "champion": "Nidalee",
                     "titles": [
-                        "ALPHA"
+                        "GOD"
                     ],
                     "score": 22.0,
                     "kill_pct": 48.28,
@@ -16241,7 +16245,7 @@
                     "name": "matuque#0000",
                     "champion": "Yunara",
                     "titles": [
-                        "ALPHA"
+                        "GOD"
                     ],
                     "score": 22.0,
                     "kill_pct": 66.04,
@@ -16462,7 +16466,9 @@
                 {
                     "name": "Nabuegixi#LAS",
                     "champion": "Kog'Maw",
-                    "titles": [],
+                    "titles": [
+                        "ALPHA"
+                    ],
                     "score": 21.0,
                     "kill_pct": 15.25,
                     "kp_score": 10,
@@ -16495,7 +16501,7 @@
                     "name": "AmsterdamK#LAS",
                     "champion": "Amumu",
                     "titles": [
-                        "ALPHA"
+                        "GOD"
                     ],
                     "score": 25.0,
                     "kill_pct": 42.37,
@@ -17340,7 +17346,7 @@
                     "name": "SworDanc3#LAS",
                     "champion": "Varus",
                     "titles": [
-                        "ALPHA"
+                        "GOD"
                     ],
                     "score": 23.5,
                     "kill_pct": 54.39,
@@ -17515,7 +17521,9 @@
                 {
                     "name": "UN CONO#LAS",
                     "champion": "Milio",
-                    "titles": [],
+                    "titles": [
+                        "CONO"
+                    ],
                     "score": 15.5,
                     "kill_pct": 2.08,
                     "kp_score": 10,
@@ -17617,7 +17625,7 @@
                     "name": "matuque#0000",
                     "champion": "Xayah",
                     "titles": [
-                        "ALPHA"
+                        "GOD"
                     ],
                     "score": 22.0,
                     "kill_pct": 61.82,
@@ -17657,7 +17665,9 @@
                 {
                     "name": "SworDanc3#LAS",
                     "champion": "Varus",
-                    "titles": [],
+                    "titles": [
+                        "ALPHA"
+                    ],
                     "score": 22.0,
                     "kill_pct": 29.79,
                     "kp_score": 9,
@@ -17689,7 +17699,9 @@
                 {
                     "name": "matuque#0000",
                     "champion": "Garen",
-                    "titles": [],
+                    "titles": [
+                        "GOD"
+                    ],
                     "score": 23.5,
                     "kill_pct": 25.53,
                     "kp_score": 8,
@@ -17728,9 +17740,7 @@
                 {
                     "name": "Einherjar#LAS",
                     "champion": "Locke",
-                    "titles": [
-                        "CONO"
-                    ],
+                    "titles": [],
                     "score": 7.5,
                     "kill_pct": 16.67,
                     "kp_score": 2,
@@ -17801,9 +17811,7 @@
                 {
                     "name": "Einherjar#LAS",
                     "champion": "Rengar",
-                    "titles": [
-                        "CONO"
-                    ],
+                    "titles": [],
                     "score": 7.5,
                     "kill_pct": 21.54,
                     "kp_score": 1,
@@ -17877,7 +17885,7 @@
                     "name": "SworDanc3#LAS",
                     "champion": "Varus",
                     "titles": [
-                        "ALPHA"
+                        "GOD"
                     ],
                     "score": 27.0,
                     "kill_pct": 44.64,
@@ -18263,9 +18271,7 @@
                 {
                     "name": "SworDanc3#LAS",
                     "champion": "Blitzcrank",
-                    "titles": [
-                        "CONO"
-                    ],
+                    "titles": [],
                     "score": 10.5,
                     "kill_pct": 14.04,
                     "kp_score": 2,
@@ -18408,7 +18414,7 @@
                     "name": "AmsterdamK#LAS",
                     "champion": "Azir",
                     "titles": [
-                        "ALPHA"
+                        "GOD"
                     ],
                     "score": 23.0,
                     "kill_pct": 40.91,
@@ -18634,7 +18640,7 @@
                     "name": "Groppeta#LAS",
                     "champion": "Aurelion Sol",
                     "titles": [
-                        "ALPHA"
+                        "GOD"
                     ],
                     "score": 23.5,
                     "kill_pct": 32.56,
@@ -18699,9 +18705,7 @@
                 {
                     "name": "UN CONO#LAS",
                     "champion": "Malzahar",
-                    "titles": [
-                        "CONO"
-                    ],
+                    "titles": [],
                     "score": 10.0,
                     "kill_pct": 4.65,
                     "kp_score": 1,
@@ -18797,7 +18801,9 @@
                 {
                     "name": "SworDanc3#LAS",
                     "champion": "Zyra",
-                    "titles": [],
+                    "titles": [
+                        "ALPHA"
+                    ],
                     "score": 23.0,
                     "kill_pct": 18.42,
                     "kp_score": 6,
@@ -18829,9 +18835,7 @@
                 {
                     "name": "L3blanc James#LAS",
                     "champion": "Talon",
-                    "titles": [
-                        "CONO"
-                    ],
+                    "titles": [],
                     "score": 10.5,
                     "kill_pct": 15.79,
                     "kp_score": 2,
@@ -18887,7 +18891,7 @@
                     "name": "SworDanc3#LAS",
                     "champion": "Akshan",
                     "titles": [
-                        "ALPHA"
+                        "GOD"
                     ],
                     "score": 21.0,
                     "kill_pct": 52.94,
@@ -18991,9 +18995,7 @@
                 {
                     "name": "matuque#0000",
                     "champion": "Nautilus",
-                    "titles": [
-                        "ALPHA"
-                    ],
+                    "titles": [],
                     "score": 24.0,
                     "kill_pct": 0.0,
                     "kp_score": 10,
@@ -19025,7 +19027,9 @@
                 {
                     "name": "UN CONO#LAS",
                     "champion": "Pantheon",
-                    "titles": [],
+                    "titles": [
+                        "ALPHA"
+                    ],
                     "score": 24.5,
                     "kill_pct": 50.0,
                     "kp_score": 10,
@@ -19080,7 +19084,9 @@
                 {
                     "name": "matuque#0000",
                     "champion": "Fiddlesticks",
-                    "titles": [],
+                    "titles": [
+                        "ALPHA"
+                    ],
                     "score": 20.5,
                     "kill_pct": 13.56,
                     "kp_score": 4,
@@ -19290,9 +19296,7 @@
                 {
                     "name": "UN CONO#LAS",
                     "champion": "Naafiri",
-                    "titles": [
-                        "CONO"
-                    ],
+                    "titles": [],
                     "score": 10.0,
                     "kill_pct": 37.5,
                     "kp_score": 1,
@@ -19516,9 +19520,7 @@
                 {
                     "name": "matuque#0000",
                     "champion": "Yorick",
-                    "titles": [
-                        "CONO"
-                    ],
+                    "titles": [],
                     "score": 11.0,
                     "kill_pct": 12.31,
                     "kp_score": 1,
@@ -19654,7 +19656,7 @@
                     "name": "SworDanc3#LAS",
                     "champion": "Twitch",
                     "titles": [
-                        "ALPHA"
+                        "GOD"
                     ],
                     "score": 23.0,
                     "kill_pct": 64.0,
@@ -19711,7 +19713,7 @@
                     "name": "Nabuegixi#LAS",
                     "champion": "Master Yi",
                     "titles": [
-                        "ALPHA"
+                        "GOD"
                     ],
                     "score": 23.0,
                     "kill_pct": 50.0,
@@ -20139,9 +20141,7 @@
                 {
                     "name": "L3blanc James#LAS",
                     "champion": "Malzahar",
-                    "titles": [
-                        "CONO"
-                    ],
+                    "titles": [],
                     "score": 13.0,
                     "kill_pct": 12.96,
                     "kp_score": 1,
@@ -20157,7 +20157,9 @@
                 {
                     "name": "AmsterdamK#LAS",
                     "champion": "Poppy",
-                    "titles": [],
+                    "titles": [
+                        "ALPHA"
+                    ],
                     "score": 21.0,
                     "kill_pct": 31.48,
                     "kp_score": 8,
@@ -20197,7 +20199,7 @@
                     "name": "SworDanc3#LAS",
                     "champion": "Caitlyn",
                     "titles": [
-                        "ALPHA"
+                        "GOD"
                     ],
                     "score": 23.5,
                     "kill_pct": 50.0,
@@ -20246,7 +20248,9 @@
                 {
                     "name": "AmsterdamK#LAS",
                     "champion": "Shaco",
-                    "titles": [],
+                    "titles": [
+                        "CONO"
+                    ],
                     "score": 11.0,
                     "kill_pct": 6.41,
                     "kp_score": 6,
@@ -20286,7 +20290,7 @@
                     "name": "SworDanc3#LAS",
                     "champion": "Lucian",
                     "titles": [
-                        "ALPHA"
+                        "GOD"
                     ],
                     "score": 21.5,
                     "kill_pct": 53.62,
@@ -20511,7 +20515,9 @@
                 {
                     "name": "AmsterdamK#LAS",
                     "champion": "Nautilus",
-                    "titles": [],
+                    "titles": [
+                        "GOD"
+                    ],
                     "score": 24.0,
                     "kill_pct": 34.67,
                     "kp_score": 7,
@@ -20760,9 +20766,7 @@
                 {
                     "name": "AmsterdamK#LAS",
                     "champion": "Blitzcrank",
-                    "titles": [
-                        "CONO"
-                    ],
+                    "titles": [],
                     "score": 10.5,
                     "kill_pct": 14.55,
                     "kp_score": 2,
@@ -20786,7 +20790,7 @@
                     "name": "Nabuegixi#LAS",
                     "champion": "Vel'Koz",
                     "titles": [
-                        "ALPHA"
+                        "GOD"
                     ],
                     "score": 24.0,
                     "kill_pct": 25.42,
@@ -20924,9 +20928,7 @@
                 {
                     "name": "L3blanc James#LAS",
                     "champion": "Fizz",
-                    "titles": [
-                        "CONO"
-                    ],
+                    "titles": [],
                     "score": 10.5,
                     "kill_pct": 17.24,
                     "kp_score": 2,
@@ -21013,7 +21015,9 @@
                 {
                     "name": "UN CONO#LAS",
                     "champion": "Lulu",
-                    "titles": [],
+                    "titles": [
+                        "CONO"
+                    ],
                     "score": 15.5,
                     "kill_pct": 7.14,
                     "kp_score": 9,
@@ -21276,9 +21280,7 @@
                 {
                     "name": "UN CONO#LAS",
                     "champion": "Fiddlesticks",
-                    "titles": [
-                        "CONO"
-                    ],
+                    "titles": [],
                     "score": 9.0,
                     "kill_pct": 7.14,
                     "kp_score": 1,
@@ -21318,7 +21320,7 @@
                     "name": "Nabuegixi#LAS",
                     "champion": "Ashe",
                     "titles": [
-                        "ALPHA"
+                        "GOD"
                     ],
                     "score": 23.5,
                     "kill_pct": 38.89,
@@ -21593,9 +21595,7 @@
                 {
                     "name": "Fipus#ACLRV",
                     "champion": "Lissandra",
-                    "titles": [
-                        "CONO"
-                    ],
+                    "titles": [],
                     "score": 11.5,
                     "kill_pct": 18.75,
                     "kp_score": 2,
@@ -21822,7 +21822,7 @@
                     "name": "AmsterdamK#LAS",
                     "champion": "Orianna",
                     "titles": [
-                        "ALPHA"
+                        "GOD"
                     ],
                     "score": 24.0,
                     "kill_pct": 37.33,
@@ -22163,7 +22163,9 @@
                 {
                     "name": "AmsterdamK#LAS",
                     "champion": "Cassiopeia",
-                    "titles": [],
+                    "titles": [
+                        "ALPHA"
+                    ],
                     "score": 24.0,
                     "kill_pct": 23.26,
                     "kp_score": 7,
@@ -22203,7 +22205,7 @@
                     "name": "SworDanc3#LAS",
                     "champion": "Twitch",
                     "titles": [
-                        "ALPHA"
+                        "GOD"
                     ],
                     "score": 22.0,
                     "kill_pct": 63.77,
