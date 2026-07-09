@@ -15,8 +15,17 @@ function showView(viewName){
         view.classList.remove("active-view");
     });
 
+    document.querySelectorAll(".tab-button").forEach(button => {
+        button.classList.remove("active");
+    });
+
     views[viewName].classList.add("active-view");
+
+    document
+        .querySelector(`.tab-button[data-view="${viewName}"]`)
+        .classList.add("active");
 }
+
 async function loadDashboard(){
   try{
     const response=await fetch("dashboard_data.json");
@@ -80,11 +89,17 @@ function loadChampionsSelect(){
         return;
     }
 
-    Object.keys(
-        dashboardData
-            .champion_engine
-            .champion_performance
-    ).sort().forEach(championName => {
+    const championNames =
+        Object.keys(
+            dashboardData
+                .champion_engine
+                .champion_performance
+        ).sort();
+
+    const championSearchOptions =
+        document.getElementById("champion-search-options");
+
+    championNames.forEach(championName => {
 
         championSelect.innerHTML += `
             <option value="${championName}">
@@ -92,12 +107,51 @@ function loadChampionsSelect(){
             </option>
         `;
 
+        if(championSearchOptions){
+            championSearchOptions.innerHTML += `
+                <option value="${championName}">
+            `;
+        }
+
     });
 
     championSelect.addEventListener("change", () => {
         const championName = championSelect.value;
 
         renderChampionProfile(championName);
+    });
+
+    const championSearchInput =
+        document.getElementById("champion-search-input");
+
+    if(!championSearchInput){
+        return;
+    }
+
+    championSearchInput.addEventListener("input", () => {
+
+        const query =
+            championSearchInput.value.trim().toLowerCase();
+
+        if(!query){
+            championSelect.value = "";
+            document.getElementById("champions-champion-results").innerHTML = "";
+            return;
+        }
+
+        const championName =
+            championNames.find(
+                name => name.toLowerCase() === query
+            );
+
+        if(!championName){
+            return;
+        }
+
+        championSelect.value = championName;
+
+        renderChampionProfile(championName);
+
     });
 
 }
@@ -353,7 +407,9 @@ function renderChampionPlayerTable(championProfile){
                 <th rowspan="2">Games</th>
                 <th rowspan="2" class="score-stat">Score</th>
 
+                <th rowspan="2">KILL%</th>
                 <th rowspan="2">KP</th>
+                <th rowspan="2">KP%</th>
                 <th class="metric-group" colspan="2">DMG</th>
                 <th rowspan="2">UTIL</th>
                 <th class="metric-group secondary-stat" colspan="2">CC</th>
@@ -388,7 +444,9 @@ function renderChampionPlayerTable(championProfile){
                     </td>
                     <td>${player.global_games}</td>
                     <td class="score-stat">${player.global_avg}</td>
+                    <td>${player.avg_kill_pct.toFixed(1)}%</td>
                     <td>${player.global_avg_kp}</td>
+                    <td>${player.avg_kp_pct.toFixed(1)}%</td>
 
                     <td class="metric-block-left">${player.global_avg_dmg}</td>
                     <td class="metric-block-right">${player.avg_dmg_share.toFixed(1)}%</td>
@@ -608,34 +666,6 @@ function renderPlayerChampionDetail(champion){
                     </div>
                 `;
 
-}
-
-function renderRanking(elementId,ranking){
-  const el=document.getElementById(elementId);
-  if(!ranking||ranking.length===0){el.innerHTML="<p>No hay datos.</p>";return;}
-  let html=`<table><thead><tr><th>#</th><th>Jugador</th><th>Games</th><th class="score-stat">Score</th><th>DMG</th><th>KP</th><th>UTIL</th><th class="secondary-stat">CC</th><th class="secondary-stat">TANK</th></tr></thead><tbody>`;
-  ranking.forEach((r,i)=>{
-const rankClass = i < 3 ? `rank-${i+1}` : "";
-html+=`<tr class="${rankClass}">
-<td>${i+1}</td>
-<td>
-${r.name}
-<br>
-😈${r.god_count} (${r.god_count}/${r.games})
-🏅${r.alpha_count} (${r.alpha_count}/${r.games})
-🍦${r.cono_count} (${r.cono_count}/${r.games})
-</td>
-<td>${r.games}</td>
-<td class="score-stat">${r.avg}</td>
-<td>${r.avg_dmg}</td>
-<td>${r.avg_kp}</td>
-<td>${r.avg_util}</td>
-<td class="secondary-stat">${r.avg_cc}</td>
-<td class="secondary-stat">${r.avg_tank}</td>
-</tr>`;
-  });
-  html+=`</tbody></table>`;
-  el.innerHTML=html;
 }
 
 function renderGlobalRanking(elementId, ranking){

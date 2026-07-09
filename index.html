@@ -43,7 +43,16 @@
 <div id="view-champions" class="app-view">
 
 <section>
-  <h2>⚔️ Champions</h2>
+    <h2>⚔️ Champions</h2>
+
+  <input
+    id="champion-search-input"
+    class="champion-search-input"
+    placeholder="Search Champion..."
+    list="champion-search-options"
+  >
+
+  <datalist id="champion-search-options"></datalist>
 
   <select id="champions-champion-select">
     <option value="">Select Champion..</option>

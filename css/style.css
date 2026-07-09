@@ -294,3 +294,15 @@ table td {
     color:#f9fafb;
     font-weight:bold;
 }
+
+.champion-search-input{
+    width:100%;
+    max-width:320px;
+    margin:0 12px 12px 0;
+    padding:10px 12px;
+    border-radius:10px;
+    border:1px solid rgba(75,85,99,0.85);
+    background:rgba(17,24,39,0.92);
+    color:#f9fafb;
+    font-weight:bold;
+}
