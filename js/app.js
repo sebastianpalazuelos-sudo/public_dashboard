@@ -752,10 +752,6 @@ function renderPlayerChampionDetail(champion){
 
                 <div style="text-align:center; margin:28px 0 24px;">
 
-                    <h3>
-                        Champion Baseline — ${champion.champion}
-                    </h3>
-
                     <div class="meta">
                         Promedio histórico de jugadores no-Friends
                         observados con ${champion.champion}.
@@ -797,7 +793,11 @@ function renderPlayerChampionDetail(champion){
                         Promedio histórico de jugadores no-Friends.
                         Muestra: ${champion.games} partidas.
                     `
-                    : "Promedio histórico del jugador seleccionado."
+                    : `
+                        Promedio histórico del jugador seleccionado.
+                        <br>
+                        Muestra: ${champion.games} partidas.
+                    `
                 }
             </div>
 
