@@ -35,8 +35,9 @@ h1,h2{
 
 h1{
     margin-bottom:8px;
-    font-size:34px;
+    font-size:28px;
     letter-spacing:-0.03em;
+    text-align:center;
 }
 
 h2{
@@ -311,4 +312,13 @@ table td {
     background:rgba(17,24,39,0.92);
     color:#f9fafb;
     font-weight:bold;
+}
+
+.header-subtitle{
+    text-align:center;
+    color:#9ca3af;
+    font-size:15px;
+    font-style:italic;
+    margin-top:-8px;
+    margin-bottom:18px;
 }

@@ -62,15 +62,22 @@ function loadPlayersSelect(){
         return;
     }
 
-    Object.keys(
-        dashboardData.champion_engine.player_champion_profiles
-    ).sort().forEach(playerName => {
-        playerSelect.innerHTML += `
-            <option value="${playerName}">
-                ${playerName}
-            </option>
-        `;
-    });
+playerSelect.innerHTML += `
+    <option value="Champion Baseline">
+        Champion Baseline
+    </option>
+`;
+
+Object.keys(
+    dashboardData.champion_engine.player_champion_profiles
+).sort().forEach(playerName => {
+
+    playerSelect.innerHTML += `
+        <option value="${playerName}">
+            ${playerName}
+        </option>
+    `;
+});
 
     playerSelect.addEventListener("change", () => {
         const playerName = playerSelect.value;
@@ -364,10 +371,28 @@ function renderChampionTendencies(metricName){
 
 function renderChampionProfile(championName){
 
-    const championProfile =
+    const friendProfiles =
         dashboardData
             .champion_engine
-            .champion_performance[championName];
+            .champion_performance[championName] ?? [];
+
+    const baseline =
+        dashboardData
+            .champion_engine
+            .champion_baseline?.[championName];
+
+    const championProfile = [
+        ...friendProfiles
+    ];
+
+    if(baseline){
+
+        championProfile.push({
+            ...baseline,
+            global_games: baseline.games
+        });
+
+    }
 
     document.getElementById("champions-champion-results").innerHTML = `
         <div class="player-profile-card">
@@ -378,7 +403,7 @@ function renderChampionProfile(championName){
             <div class="summary-cards">
                 <div class="summary-card">
                     <div class="summary-label">
-                        Jugadores
+                        Perfiles
                     </div>
                     <div class="summary-value">
                         ${championProfile.length}
@@ -473,10 +498,29 @@ function renderChampionPlayerTable(championProfile){
 
 function renderPlayerProfile(playerName){
 
-    const playerProfile =
-        dashboardData
-            .champion_engine
-            .player_champion_profiles[playerName];
+    let playerProfile;
+
+    let profileTitle =
+        "PLAYER CHAMPION PROFILE";
+
+    if(playerName === "Champion Baseline"){
+
+        playerProfile =
+            dashboardData
+                .champion_engine
+                .champion_baseline;
+
+        profileTitle =
+            "CHAMPION BASELINE";
+
+    }else{
+
+        playerProfile =
+            dashboardData
+                .champion_engine
+                .player_champion_profiles[playerName];
+
+    }
 
     const championCount =
         Object.keys(playerProfile).length;
@@ -503,14 +547,16 @@ function renderPlayerProfile(playerName){
 
     document.getElementById("players-player-results").innerHTML = `
         <div class="player-profile-card">
-            <div class="meta">PLAYER CHAMPION PROFILE</div>
+            <div class="meta">${profileTitle}</div>
 
             <h3>${playerName}</h3>
 
             <div class="summary-cards">
                 <div class="summary-card">
                     <div class="summary-label">
-                        Campeones utilizados
+                        ${playerName === "Champion Baseline"
+                            ? "Champion Baselines"
+                            : "Campeones utilizados"}
                     </div>
                     <div class="summary-value">
                         ${championCount}
@@ -519,7 +565,9 @@ function renderPlayerProfile(playerName){
 
                 <div class="summary-card">
                     <div class="summary-label">
-                        Avg Score
+                        ${playerName === "Champion Baseline"
+                            ? "Avg Baseline"
+                            : "Avg Score"}
                     </div>
                     <div class="summary-value">
                         ${allMatchAvg}
@@ -589,80 +637,176 @@ function renderPlayerChampionTable(playerProfile){
 
 }
 
-function renderPlayerChampionDetail(champion){
 
-    const profileCard = document.querySelector(".player-profile-card");
+function buildChampionDetailCards(profile){
 
-    if(profileCard){
-        profileCard.style.display = "none";
-    }
-    document.getElementById("players-champion-table").innerHTML = `
-        <button class="back-button" onclick="renderPlayerChampionTable(Object.values(dashboardData.champion_engine.player_champion_profiles[document.getElementById('players-player-select').value]))">
-            ← Volver a Champion History
-        </button>
-
-        <h3>${champion.champion}</h3>
-
+    return `
         <div class="summary-cards">
             <div class="summary-card player-champion-score-card">
                 <div class="summary-label">
                     Score
                 </div>
+
                 <div class="summary-value">
-                    ${champion.global_avg}
+                    ${profile.global_avg}
                 </div>
+
                 <div class="meta">
-                    😈${champion.global_god ?? 0} 🏅${champion.global_alpha ?? 0} 🍦${champion.global_cono ?? 0}
+                    😈${profile.global_god ?? 0}
+                    🏅${profile.global_alpha ?? 0}
+                    🍦${profile.global_cono ?? 0}
                 </div>
-                       </div>
+            </div>
 
-                        <div class="summary-card contribution-table-card">
-                                <div class="summary-label">
-                                    Breakdown
-                                </div>
+            <div class="summary-card contribution-table-card">
+                <div class="summary-label">
+                    Breakdown
+                </div>
 
-                                <table class="contribution-mini-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Kill%</th>
-                                            <th>KP</th>
-                                            <th>KP%</th>
-                                            <th>DMG</th>
-                                            <th>DMG%</th>
-                                            <th>UTIL</th>
-                                            <th class="secondary-stat">CC</th>
-                                            <th class="secondary-stat">CC%</th>
-                                            <th class="secondary-stat">TANK</th>
-                                            <th class="secondary-stat">TANK%</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>${champion.avg_kill_pct.toFixed(1)}%</td>
+                <table class="contribution-mini-table">
+                    <thead>
+                        <tr>
+                            <th>Kill%</th>
+                            <th>KP</th>
+                            <th>KP%</th>
+                            <th>DMG</th>
+                            <th>DMG%</th>
+                            <th>UTIL</th>
+                            <th class="secondary-stat">CC</th>
+                            <th class="secondary-stat">CC%</th>
+                            <th class="secondary-stat">TANK</th>
+                            <th class="secondary-stat">TANK%</th>
+                        </tr>
+                    </thead>
 
-                                            <td>${champion.global_avg_kp}</td>
-                                            <td>${champion.avg_kp_pct.toFixed(1)}%</td>
+                    <tbody>
+                        <tr>
+                            <td>${profile.avg_kill_pct.toFixed(1)}%</td>
 
-                                            <td>${champion.global_avg_dmg}</td>
-                                            <td>${champion.avg_dmg_share.toFixed(1)}%</td>
+                            <td>${profile.global_avg_kp}</td>
+                            <td>${profile.avg_kp_pct.toFixed(1)}%</td>
 
-                                            <td>${champion.global_avg_util}</td>
+                            <td>${profile.global_avg_dmg}</td>
+                            <td>${profile.avg_dmg_share.toFixed(1)}%</td>
 
-                                            <td class="secondary-stat">${champion.global_avg_cc}</td>
-                                            <td class="secondary-stat">${champion.avg_cc_share.toFixed(1)}%</td>
+                            <td>${profile.global_avg_util}</td>
 
-                                            <td class="secondary-stat">${champion.global_avg_tank}</td>
-                                            <td class="secondary-stat">${champion.avg_tank_share.toFixed(1)}%</td>
-                                        </tr>
-                                    </tbody>
-                                    </table>
-                            </div>
-                            </div>
-                        
-                        </div>
+                            <td class="secondary-stat">
+                                ${profile.global_avg_cc}
+                            </td>
 
+                            <td class="secondary-stat">
+                                ${profile.avg_cc_share.toFixed(1)}%
+                            </td>
+
+                            <td class="secondary-stat">
+                                ${profile.global_avg_tank}
+                            </td>
+
+                            <td class="secondary-stat">
+                                ${profile.avg_tank_share.toFixed(1)}%
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    `;
+
+}
+
+
+function renderPlayerChampionDetail(champion){
+
+    const profileCard =
+        document.querySelector(".player-profile-card");
+
+    if(profileCard){
+        profileCard.style.display = "none";
+    }
+
+    const selectedProfileName =
+        document.getElementById(
+            "players-player-select"
+        ).value;
+
+    const baseline =
+        dashboardData
+            .champion_engine
+            .champion_baseline?.[champion.champion];
+
+    const isBaselineProfile =
+        selectedProfileName === "Champion Baseline";
+
+    let baselineComparison = "";
+
+    if(
+        baseline
+        && !isBaselineProfile
+    ){
+
+        baselineComparison = `
+            <div class="baseline-comparison">
+
+                <hr>
+
+                <div style="text-align:center; margin:28px 0 24px;">
+
+                    <h3>
+                        Champion Baseline — ${champion.champion}
+                    </h3>
+
+                    <div class="meta">
+                        Promedio histórico de jugadores no-Friends
+                        observados con ${champion.champion}.
+                        <br>
+                        Muestra: ${baseline.games} partidas.
                     </div>
-                `;
+
+                </div>
+
+                ${buildChampionDetailCards(baseline)}
+
+            </div>
+        `;
+
+    }
+
+    document.getElementById(
+        "players-champion-table"
+    ).innerHTML = `
+
+        <button
+            class="back-button"
+            onclick="renderPlayerProfile(
+                document.getElementById(
+                    'players-player-select'
+                ).value
+            )"
+        >
+            ← Volver a Champion History
+        </button>
+
+        <div style="text-align:center; margin-bottom:24px;">
+
+            <h3>${champion.champion}</h3>
+
+            <div class="meta">
+                ${isBaselineProfile
+                    ? `
+                        Promedio histórico de jugadores no-Friends.
+                        Muestra: ${champion.games} partidas.
+                    `
+                    : "Promedio histórico del jugador seleccionado."
+                }
+            </div>
+
+        </div>
+
+        ${buildChampionDetailCards(champion)}
+
+        ${baselineComparison}
+    `;
 
 }
 
