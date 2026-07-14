@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>ARAM Engine Dashboard</title>
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/style.css?v=navigation-v0.2.0">
 </head>
 <body>
 <header>
@@ -23,9 +23,13 @@
 
 <main>
 <div id="view-home" class="app-view active-view">
+
 <section>
-  <h2>Split Ranking</h2>
-  <div id="home-global-split-ranking"></div>
+  <h2>Player Champion Highlights</h2>
+  <div class="home-highlights-note">
+    Top 3 champions per player · Minimum 3 matches per champion
+  </div>
+  <div id="home-player-champion-highlights"></div>
 </section>
 
 </div>
@@ -47,52 +51,65 @@
 <div id="view-champions" class="app-view">
 
 <section>
-    <h2>⚔️ Champions</h2>
+  <h2>⚔️ Champions</h2>
 
-  <input
-    id="champion-search-input"
-    class="champion-search-input"
-    placeholder="Search Champion..."
-    list="champion-search-options"
-  >
+  <nav class="champion-subtabs">
+    <button class="champion-subtab-button active" data-champion-subview="explorer">
+      Champion Explorer
+    </button>
+    <button class="champion-subtab-button" data-champion-subview="representative">
+      Champion Representative
+    </button>
+    <button class="champion-subtab-button" data-champion-subview="tendencies">
+      Champion Tendencies
+    </button>
+  </nav>
 
-  <datalist id="champion-search-options"></datalist>
+  <div id="champion-subview-explorer" class="champion-subview active-champion-subview">
+    <input
+      id="champion-search-input"
+      class="champion-search-input"
+      placeholder="Search Champion..."
+      list="champion-search-options"
+    >
+    <datalist id="champion-search-options"></datalist>
 
-  <select id="champions-champion-select">
-    <option value="">Select Champion..</option>
-  </select>
+    <select id="champions-champion-select">
+      <option value="">Select Champion..</option>
+    </select>
 
-  <div id="champions-champion-results"></div>
+    <div id="champions-champion-results"></div>
+  </div>
 
-  <hr>
+  <div id="champion-subview-representative" class="champion-subview">
+    <h3>By category:</h3>
 
-  <h3> Champion Specialization </h3>
+    <select id="champion-representative-metric-select">
+      <option value="">Select category...</option>
+      <option value="dmg_share">DMG</option>
+      <option value="cc_share">CC</option>
+      <option value="tank_share">Tank</option>
+      <option value="kp">KP%</option>
+      <option value="kill">Kill%</option>
+    </select>
 
-  <select id="champion-representative-metric-select">
-    <option value="">Select Specialization..</option>
-    <option value="dmg_share">DMG </option>
-    <option value="cc_share">CC </option>
-    <option value="tank_share">Tank </option>
-    <option value="kp">KP% </option>
-    <option value="kill">Kill% </option>
-  </select>
+    <div id="champion-representative-results"></div>
+  </div>
 
-  <div id="champion-representative-results"></div>
+  <div id="champion-subview-tendencies" class="champion-subview">
+    <h3>By category:</h3>
 
-  <hr>
+    <select id="champion-tendencies-metric-select">
+      <option value="">Select category...</option>
+      <option value="dmg_share">Damage</option>
+      <option value="cc_share">Control</option>
+      <option value="tank_share">Tank</option>
+      <option value="kp">KP%</option>
+      <option value="kill">Kill%</option>
+    </select>
 
-<h3>Champion Tendencies</h3>
-
-<select id="champion-tendencies-metric-select">
-  <option value="">Select criterion...</option>
-  <option value="dmg_share">Damage</option>
-  <option value="cc_share">Control</option>
-  <option value="tank_share">Tank</option>
-  <option value="kp">KP%</option>
-  <option value="kill">Kill%</option>
-</select>
-
-<div id="champion-tendencies-results"></div>
+    <div id="champion-tendencies-results"></div>
+  </div>
 </section>
 
 </div>
@@ -100,20 +117,14 @@
 <div id="view-splits" class="app-view">
 
 <section>
+  <h2>🏁 Splits</h2>
 
-    <h2>🏁 Splits</h2>
+  <div class="split-toolbar">
+    <label for="split-select">Select Split</label>
+    <select id="split-select"></select>
+  </div>
 
-    <div class="player-profile-card">
-
-        <h3>Split #1</h3>
-
-        <div class="meta">
-            12 Jun 2026 — 31 Jul 2026
-        </div>
-        <div class="meta" id="current-split-matches"></div>
-
-    </div>
-
+  <div id="split-results"></div>
 </section>
 
 </div>
@@ -142,6 +153,6 @@
 
 </main>
 
-<script src="js/app.js"></script>
+<script src="js/app.js?v=navigation-v0.2.0"></script>
 </body>
 </html>
