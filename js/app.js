@@ -654,13 +654,23 @@ function renderPlayerProfile(playerName){
             (a, b) => b.global_avg - a.global_avg
         );
 
+    const getChampionGames = champion =>
+        champion.global_games ?? champion.games ?? 0;
+
     const allMatchGames =
-        champions.reduce((sum, champion) => sum + champion.global_games, 0);
+        champions.reduce(
+            (sum, champion) =>
+                sum + getChampionGames(champion),
+            0
+        );
 
     const allMatchTotal =
         champions.reduce(
             (sum, champion) =>
-                sum + (champion.global_avg * champion.global_games),
+                sum + (
+                    champion.global_avg
+                    * getChampionGames(champion)
+                ),
             0
         );
 
@@ -669,7 +679,9 @@ function renderPlayerProfile(playerName){
             ? (allMatchTotal / allMatchGames).toFixed(2)
             : "0.00";
 
-    document.getElementById("players-player-results").innerHTML = `
+    document.getElementById(
+        "players-player-results"
+    ).innerHTML = `
         <div class="player-profile-card">
             <div class="meta">${profileTitle}</div>
 
@@ -697,15 +709,14 @@ function renderPlayerProfile(playerName){
                         ${allMatchAvg}
                     </div>
                 </div>
-                                        </div>
+            </div>
         </div>
 
         <div id="players-champion-table"></div>
     `;
 
     renderPlayerChampionTable(champions);
-
-    }
+}
 
 function renderPlayerChampionTable(playerProfile){
 
@@ -735,7 +746,7 @@ function renderPlayerChampionTable(playerProfile){
         <tr class="champion-row" data-champion-index="${index}">
                 <td>${index + 1}</td>
                 <td>${champion.champion}</td>
-                <td>${champion.games}</td>
+                <td>${champion.global_games ?? champion.games ?? 0}</td>
                 <td>
                     <strong>${champion.global_avg}</strong>
                     (${champion.global_god ?? 0}😈 ${champion.global_alpha ?? 0}🏅 ${champion.global_cono ?? 0}🍦)
