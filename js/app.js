@@ -493,8 +493,7 @@ function renderChampionTendencies(metricName){
     el.innerHTML = html;
 }
 
-function renderChampionProfile(championName){
-
+function getChampionComparisonProfile(championName){
     const friendProfiles =
         dashboardData
             .champion_engine
@@ -505,50 +504,23 @@ function renderChampionProfile(championName){
             .champion_engine
             .champion_baseline?.[championName];
 
-    const championProfile = [
-        ...friendProfiles
-    ];
+    const championProfile = friendProfiles.map(player => ({...player}));
 
     if(baseline){
-
         championProfile.push({
             ...baseline,
             global_games: baseline.games
         });
-
     }
 
-    document.getElementById("champions-champion-results").innerHTML = `
-        <div class="player-profile-card">
-            <div class="meta">CHAMPION PROFILE</div>
-
-            <h3>${championName}</h3>
-
-            <div class="summary-cards">
-                <div class="summary-card">
-                    <div class="summary-label">
-                        Perfiles
-                    </div>
-                    <div class="summary-value">
-                        ${championProfile.length}
-                    </div>
-                </div>
-            </div>
-
-            <div id="champions-player-table"></div>
-        </div>
-    `;
-
-    renderChampionPlayerTable(championProfile);
-
+    return championProfile;
 }
 
-function renderChampionPlayerTable(championProfile){
-
+function buildChampionRankingTable(championProfile, selectedPlayerName = null){
     let html = `
         <h3>Champion Ranking</h3>
 
-        <table>
+        <table class="champion-ranking-table">
         <thead>
             <tr>
                 <th rowspan="2">#</th>
@@ -575,21 +547,27 @@ function renderChampionPlayerTable(championProfile){
                 <th class="metric-block-right secondary-stat">Share</th>
             </tr>
         </thead>
-            <tbody>
+        <tbody>
     `;
 
-    championProfile
+    [...championProfile]
         .sort((a, b) => b.global_avg - a.global_avg)
         .forEach((player, index) => {
+            const isSelected = selectedPlayerName && player.name === selectedPlayerName;
+
             html += `
-                <tr>
+                <tr class="${isSelected ? "selected-player-row" : ""}">
                     <td>${index + 1}</td>
                     <td>
-                        ${player.name}
-                        <br>
-                        😈${player.global_god ?? 0}
-                        🏅${player.global_alpha ?? 0}
-                        🍦${player.global_cono ?? 0}
+                        <div class="champion-ranking-player-name">
+                            ${escapeHtml(player.name)}
+                            ${isSelected ? '<span class="selected-player-badge">SELECTED PLAYER</span>' : ''}
+                        </div>
+                        <div class="champion-ranking-titles">
+                            😈${player.global_god ?? 0}
+                            🏅${player.global_alpha ?? 0}
+                            🍦${player.global_cono ?? 0}
+                        </div>
                     </td>
                     <td>${player.global_games}</td>
                     <td class="score-stat">${player.global_avg}</td>
@@ -607,17 +585,39 @@ function renderChampionPlayerTable(championProfile){
 
                     <td class="metric-block-left secondary-stat">${player.global_avg_tank}</td>
                     <td class="metric-block-right secondary-stat">${player.avg_tank_share.toFixed(1)}%</td>
-                    </tr>
+                </tr>
             `;
         });
 
     html += `
-            </tbody>
+        </tbody>
         </table>
-`;
+    `;
 
-    document.getElementById("champions-player-table").innerHTML = html;
+    return html;
+}
 
+function renderChampionProfile(championName){
+    const championProfile = getChampionComparisonProfile(championName);
+
+    document.getElementById("champions-champion-results").innerHTML = `
+        <div class="player-profile-card">
+            <div class="meta">CHAMPION PROFILE</div>
+            <h3>${escapeHtml(championName)}</h3>
+
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <div class="summary-label">Perfiles</div>
+                    <div class="summary-value">${championProfile.length}</div>
+                </div>
+            </div>
+
+            <div id="champions-player-table"></div>
+        </div>
+    `;
+
+    document.getElementById("champions-player-table").innerHTML =
+        buildChampionRankingTable(championProfile);
 }
 
 function renderPlayerProfile(playerName){
@@ -766,88 +766,39 @@ function renderPlayerChampionTable(playerProfile){
         const championIndex = row.dataset.championIndex;
         const champion = playerProfile[championIndex];
 
-        renderPlayerChampionDetail(champion);
+        renderPlayerChampionDetail(champion, document.getElementById("players-player-select").value);
     });
 });
 
 }
 
-function renderPlayerChampionDetail(champion){
-
+function renderPlayerChampionDetail(champion, playerName){
     const profileCard = document.querySelector(".player-profile-card");
 
     if(profileCard){
         profileCard.style.display = "none";
     }
+
+    const championName = champion.champion;
+    const championProfile = getChampionComparisonProfile(championName);
+
     document.getElementById("players-champion-table").innerHTML = `
         <button class="back-button" onclick="renderPlayerChampionTable(Object.values(dashboardData.champion_engine.player_champion_profiles[document.getElementById('players-player-select').value]))">
-            ← Volver a Champion History
+            ← Volver al historial de ${escapeHtml(playerName)}
         </button>
 
-        <h3>${champion.champion}</h3>
+        <div class="player-champion-comparison-header">
+            <div class="meta">PLAYER CHAMPION COMPARISON</div>
+            <h3>${escapeHtml(championName)}</h3>
+            <p>Comparación del rendimiento de <strong>${escapeHtml(playerName)}</strong> frente a los demás perfiles del campeón.</p>
+        </div>
 
-        <div class="summary-cards player-champion-detail-grid">
-            <div class="summary-card player-champion-score-card">
-                <div class="summary-label">
-                    Score
-                </div>
-                <div class="summary-value">
-                    ${champion.global_avg}
-                </div>
-                <div class="meta">
-                    😈${champion.global_god ?? 0} 🏅${champion.global_alpha ?? 0} 🍦${champion.global_cono ?? 0}
-                </div>
-                       </div>
-
-                        <div class="summary-card contribution-table-card">
-                                <div class="summary-label">
-                                    Breakdown
-                                </div>
-
-                                <table class="contribution-mini-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Kill%</th>
-                                            <th>KP</th>
-                                            <th>KP%</th>
-                                            <th>DMG</th>
-                                            <th>DMG%</th>
-                                            <th>UTIL</th>
-                                            <th class="secondary-stat">CC</th>
-                                            <th class="secondary-stat">CC%</th>
-                                            <th class="secondary-stat">TANK</th>
-                                            <th class="secondary-stat">TANK%</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>${champion.avg_kill_pct.toFixed(1)}%</td>
-
-                                            <td>${champion.global_avg_kp}</td>
-                                            <td>${champion.avg_kp_pct.toFixed(1)}%</td>
-
-                                            <td>${champion.global_avg_dmg}</td>
-                                            <td>${champion.avg_dmg_share.toFixed(1)}%</td>
-
-                                            <td>${champion.global_avg_util}</td>
-
-                                            <td class="secondary-stat">${champion.global_avg_cc}</td>
-                                            <td class="secondary-stat">${champion.avg_cc_share.toFixed(1)}%</td>
-
-                                            <td class="secondary-stat">${champion.global_avg_tank}</td>
-                                            <td class="secondary-stat">${champion.avg_tank_share.toFixed(1)}%</td>
-                                        </tr>
-                                    </tbody>
-                                    </table>
-                            </div>
-                            </div>
-                        
-                        </div>
-
-                    </div>
-                `;
-
+        <div class="player-champion-comparison-table">
+            ${buildChampionRankingTable(championProfile, playerName)}
+        </div>
+    `;
 }
+
 
 function formatHomeMetric(value, digits = 2){
     const number = Number(value);
@@ -1221,6 +1172,19 @@ function escapeHtml(value){
         .replaceAll("'", "&#039;");
 }
 
+
+function formatChampionName(player){
+    const champion = String(player?.champion ?? "").trim();
+
+    // Nunca mostrar un championId como si fuera el nombre del campeón.
+    // El motor intenta resolverlo; si no puede, la interfaz omite el dato.
+    if(!champion || /^\d+$/.test(champion) || /^unknown(?: champion)?/i.test(champion)){
+        return `<span class="champion-unavailable" title="Nombre de campeón no disponible">—</span>`;
+    }
+
+    return escapeHtml(champion);
+}
+
 function formatContextNumber(value){
     return Number(value || 0).toLocaleString("es-AR");
 }
@@ -1249,7 +1213,7 @@ function renderContextEntities(entities, type){
     }).join("");
 }
 
-function renderPlayerContext(player){
+function renderPlayerContext(player, isRemake = false){
     const context = player.context || {};
 
     return `
@@ -1276,6 +1240,7 @@ function renderPlayerContext(player){
                 </div>
             </div>
 
+            ${isRemake ? "" : `
             <div class="match-context-group">
                 <h4>Items</h4>
                 <div class="context-entities">${renderContextEntities(context.items, "item")}</div>
@@ -1285,6 +1250,7 @@ function renderPlayerContext(player){
                 <h4>Augments</h4>
                 <div class="context-entities">${renderContextEntities(context.augments, "augment")}</div>
             </div>
+            `}
         </div>
     `;
 }
@@ -1319,8 +1285,20 @@ function renderMatchExplorer(matchId){
         return;
     }
 
+    const remakeHeader = match.is_remake
+        ? `<span class="match-remake-badge">REMAKE</span>`
+        : "";
+
+    const remakeNotice = match.is_remake
+        ? `<div class="match-remake-notice">Esta partida fue anulada oficialmente por Riot y no participa en estadísticas, rankings ni análisis.</div>`
+        : "";
+
     let html = `
-    <h3>${match.match_id}</h3>
+    <div class="match-heading ${match.is_remake ? "match-heading-remake" : ""}">
+        <h3>${escapeHtml(match.match_id)}</h3>
+        ${remakeHeader}
+    </div>
+    ${remakeNotice}
     <div class="match-table-wrap">
     <table class="match-explorer-table">
     <thead><tr>
@@ -1334,7 +1312,7 @@ function renderMatchExplorer(matchId){
             onclick="toggleMatchContext('${rowId}')"
             onkeydown="if(event.key === 'Enter' || event.key === ' '){event.preventDefault();toggleMatchContext('${rowId}');}">
         <td>${escapeHtml(player.name)}</td>
-        <td>${escapeHtml(player.champion)}</td>
+        <td>${formatChampionName(player)}</td>
         <td>${player.titles.join(" ")}</td>
         <td class="score-stat">${player.score}</td>
         <td>${player.kill_pct}%</td><td>${player.kp_score}</td><td>${player.kp_pct}%</td>
@@ -1342,7 +1320,7 @@ function renderMatchExplorer(matchId){
         <td class="secondary-stat">${player.cc_score}</td><td class="secondary-stat">${player.cc_share}%</td>
         <td class="secondary-stat">${player.tank_score}</td><td class="secondary-stat">${player.tank_share}%</td>
         </tr>
-        <tr id="${rowId}" class="match-context-row" hidden><td colspan="14">${renderPlayerContext(player)}</td></tr>`;
+        <tr id="${rowId}" class="match-context-row" hidden><td colspan="14">${renderPlayerContext(player, match.is_remake)}</td></tr>`;
     });
 
     html += `</tbody></table></div>`;
