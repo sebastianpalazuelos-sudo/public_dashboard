@@ -845,3 +845,267 @@ table td {
     letter-spacing:.08em;
     white-space:nowrap;
 }
+
+
+/* CHAMPION REFERENCE + EXPANDABLE PLAYER HISTORY */
+.champion-ranking-wrap{
+    width:100%;
+    overflow-x:auto;
+}
+.champion-ranking-row.champion-history-toggle{
+    cursor:pointer;
+    outline:none;
+}
+.champion-ranking-row.champion-history-toggle:hover,
+.champion-ranking-row.champion-history-toggle:focus{
+    background:rgba(59,130,246,.12);
+}
+.champion-expand-arrow{
+    display:inline-block;
+    width:18px;
+    color:#93c5fd;
+    transition:transform .15s ease;
+}
+.champion-ranking-row.history-open .champion-expand-arrow{
+    transform:rotate(90deg);
+}
+.champion-reference-row > td{
+    background:rgba(251,191,36,.11);
+    border-top:2px solid rgba(251,191,36,.82);
+    border-bottom:2px solid rgba(251,191,36,.82);
+}
+.champion-reference-row > td:first-child{
+    border-left:5px solid #fbbf24;
+    box-shadow:inset 8px 0 18px rgba(251,191,36,.08);
+}
+.champion-reference-row > td:last-child{
+    border-right:2px solid rgba(251,191,36,.82);
+}
+.champion-reference-row .score-stat{
+    color:#fbbf24;
+    text-shadow:0 0 14px rgba(251,191,36,.18);
+}
+.champion-reference-badge{
+    display:inline-flex;
+    align-items:center;
+    padding:3px 7px;
+    border:1px solid rgba(251,191,36,.75);
+    border-radius:999px;
+    background:rgba(180,83,9,.18);
+    color:#fcd34d;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:.08em;
+    white-space:nowrap;
+}
+.champion-history-row td{
+    padding:0;
+    background:rgba(2,6,23,.76);
+    white-space:normal;
+    text-align:left!important;
+}
+.champion-history-panel{
+    padding:18px 22px 22px;
+    border-top:1px solid rgba(96,165,250,.28);
+    border-bottom:1px solid rgba(96,165,250,.18);
+}
+.champion-history-heading{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:18px;
+    margin-bottom:14px;
+}
+.champion-history-heading strong{
+    display:block;
+    margin-top:4px;
+    color:#f8fafc;
+    font-size:18px;
+}
+.champion-history-heading > span{
+    color:#94a3b8;
+    font-size:12px;
+    font-weight:700;
+}
+.champion-history-stats{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(150px,1fr));
+    gap:10px;
+    margin-bottom:18px;
+}
+.champion-history-stat{
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+    padding:12px 14px;
+    border:1px solid rgba(75,85,99,.85);
+    border-radius:10px;
+    background:rgba(17,24,39,.9);
+}
+.champion-history-stat span{
+    color:#93c5fd;
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+}
+.champion-history-stat strong{
+    color:#f8fafc;
+    font-size:22px;
+}
+.champion-history-groups{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:16px;
+}
+.champion-history-group{
+    min-width:0;
+    padding:14px;
+    border:1px solid rgba(75,85,99,.7);
+    border-radius:12px;
+    background:rgba(15,23,42,.62);
+    box-shadow:none;
+}
+.champion-history-group h4{
+    margin:0 0 10px;
+    color:#cbd5e1;
+    font-size:12px;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+}
+.champion-signature-list{
+    display:flex;
+    flex-wrap:wrap;
+    gap:9px;
+}
+.champion-signature-entity{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    min-width:190px;
+    flex:1 1 190px;
+    padding:7px 10px 7px 7px;
+    border:1px solid rgba(75,85,99,.85);
+    border-radius:10px;
+    background:rgba(17,24,39,.92);
+}
+.champion-signature-icon{
+    width:38px;
+    height:38px;
+    flex:0 0 38px;
+    object-fit:cover;
+    border-radius:8px;
+    background:#111827;
+}
+.champion-signature-copy{
+    display:flex;
+    min-width:0;
+    flex-direction:column;
+    gap:2px;
+}
+.champion-signature-copy strong{
+    overflow:hidden;
+    color:#f8fafc;
+    font-size:12px;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+.champion-signature-copy span{
+    color:#94a3b8;
+    font-size:10px;
+}
+.champion-signature-rarity{
+    color:#c4b5fd!important;
+    font-weight:800;
+}
+.champion-history-empty{
+    color:#94a3b8;
+    font-size:12px;
+    font-style:italic;
+}
+@media (max-width:760px){
+    .champion-history-heading{align-items:flex-start;flex-direction:column;gap:8px}
+    .champion-history-stats,.champion-history-groups{grid-template-columns:1fr}
+    .champion-history-panel{padding:16px}
+}
+
+
+/* =========================================
+   PROFILE CONTEXT HIERARCHY v0.4
+   ========================================= */
+
+.champion-history-heading{
+    align-items:flex-start;
+    justify-content:flex-start;
+}
+
+.champion-history-match-count{
+    display:block;
+    margin-top:4px;
+    color:#94a3b8;
+    font-size:12px;
+    font-weight:700;
+}
+
+.champion-history-stat{
+    gap:6px;
+}
+
+.champion-history-stat strong{
+    color:#f8fafc;
+    font-size:30px;
+    line-height:1;
+    letter-spacing:-0.025em;
+}
+
+.champion-history-stat small{
+    color:#94a3b8;
+    font-size:12px;
+    font-weight:600;
+}
+
+.context-stat-card{
+    gap:6px;
+}
+
+.context-stat-card strong{
+    color:#f8fafc;
+    font-size:30px;
+    line-height:1;
+    letter-spacing:-0.025em;
+}
+
+.context-stat-card small{
+    color:#9ca3af;
+    font-size:12px;
+    font-weight:600;
+}
+
+@media (max-width:760px){
+    .champion-history-heading{
+        gap:0;
+    }
+}
+
+
+/* =========================================
+   PROFILES — CHAMPION REFERENCE DESCRIPTION
+   ========================================= */
+
+.champion-reference-description{
+    max-width:760px;
+    margin:10px 0 24px;
+    color:#94a3b8;
+    font-size:14px;
+    line-height:1.55;
+}
+
+.player-profile-card > .meta + .champion-reference-description{
+    margin-top:10px;
+}
+
+@media (max-width:760px){
+    .champion-reference-description{
+        margin-bottom:20px;
+    }
+}

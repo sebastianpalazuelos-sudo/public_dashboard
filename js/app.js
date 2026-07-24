@@ -187,8 +187,8 @@ function loadPlayersSelect(){
     }
 
 playerSelect.innerHTML += `
-    <option value="Champion Baseline">
-        Champion Baseline
+    <option value="Champion Reference">
+        ‹ Champion Reference ›
     </option>
 `;
 
@@ -372,7 +372,9 @@ function renderChampionRepresentatives(metricName){
             <tr>
                 <td>${index + 1}</td>
                 <td>${r.champion}</td>
-                <td>${r.name}</td>
+                <td>${r.name === "Champion Baseline"
+                    ? "‹ Champion Reference ›"
+                    : escapeHtml(r.name)}</td>
                 <td>${r.games}</td>
                 <td>${r.score}</td>
                 <td class="${metricName === "kp" ? "specialization-stat" : ""}">${r.kp.toFixed(1)}%</td>
@@ -516,10 +518,138 @@ function getChampionComparisonProfile(championName){
     return championProfile;
 }
 
-function buildChampionRankingTable(championProfile, selectedPlayerName = null){
+function formatChampionContextValue(value, digits = 2){
+    const number = Number(value);
+
+    if(!Number.isFinite(number)){
+        return "0";
+    }
+
+    return number.toFixed(digits).replace(/\.?0+$/, "");
+}
+
+function renderSignatureEntities(entities, entityType){
+    const safeEntities = Array.isArray(entities) ? entities : [];
+
+    if(safeEntities.length === 0){
+        return `<span class="champion-history-empty">No historical data available.</span>`;
+    }
+
+    return safeEntities.map(entity => {
+        const icon = entity.icon
+            ? `<img class="champion-signature-icon" src="${escapeHtml(entity.icon)}" alt="" loading="lazy">`
+            : "";
+        const rarity = entityType === "augment" && entity.rarity
+            ? `<span class="champion-signature-rarity">${escapeHtml(entity.rarity)}</span>`
+            : "";
+        const games = Number(entity.games) || 0;
+        const usage = formatChampionContextValue(entity.usage_pct, 1);
+
+        return `
+            <div class="champion-signature-entity" title="${escapeHtml(entity.description || entity.name || "")}">
+                ${icon}
+                <div class="champion-signature-copy">
+                    <strong>${escapeHtml(entity.name || "Unknown")}</strong>
+                    <span>${games} game${games === 1 ? "" : "s"} · ${usage}% usage</span>
+                    ${rarity}
+                </div>
+            </div>
+        `;
+    }).join("");
+}
+
+function buildChampionHistoryPanel(player){
+    const games = Number(player.global_games) || 0;
+
+    return `
+        <div class="champion-history-panel">
+            <div class="champion-history-heading">
+                <div>
+                    <div class="meta">HISTORICAL PROFILE</div>
+                    <strong>${escapeHtml(
+                        player.name === "Champion Baseline"
+                            ? "‹ Champion Reference ›"
+                            : player.name
+                    )}</strong>
+                    <span class="champion-history-match-count">
+                        Based on ${games} match${games === 1 ? "" : "es"}
+                    </span>
+                </div>
+            </div>
+
+            <div class="champion-history-stats">
+                <div class="champion-history-stat">
+                    <span>Avg Death Share</span>
+                    <strong>
+                        ${formatChampionContextValue(
+                            player.avg_deaths_share,
+                            1
+                        )}%
+                    </strong>
+                    <small>
+                        ${formatChampionContextValue(player.avg_deaths)}
+                        average deaths
+                    </small>
+                </div>
+
+                <div class="champion-history-stat">
+                    <span>Avg Minion Share</span>
+                    <strong>
+                        ${formatChampionContextValue(
+                            player.avg_minions_share,
+                            1
+                        )}%
+                    </strong>
+                    <small>
+                        ${formatChampionContextValue(player.avg_minions)}
+                        average minions
+                    </small>
+                </div>
+
+                <div class="champion-history-stat">
+                    <span>Avg Gold Share</span>
+                    <strong>
+                        ${formatChampionContextValue(
+                            player.avg_gold_spent_share,
+                            1
+                        )}%
+                    </strong>
+                    <small>
+                        ${Math.round(
+                            Number(player.avg_gold_spent) || 0
+                        ).toLocaleString("es-AR")}
+                        average gold spent
+                    </small>
+                </div>
+            </div>
+
+            <div class="champion-history-groups">
+                <section class="champion-history-group">
+                    <h4>Signature Items</h4>
+                    <div class="champion-signature-list">
+                        ${renderSignatureEntities(player.signature_items, "item")}
+                    </div>
+                </section>
+
+                <section class="champion-history-group">
+                    <h4>Signature Augments</h4>
+                    <div class="champion-signature-list">
+                        ${renderSignatureEntities(player.signature_augments, "augment")}
+                    </div>
+                </section>
+            </div>
+        </div>
+    `;
+}
+
+function buildChampionRankingTable(
+    championProfile,
+    selectedProfileName = null
+){
     let html = `
         <h3>Champion Ranking</h3>
 
+        <div class="champion-ranking-wrap">
         <table class="champion-ranking-table">
         <thead>
             <tr>
@@ -552,39 +682,152 @@ function buildChampionRankingTable(championProfile, selectedPlayerName = null){
 
     [...championProfile]
         .sort((a, b) => b.global_avg - a.global_avg)
-        .forEach((player, index) => {
-            const isSelected = selectedPlayerName && player.name === selectedPlayerName;
+        .forEach((profile, index) => {
+
+            const isReference =
+                profile.name === "Champion Baseline";
+
+            const displayName =
+                isReference
+                    ? "‹ Champion Reference ›"
+                    : profile.name;
+
+            const isSelected =
+                Boolean(
+                    selectedProfileName
+                    && (
+                        isReference
+                            ? selectedProfileName === "Champion Reference"
+                            : displayName === selectedProfileName
+                    )
+                );
+
+            const isExpandable = true;
+
+            const rowKey =
+                `champion-profile-${index}`;
+
+            const rowClasses = [
+                "champion-ranking-row",
+                isSelected
+                    ? "selected-player-row"
+                    : "",
+                isReference
+                    ? "champion-reference-row"
+                    : "",
+                "champion-history-toggle"
+            ]
+                .filter(Boolean)
+                .join(" ");
 
             html += `
-                <tr class="${isSelected ? "selected-player-row" : ""}">
-                    <td>${index + 1}</td>
+                <tr
+                    class="${rowClasses}"
+                    data-history-target="${rowKey}"
+                    tabindex="0"
+                    role="button"
+                    aria-expanded="false"
+                >
+                    <td>
+                        <span class="champion-expand-arrow">▸</span>
+                        ${index + 1}
+                    </td>
+
                     <td>
                         <div class="champion-ranking-player-name">
-                            ${escapeHtml(player.name)}
-                            ${isSelected ? '<span class="selected-player-badge">SELECTED PLAYER</span>' : ''}
+                            ${escapeHtml(displayName)}
+
+                            ${isSelected
+                                ? `
+                                    <span class="selected-player-badge">
+                                        SELECTED PROFILE
+                                    </span>
+                                `
+                                : ""
+                            }
+
+                            ${isReference
+                                ? `
+                                    <span class="champion-reference-badge">
+                                        CHAMPION REFERENCE
+                                    </span>
+                                `
+                                : ""
+                            }
                         </div>
+
                         <div class="champion-ranking-titles">
-                            😈${player.global_god ?? 0}
-                            🏅${player.global_alpha ?? 0}
-                            🍦${player.global_cono ?? 0}
+                            😈${profile.global_god ?? 0}
+                            🏅${profile.global_alpha ?? 0}
+                            🍦${profile.global_cono ?? 0}
                         </div>
                     </td>
-                    <td>${player.global_games}</td>
-                    <td class="score-stat">${player.global_avg}</td>
-                    <td>${player.avg_kill_pct.toFixed(1)}%</td>
-                    <td>${player.global_avg_kp}</td>
-                    <td>${player.avg_kp_pct.toFixed(1)}%</td>
 
-                    <td class="metric-block-left">${player.global_avg_dmg}</td>
-                    <td class="metric-block-right">${player.avg_dmg_share.toFixed(1)}%</td>
+                    <td>${profile.global_games}</td>
 
-                    <td>${player.global_avg_util}</td>
+                    <td class="score-stat">
+                        ${profile.global_avg}
+                    </td>
 
-                    <td class="metric-block-left secondary-stat">${player.global_avg_cc}</td>
-                    <td class="metric-block-right secondary-stat">${player.avg_cc_share.toFixed(1)}%</td>
+                    <td>
+                        ${Number(
+                            profile.avg_kill_pct || 0
+                        ).toFixed(1)}%
+                    </td>
 
-                    <td class="metric-block-left secondary-stat">${player.global_avg_tank}</td>
-                    <td class="metric-block-right secondary-stat">${player.avg_tank_share.toFixed(1)}%</td>
+                    <td>
+                        ${profile.global_avg_kp}
+                    </td>
+
+                    <td>
+                        ${Number(
+                            profile.avg_kp_pct || 0
+                        ).toFixed(1)}%
+                    </td>
+
+                    <td class="metric-block-left">
+                        ${profile.global_avg_dmg}
+                    </td>
+
+                    <td class="metric-block-right">
+                        ${Number(
+                            profile.avg_dmg_share || 0
+                        ).toFixed(1)}%
+                    </td>
+
+                    <td>
+                        ${profile.global_avg_util}
+                    </td>
+
+                    <td class="metric-block-left secondary-stat">
+                        ${profile.global_avg_cc}
+                    </td>
+
+                    <td class="metric-block-right secondary-stat">
+                        ${Number(
+                            profile.avg_cc_share || 0
+                        ).toFixed(1)}%
+                    </td>
+
+                    <td class="metric-block-left secondary-stat">
+                        ${profile.global_avg_tank}
+                    </td>
+
+                    <td class="metric-block-right secondary-stat">
+                        ${Number(
+                            profile.avg_tank_share || 0
+                        ).toFixed(1)}%
+                    </td>
+                </tr>
+
+                <tr
+                    id="${rowKey}"
+                    class="champion-history-row"
+                    hidden
+                >
+                    <td colspan="14">
+                        ${buildChampionHistoryPanel(profile)}
+                    </td>
                 </tr>
             `;
         });
@@ -592,9 +835,40 @@ function buildChampionRankingTable(championProfile, selectedPlayerName = null){
     html += `
         </tbody>
         </table>
+        </div>
     `;
 
     return html;
+}
+
+function attachChampionRankingInteractions(container){
+    if(!container){
+        return;
+    }
+
+    container.querySelectorAll(".champion-history-toggle").forEach(row => {
+        const toggle = () => {
+            const targetId = row.dataset.historyTarget;
+            const detailRow = targetId ? container.querySelector(`#${targetId}`) : null;
+
+            if(!detailRow){
+                return;
+            }
+
+            const willOpen = detailRow.hidden;
+            detailRow.hidden = !willOpen;
+            row.classList.toggle("history-open", willOpen);
+            row.setAttribute("aria-expanded", String(willOpen));
+        };
+
+        row.addEventListener("click", toggle);
+        row.addEventListener("keydown", event => {
+            if(event.key === "Enter" || event.key === " "){
+                event.preventDefault();
+                toggle();
+            }
+        });
+    });
 }
 
 function renderChampionProfile(championName){
@@ -616,8 +890,9 @@ function renderChampionProfile(championName){
         </div>
     `;
 
-    document.getElementById("champions-player-table").innerHTML =
-        buildChampionRankingTable(championProfile);
+    const tableContainer = document.getElementById("champions-player-table");
+    tableContainer.innerHTML = buildChampionRankingTable(championProfile);
+    attachChampionRankingInteractions(tableContainer);
 }
 
 function renderPlayerProfile(playerName){
@@ -627,7 +902,10 @@ function renderPlayerProfile(playerName){
     let profileTitle =
         "PLAYER CHAMPION PROFILE";
 
-    if(playerName === "Champion Baseline"){
+    const isChampionReference =
+        playerName === "Champion Reference";
+
+    if(isChampionReference){
 
         playerProfile =
             dashboardData
@@ -635,7 +913,7 @@ function renderPlayerProfile(playerName){
                 .champion_baseline;
 
         profileTitle =
-            "CHAMPION BASELINE";
+            "CHAMPION REFERENCE";
 
     }else{
 
@@ -685,14 +963,21 @@ function renderPlayerProfile(playerName){
         <div class="player-profile-card">
             <div class="meta">${profileTitle}</div>
 
-            <h3>${playerName}</h3>
+            ${isChampionReference
+                ? `
+                    <p class="champion-reference-description">
+                        Average performance of all observed opposing players for each champion.
+                        Used as the reference baseline.
+                    </p>
+                `
+                : `<h3>${escapeHtml(playerName)}</h3>`}
 
             <div class="summary-cards">
                 <div class="summary-card">
                     <div class="summary-label">
-                        ${playerName === "Champion Baseline"
-                            ? "Champion Baselines"
-                            : "Campeones utilizados"}
+                        ${isChampionReference
+                            ? "Champions Indexed"
+                            : "Champions Used"}
                     </div>
                     <div class="summary-value">
                         ${championCount}
@@ -701,9 +986,7 @@ function renderPlayerProfile(playerName){
 
                 <div class="summary-card">
                     <div class="summary-label">
-                        ${playerName === "Champion Baseline"
-                            ? "Avg Baseline"
-                            : "Avg Score"}
+                        Avg Score
                     </div>
                     <div class="summary-value">
                         ${allMatchAvg}
@@ -773,32 +1056,78 @@ function renderPlayerChampionTable(playerProfile){
 }
 
 function renderPlayerChampionDetail(champion, playerName){
-    const profileCard = document.querySelector(".player-profile-card");
+    const profileCard =
+        document.querySelector(".player-profile-card");
 
     if(profileCard){
         profileCard.style.display = "none";
     }
 
-    const championName = champion.champion;
-    const championProfile = getChampionComparisonProfile(championName);
+    const championName =
+        champion.champion;
 
-    document.getElementById("players-champion-table").innerHTML = `
-        <button class="back-button" onclick="renderPlayerChampionTable(Object.values(dashboardData.champion_engine.player_champion_profiles[document.getElementById('players-player-select').value]))">
-            ← Volver al historial de ${escapeHtml(playerName)}
+    const championProfile =
+        getChampionComparisonProfile(championName);
+
+    const detailContainer =
+        document.getElementById("players-champion-table");
+
+    const isChampionReference =
+        playerName === "Champion Reference";
+
+    detailContainer.innerHTML = `
+        <button
+            class="back-button"
+            id="player-champion-back-button"
+            type="button"
+        >
+            ← Back to ${escapeHtml(playerName)} history
         </button>
 
         <div class="player-champion-comparison-header">
-            <div class="meta">PLAYER CHAMPION COMPARISON</div>
+            <div class="meta">CHAMPION PROFILE COMPARISON</div>
             <h3>${escapeHtml(championName)}</h3>
-            <p>Comparación del rendimiento de <strong>${escapeHtml(playerName)}</strong> frente a los demás perfiles del campeón.</p>
+            <p>
+                Comparing
+                <strong>${escapeHtml(playerName)}</strong>
+                with the other observed profiles for this champion.
+            </p>
         </div>
 
         <div class="player-champion-comparison-table">
-            ${buildChampionRankingTable(championProfile, playerName)}
+            ${buildChampionRankingTable(
+                championProfile,
+                playerName
+            )}
         </div>
     `;
-}
 
+    document
+        .getElementById("player-champion-back-button")
+        ?.addEventListener("click", () => {
+
+            const sourceProfile =
+                isChampionReference
+                    ? dashboardData
+                        .champion_engine
+                        .champion_baseline
+                    : dashboardData
+                        .champion_engine
+                        .player_champion_profiles[playerName];
+
+            const champions =
+                Object
+                    .values(sourceProfile || {})
+                    .sort(
+                        (a, b) =>
+                            b.global_avg - a.global_avg
+                    );
+
+            renderPlayerChampionTable(champions);
+        });
+
+    attachChampionRankingInteractions(detailContainer);
+}
 
 function formatHomeMetric(value, digits = 2){
     const number = Number(value);
@@ -1225,18 +1554,21 @@ function renderPlayerContext(player, isRemake = false){
 
             <div class="match-context-stats">
                 <div class="context-stat-card">
-                    <span class="context-stat-label">Deaths</span>
-                    <strong>${formatContextNumber(context.deaths)}</strong>
-                    <span>${context.deaths_pct || 0}% del equipo</span>
+                    <span class="context-stat-label">Death Share</span>
+                    <strong>${context.deaths_pct || 0}%</strong>
+                    <small>${formatContextNumber(context.deaths)} deaths</small>
                 </div>
+
                 <div class="context-stat-card">
-                    <span class="context-stat-label">Minions</span>
-                    <strong>${formatContextNumber(context.minions)}</strong>
-                    <span>${context.minions_pct || 0}% del equipo</span>
+                    <span class="context-stat-label">Minion Share</span>
+                    <strong>${context.minions_pct || 0}%</strong>
+                    <small>${formatContextNumber(context.minions)} minions</small>
                 </div>
+
                 <div class="context-stat-card">
-                    <span class="context-stat-label">Gold Spent</span>
-                    <strong>${formatContextNumber(context.gold_spent)}</strong>
+                    <span class="context-stat-label">Gold Share</span>
+                    <strong>${context.gold_spent_pct || 0}%</strong>
+                    <small>${formatContextNumber(context.gold_spent)} gold spent</small>
                 </div>
             </div>
 
