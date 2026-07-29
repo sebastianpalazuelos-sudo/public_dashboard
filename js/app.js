@@ -1815,9 +1815,26 @@ function sortMatchPlayers(players){
 }
 
 function matchSortHeader(label, key){
-    const active = matchExplorerSort.key === key;
-    const arrow = active ? (matchExplorerSort.direction === "asc" ? " ▲" : " ▼") : "";
-    return `<th class="match-sort-header ${active ? "active-sort" : ""}" data-sort-key="${key}">${label}${arrow}</th>`;
+
+    const sortable = !["teamId", "name", "champion"].includes(key);
+
+    const active = sortable && matchExplorerSort.key === key;
+
+    const arrow = !sortable
+        ? ""
+        : (active
+            ? (matchExplorerSort.direction === "asc" ? " ▲" : " ▼")
+            : " ↕");
+
+    const cls = sortable
+        ? "match-sort-header"
+        : "";
+
+    const data = sortable
+        ? `data-sort-key="${key}"`
+        : "";
+
+    return `<th class="${cls} ${active ? "active-sort" : ""}" ${data}>${label}${arrow}</th>`;
 }
 
 function attachMatchExplorerSorting(matchId){
