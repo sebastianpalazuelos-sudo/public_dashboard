@@ -7,6 +7,7 @@ const views = {
 };
 
 let dashboardData = null;
+let matchExplorerSort = { key: "score", direction: "desc" };
 
 let activeViewName = "home";
 
@@ -532,7 +533,7 @@ function renderSignatureEntities(entities, entityType){
     const safeEntities = Array.isArray(entities) ? entities : [];
 
     if(safeEntities.length === 0){
-        return `<span class="champion-history-empty">No historical data available.</span>`;
+        return `<span class="champion-history-empty">No current split data available.</span>`;
     }
 
     return safeEntities.map(entity => {
@@ -565,7 +566,7 @@ function buildChampionHistoryPanel(player){
         <div class="champion-history-panel">
             <div class="champion-history-heading">
                 <div>
-                    <div class="meta">HISTORICAL PROFILE</div>
+                    <div class="meta">CURRENT SPLIT PROFILE</div>
                     <strong>${escapeHtml(
                         player.name === "Champion Baseline"
                             ? "‹ Champion Reference ›"
@@ -640,6 +641,114 @@ function buildChampionHistoryPanel(player){
             </div>
         </div>
     `;
+}
+
+
+function formatProfileMatchDate(timestamp){
+    const value = Number(timestamp);
+    if(!Number.isFinite(value) || value <= 0){ return ""; }
+
+    return new Intl.DateTimeFormat("es-AR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+    }).format(new Date(value));
+}
+
+function buildProfileMatchesPanel(profile, options = {}){
+    const matches = Array.isArray(profile?.matches) ? profile.matches : [];
+    const showPlayer = Boolean(options.showPlayer);
+
+    if(matches.length === 0){
+        return `<div class="profile-matches-empty">No hay partidas enlazadas para este perfil.</div>`;
+    }
+
+    return `
+        <div class="profile-matches-panel">
+            <div class="profile-matches-heading">
+                <strong>Partidas que forman este perfil</strong>
+                <span>${matches.length} partida${matches.length === 1 ? "" : "s"}</span>
+            </div>
+            <div class="profile-match-list">
+                ${matches.map(match => {
+                    const titleIcons = renderMatchTitleIcons(match.titles);
+                    const playerText = showPlayer && match.player
+                        ? `<span class="profile-match-player">${escapeHtml(formatMatchPlayerName(match.player))}</span>`
+                        : "";
+                    const dateText = formatProfileMatchDate(match.timestamp);
+
+                    return `
+                        <button
+                            class="profile-match-link"
+                            type="button"
+                            data-match-id="${escapeHtml(match.match_id)}"
+                            title="Abrir partida ${escapeHtml(match.match_id)} en Match Explorer"
+                        >
+                            <span class="profile-match-id">${escapeHtml(match.match_id)}</span>
+                            ${playerText}
+                            <span class="profile-match-score">${titleIcons ? `${titleIcons} ` : ""}${Number(match.score || 0)}</span>
+                            ${dateText ? `<span class="profile-match-date">${dateText}</span>` : ""}
+                            <span class="profile-match-open">Ver partida →</span>
+                        </button>
+                    `;
+                }).join("")}
+            </div>
+        </div>
+    `;
+}
+
+function navigateToMatchExplorer(matchId){
+    const normalizedId = String(matchId || "");
+    const match = dashboardData?.match_explorer?.find(
+        row => String(row.match_id) === normalizedId
+    );
+
+    if(!match){ return; }
+
+    showView("matches");
+
+    const select = document.getElementById("match-select");
+    const search = document.getElementById("match-search-input");
+
+    if(select){ select.value = normalizedId; }
+    if(search){ search.value = normalizedId; }
+
+    renderMatchExplorer(normalizedId);
+    document.getElementById("match-results")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+}
+
+function attachProfileMatchInteractions(container){
+    if(!container){ return; }
+
+    container.querySelectorAll(".profile-matches-toggle").forEach(button => {
+        button.addEventListener("click", event => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const targetId = button.dataset.matchesTarget;
+            const detailRow = targetId
+                ? container.querySelector(`#${targetId}`)
+                : null;
+
+            if(!detailRow){ return; }
+
+            const willOpen = detailRow.hidden;
+            detailRow.hidden = !willOpen;
+            button.classList.toggle("matches-open", willOpen);
+            button.setAttribute("aria-expanded", String(willOpen));
+        });
+    });
+
+    container.querySelectorAll(".profile-match-link").forEach(button => {
+        button.addEventListener("click", event => {
+            event.preventDefault();
+            event.stopPropagation();
+            navigateToMatchExplorer(button.dataset.matchId);
+        });
+    });
 }
 
 function buildChampionRankingTable(
@@ -763,7 +872,18 @@ function buildChampionRankingTable(
                         </div>
                     </td>
 
-                    <td>${profile.global_games}</td>
+                    <td>
+                        <div class="profile-games-cell">
+                            <span>${profile.global_games}</span>
+                            <button
+                                class="profile-matches-toggle"
+                                type="button"
+                                data-matches-target="${rowKey}-matches"
+                                aria-expanded="false"
+                                title="Ver las partidas de este perfil"
+                            >▸</button>
+                        </div>
+                    </td>
 
                     <td class="score-stat">
                         ${profile.global_avg}
@@ -821,6 +941,16 @@ function buildChampionRankingTable(
                 </tr>
 
                 <tr
+                    id="${rowKey}-matches"
+                    class="profile-matches-row"
+                    hidden
+                >
+                    <td colspan="14">
+                        ${buildProfileMatchesPanel(profile, {showPlayer: isReference})}
+                    </td>
+                </tr>
+
+                <tr
                     id="${rowKey}"
                     class="champion-history-row"
                     hidden
@@ -845,6 +975,8 @@ function attachChampionRankingInteractions(container){
     if(!container){
         return;
     }
+
+    attachProfileMatchInteractions(container);
 
     container.querySelectorAll(".champion-history-toggle").forEach(row => {
         const toggle = () => {
@@ -1012,7 +1144,7 @@ function renderPlayerChampionTable(playerProfile){
     let html = `
         <h3>Champion History</h3>
 
-        <table>
+        <table class="player-champion-history-table">
             <thead>
                 <tr>
                     <th>#</th>
@@ -1025,15 +1157,31 @@ function renderPlayerChampionTable(playerProfile){
     `;
 
     playerProfile.forEach((champion, index) => {
-    html += `
-        <tr class="champion-row" data-champion-index="${index}">
+        const matchesRowId = `player-champion-matches-${index}`;
+
+        html += `
+            <tr class="champion-row" data-champion-index="${index}">
                 <td>${index + 1}</td>
-                <td>${champion.champion}</td>
-                <td>${champion.global_games ?? champion.games ?? 0}</td>
+                <td>${escapeHtml(champion.champion)}</td>
+                <td>
+                    <div class="profile-games-cell">
+                        <span>${champion.global_games ?? champion.games ?? 0}</span>
+                        <button
+                            class="profile-matches-toggle"
+                            type="button"
+                            data-matches-target="${matchesRowId}"
+                            aria-expanded="false"
+                            title="Ver las partidas jugadas con ${escapeHtml(champion.champion)}"
+                        >▸</button>
+                    </div>
+                </td>
                 <td>
                     <strong>${champion.global_avg}</strong>
                     (${champion.global_god ?? 0}😈 ${champion.global_alpha ?? 0}🏅 ${champion.global_cono ?? 0}🍦)
                 </td>
+            </tr>
+            <tr id="${matchesRowId}" class="profile-matches-row" hidden>
+                <td colspan="4">${buildProfileMatchesPanel(champion)}</td>
             </tr>
         `;
     });
@@ -1043,16 +1191,22 @@ function renderPlayerChampionTable(playerProfile){
         </table>
     `;
 
-    document.getElementById("players-champion-table").innerHTML = html;
-    document.querySelectorAll(".champion-row").forEach(row => {
-    row.addEventListener("click", () => {
-        const championIndex = row.dataset.championIndex;
-        const champion = playerProfile[championIndex];
+    const container = document.getElementById("players-champion-table");
+    container.innerHTML = html;
 
-        renderPlayerChampionDetail(champion, document.getElementById("players-player-select").value);
+    attachProfileMatchInteractions(container);
+
+    container.querySelectorAll(".champion-row").forEach(row => {
+        row.addEventListener("click", () => {
+            const championIndex = row.dataset.championIndex;
+            const champion = playerProfile[championIndex];
+
+            renderPlayerChampionDetail(
+                champion,
+                document.getElementById("players-player-select").value
+            );
+        });
     });
-});
-
 }
 
 function renderPlayerChampionDetail(champion, playerName){
@@ -1609,6 +1763,93 @@ function toggleMatchContext(rowId){
     }
 }
 
+function formatCompactNumber(value){
+    const number = Number(value);
+    if(!Number.isFinite(number)){ return "0"; }
+
+    const absolute = Math.abs(number);
+    const compact = (divisor, suffix, digits) =>
+        `${(number / divisor).toFixed(digits).replace(/\.?0+$/, "")}${suffix}`;
+
+    if(absolute >= 1000000){ return compact(1000000, "M", absolute >= 10000000 ? 1 : 2); }
+    if(absolute >= 1000){ return compact(1000, "k", absolute >= 100000 ? 0 : 1); }
+    return Math.round(number).toLocaleString("es-AR");
+}
+
+function formatMatchPercent(value){
+    const number = Number(value);
+    return `${Number.isFinite(number) ? number.toFixed(2).replace(/\.?0+$/, "") : "0"}%`;
+}
+
+function getTeamLabel(teamId){
+    const numericId = Number(teamId);
+    if(numericId === 100){ return { label: "", title: "Blue team", className: "team-blue" }; }
+    if(numericId === 200){ return { label: "", title: "Red team", className: "team-red" }; }
+    return { label: "", title: "Unknown team", className: "team-unknown" };
+}
+
+function formatMatchPlayerName(playerName){
+    return String(playerName || "").split("#", 1)[0];
+}
+
+function getMatchSortValue(player, key){
+    if(key === "teamId"){ return Number(player.teamId) || 999; }
+    if(key === "name" || key === "champion"){
+        return String(player[key] || "").toLocaleLowerCase("es");
+    }
+    return Number(player[key]) || 0;
+}
+
+function sortMatchPlayers(players){
+    const { key, direction } = matchExplorerSort;
+    const multiplier = direction === "asc" ? 1 : -1;
+
+    return [...players].sort((a, b) => {
+        const left = getMatchSortValue(a, key);
+        const right = getMatchSortValue(b, key);
+        if(typeof left === "string"){
+            return left.localeCompare(right, "es") * multiplier;
+        }
+        return (left - right) * multiplier;
+    });
+}
+
+function matchSortHeader(label, key){
+    const active = matchExplorerSort.key === key;
+    const arrow = active ? (matchExplorerSort.direction === "asc" ? " ▲" : " ▼") : "";
+    return `<th class="match-sort-header ${active ? "active-sort" : ""}" data-sort-key="${key}">${label}${arrow}</th>`;
+}
+
+function attachMatchExplorerSorting(matchId){
+    document.querySelectorAll(".match-sort-header").forEach(header => {
+        header.addEventListener("click", () => {
+            const key = header.dataset.sortKey;
+            if(matchExplorerSort.key === key){
+                matchExplorerSort.direction = matchExplorerSort.direction === "asc" ? "desc" : "asc";
+            }else{
+                matchExplorerSort = {
+                    key,
+                    direction: ["name", "champion", "teamId"].includes(key) ? "asc" : "desc"
+                };
+            }
+            renderMatchExplorer(matchId);
+        });
+    });
+}
+
+function renderMatchTitleIcons(titles){
+    const iconByTitle = {
+        GOD: "😈",
+        ALPHA: "🏅",
+        CONO: "🍦"
+    };
+
+    return (Array.isArray(titles) ? titles : [])
+        .map(title => iconByTitle[String(title).toUpperCase()] || "")
+        .filter(Boolean)
+        .join("");
+}
+
 function renderMatchExplorer(matchId){
     const match = dashboardData.match_explorer.find(m => m.match_id == matchId);
 
@@ -1634,29 +1875,47 @@ function renderMatchExplorer(matchId){
     <div class="match-table-wrap">
     <table class="match-explorer-table">
     <thead><tr>
-    <th>Player</th><th>Champion</th><th>Titles</th><th>Score</th><th>Kill%</th><th>KP</th><th>KP%</th><th>DMG</th><th>DMG%</th><th>UTIL</th><th class="secondary-stat">CC</th><th class="secondary-stat">CC%</th><th class="secondary-stat">TANK</th><th class="secondary-stat">TANK%</th>
+        ${matchSortHeader("Team", "teamId")}
+        ${matchSortHeader("Player", "name")}
+        ${matchSortHeader("Champion", "champion")}
+        ${matchSortHeader("Score", "score")}
+        ${matchSortHeader("Kills", "kills")}
+        ${matchSortHeader("Kill%", "kill_pct")}
+        ${matchSortHeader("KP", "kp_raw")}
+        ${matchSortHeader("KP%", "kp_pct")}
+        ${matchSortHeader("DMG", "damage_raw")}
+        ${matchSortHeader("DMG%", "dmg_share")}
+        ${matchSortHeader("CC%", "cc_share")}
+        ${matchSortHeader("Tank%", "tank_share")}
     </tr></thead><tbody>`;
 
-    match.players.forEach((player, index) => {
+    sortMatchPlayers(match.players || []).forEach((player, index) => {
         const rowId = `match-context-${match.match_id}-${index}`;
+        const team = getTeamLabel(player.teamId);
+        const titleIcons = renderMatchTitleIcons(player.titles);
         html += `
         <tr class="match-player-row" data-context-row="${rowId}" aria-expanded="false" tabindex="0"
             onclick="toggleMatchContext('${rowId}')"
             onkeydown="if(event.key === 'Enter' || event.key === ' '){event.preventDefault();toggleMatchContext('${rowId}');}">
-        <td>${escapeHtml(player.name)}</td>
-        <td>${formatChampionName(player)}</td>
-        <td>${player.titles.join(" ")}</td>
-        <td class="score-stat">${player.score}</td>
-        <td>${player.kill_pct}%</td><td>${player.kp_score}</td><td>${player.kp_pct}%</td>
-        <td>${player.dmg_score}</td><td>${player.dmg_share}%</td><td>${player.utility_score}</td>
-        <td class="secondary-stat">${player.cc_score}</td><td class="secondary-stat">${player.cc_share}%</td>
-        <td class="secondary-stat">${player.tank_score}</td><td class="secondary-stat">${player.tank_share}%</td>
+        <td><span class="match-team-badge ${team.className}" title="${escapeHtml(team.title)}" aria-label="${escapeHtml(team.title)}">${team.label}</span></td>
+        <td title="${escapeHtml(player.name)}">${escapeHtml(formatMatchPlayerName(player.name))}</td>
+        <td><span class="match-champion-cell"><span class="match-title-icons" aria-label="${escapeHtml((player.titles || []).join(", "))}">${titleIcons}</span><span>${formatChampionName(player)}</span></span></td>
+        <td class="score-stat">${Number(player.score || 0)}</td>
+        <td>${Number(player.kills || 0)}</td>
+        <td>${formatMatchPercent(player.kill_pct)}</td>
+        <td>${Number(player.kp_raw || 0)}</td>
+        <td>${formatMatchPercent(player.kp_pct)}</td>
+        <td title="${formatContextNumber(player.damage_raw)}">${formatCompactNumber(player.damage_raw)}</td>
+        <td>${formatMatchPercent(player.dmg_share)}</td>
+        <td class="secondary-stat">${formatMatchPercent(player.cc_share)}</td>
+        <td class="secondary-stat">${formatMatchPercent(player.tank_share)}</td>
         </tr>
-        <tr id="${rowId}" class="match-context-row" hidden><td colspan="14">${renderPlayerContext(player, match.is_remake)}</td></tr>`;
+        <tr id="${rowId}" class="match-context-row" hidden><td colspan="12">${renderPlayerContext(player, match.is_remake)}</td></tr>`;
     });
 
     html += `</tbody></table></div>`;
     document.getElementById("match-results").innerHTML = html;
+    attachMatchExplorerSorting(match.match_id);
 }
 
 

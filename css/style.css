@@ -309,7 +309,7 @@ table td {
 
 /* MATCH CONTEXT */
 .match-table-wrap{width:100%;overflow-x:auto;}
-.match-explorer-table{min-width:1180px;}
+.match-explorer-table{min-width:1080px;}
 .match-player-row{cursor:pointer;outline:none;}
 .match-player-row:hover,.match-player-row:focus,.match-player-row.context-open{background:rgba(59,130,246,0.16);}
 .match-player-row td:first-child::before{content:"▸";display:inline-block;width:18px;color:#93c5fd;transition:transform .15s ease;}
@@ -1107,5 +1107,162 @@ table td {
 @media (max-width:760px){
     .champion-reference-description{
         margin-bottom:20px;
+    }
+}
+
+
+/* MATCH EXPLORER — TEAM + SORTABLE FACTUAL TABLE */
+.match-sort-header{cursor:pointer;user-select:none;}
+.match-sort-header:hover,.match-sort-header.active-sort{color:#bfdbfe;background:rgba(30,64,175,.22);}
+.match-team-badge{display:inline-block;width:14px;height:14px;min-width:14px;padding:0;border-radius:2px;font-size:0;line-height:0;box-sizing:border-box;}
+.match-team-badge.team-blue{border:1px solid #60a5fa;background:#2563eb;box-shadow:0 0 0 1px rgba(37,99,235,.18);}
+.match-team-badge.team-red{border:1px solid #f87171;background:#ef4444;box-shadow:0 0 0 1px rgba(239,68,68,.18);}
+.match-team-badge.team-unknown{border:1px solid #94a3b8;background:#64748b;}
+
+.match-champion-cell{display:inline-flex;align-items:center;gap:6px;}
+.match-title-icons{display:inline-flex;align-items:center;min-width:0;font-size:15px;line-height:1;white-space:nowrap;}
+.match-title-icons:empty{display:none;}
+
+/* MATCH EXPLORER — COMPACT TEAM / PLAYER COLUMNS v1.4 */
+.match-explorer-table th:first-child,
+.match-explorer-table td:first-child{width:54px;min-width:54px;padding-left:7px;padding-right:7px;}
+.match-explorer-table th:nth-child(2),
+.match-explorer-table td:nth-child(2){width:190px;max-width:190px;overflow:hidden;text-overflow:ellipsis;}
+.match-explorer-table th:nth-child(3),
+.match-explorer-table td:nth-child(3){width:150px;max-width:150px;overflow:hidden;text-overflow:ellipsis;}
+.match-explorer-table th:nth-child(n+4),
+.match-explorer-table td:nth-child(n+4){padding-left:7px;padding-right:7px;}
+
+/* =========================================
+   PROFILE / CHAMPION MATCH LINEAGE v1.5
+   ========================================= */
+.profile-games-cell{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+}
+.profile-matches-toggle{
+    display:inline-flex;
+    width:24px;
+    height:24px;
+    align-items:center;
+    justify-content:center;
+    padding:0;
+    border:1px solid rgba(96,165,250,.55);
+    border-radius:7px;
+    background:rgba(30,64,175,.18);
+    color:#93c5fd;
+    font-size:15px;
+    font-weight:900;
+    line-height:1;
+    cursor:pointer;
+    transition:background .15s ease,border-color .15s ease,transform .15s ease;
+}
+.profile-matches-toggle:hover,
+.profile-matches-toggle:focus{
+    border-color:#93c5fd;
+    background:rgba(59,130,246,.24);
+    outline:none;
+}
+.profile-matches-toggle.matches-open{
+    transform:rotate(90deg);
+}
+.profile-matches-row td{
+    padding:0!important;
+    background:rgba(2,6,23,.76);
+    white-space:normal!important;
+    text-align:left!important;
+}
+.profile-matches-panel{
+    padding:16px 20px 20px;
+    border-top:1px solid rgba(96,165,250,.28);
+    border-bottom:1px solid rgba(96,165,250,.18);
+}
+.profile-matches-heading{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:11px;
+}
+.profile-matches-heading strong{
+    color:#f8fafc;
+    font-size:14px;
+}
+.profile-matches-heading span{
+    color:#94a3b8;
+    font-size:11px;
+    font-weight:700;
+}
+.profile-match-list{
+    display:grid;
+    gap:7px;
+}
+.profile-match-link{
+    display:grid;
+    grid-template-columns:minmax(125px,.9fr) minmax(90px,1fr) 72px 92px auto;
+    align-items:center;
+    gap:12px;
+    width:100%;
+    padding:10px 12px;
+    border:1px solid rgba(75,85,99,.82);
+    border-radius:9px;
+    background:rgba(17,24,39,.9);
+    color:#f8fafc;
+    text-align:left;
+    cursor:pointer;
+    transition:background .15s ease,border-color .15s ease,transform .15s ease;
+}
+.profile-match-link:hover,
+.profile-match-link:focus{
+    border-color:rgba(147,197,253,.8);
+    background:rgba(30,64,175,.2);
+    transform:translateY(-1px);
+    outline:none;
+}
+.profile-match-id{
+    color:#93c5fd;
+    font-weight:800;
+}
+.profile-match-player{
+    overflow:hidden;
+    color:#f8fafc;
+    font-weight:700;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+.profile-match-score{
+    color:#60a5fa;
+    font-weight:900;
+    text-align:center;
+}
+.profile-match-date{
+    color:#94a3b8;
+    font-size:12px;
+    text-align:center;
+}
+.profile-match-open{
+    color:#fbbf24;
+    font-size:12px;
+    font-weight:800;
+    text-align:right;
+}
+.profile-matches-empty{
+    padding:14px;
+    color:#94a3b8;
+    font-style:italic;
+}
+@media (max-width:760px){
+    .profile-match-link{
+        grid-template-columns:1fr auto;
+    }
+    .profile-match-player,
+    .profile-match-date{
+        grid-column:1 / -1;
+        text-align:left;
+    }
+    .profile-match-open{
+        display:none;
     }
 }
