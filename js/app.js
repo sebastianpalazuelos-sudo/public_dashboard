@@ -199,7 +199,7 @@ Object.keys(
 
     playerSelect.innerHTML += `
         <option value="${playerName}">
-            ${playerName}
+            ${escapeHtml(formatPlayerName(playerName))}
         </option>
     `;
 });
@@ -308,8 +308,7 @@ function loadChampionRepresentativeSelect(){
 
 function renderChampionRepresentatives(metricName){
 
-    const el =
-        document.getElementById("champion-representative-results");
+    const el = document.getElementById("champion-representative-results");
 
     if(!metricName){
         el.innerHTML = "";
@@ -317,80 +316,68 @@ function renderChampionRepresentatives(metricName){
     }
 
     const representatives =
-        dashboardData
-            .champion_engine
-            .champion_functional_representatives;
+        dashboardData?.champion_engine?.champion_functional_representatives || {};
 
     const rows = [];
 
     Object.keys(representatives).forEach(championName => {
-
-        const representative =
-            representatives[championName][metricName];
-
-        if(!representative){
-            return;
-        }
-
-        rows.push({
-            champion: championName,
-            ...representative
-        });
-
+        const representative = representatives[championName]?.[metricName];
+        if(!representative){ return; }
+        rows.push({ champion: championName, ...representative });
     });
 
-    rows.sort(
-        (a, b) => b.selected_metric - a.selected_metric
-    );
+    rows.sort((a, b) => Number(b.selected_metric || 0) - Number(a.selected_metric || 0));
 
     if(rows.length === 0){
         el.innerHTML = "<p>No hay datos suficientes.</p>";
         return;
     }
 
+    const activeClass = key => key === metricName ? "specialization-stat" : "";
+
     let html = `
-        <table>
+        <div class="champion-representative-table-wrap">
+        <table class="champion-representative-table">
             <thead>
                 <tr>
                     <th>#</th>
                     <th>Champion</th>
-                    <th>Player</th>
+                    <th>Profile</th>
                     <th>Games</th>
-                    <th>Score</th>
-                    <th class="${metricName === "kp" ? "specialization-stat" : ""}">KP%</th>
-                    <th class="${metricName === "kill" ? "specialization-stat" : ""}">Kill%</th>
-                    <th class="${metricName === "dmg_share" ? "specialization-stat" : ""}">Damage</th>
-                    <th class="${metricName === "cc_share" ? "specialization-stat" : ""}">Control</th>
-                    <th class="${metricName === "tank_share" ? "specialization-stat" : ""}">Tank</th>
+                    <th class="${activeClass("kp_pct")}">KP%</th>
+                    <th class="${activeClass("dpm")}">DPM</th>
+                    <th class="${activeClass("kpm")}">KPM</th>
+                    <th class="${activeClass("ccpm")}">CCPM</th>
+                    <th class="${activeClass("tank_pct")}">Tank%</th>
                 </tr>
             </thead>
             <tbody>
     `;
 
     rows.forEach((r, index) => {
+        const profileName = r.name === "Champion Baseline"
+            ? "‹ Champion Reference ›"
+            : formatPlayerName(r.name);
 
         html += `
             <tr>
                 <td>${index + 1}</td>
-                <td>${r.champion}</td>
-                <td>${r.name === "Champion Baseline"
-                    ? "‹ Champion Reference ›"
-                    : escapeHtml(r.name)}</td>
-                <td>${r.games}</td>
-                <td>${r.score}</td>
-                <td class="${metricName === "kp" ? "specialization-stat" : ""}">${r.kp.toFixed(1)}%</td>
-                <td class="${metricName === "kill" ? "specialization-stat" : ""}">${r.kill.toFixed(1)}%</td>
-                <td class="${metricName === "dmg_share" ? "specialization-stat" : ""}">${r.dmg_share.toFixed(1)}%</td>
-                <td class="${metricName === "cc_share" ? "specialization-stat" : ""}">${r.cc_share.toFixed(1)}%</td>
-                <td class="${metricName === "tank_share" ? "specialization-stat" : ""}">${r.tank_share.toFixed(1)}%</td>
+                <td>${escapeHtml(r.champion)}</td>
+                <td>${escapeHtml(profileName)}</td>
+                <td>${Number(r.games || 0)}</td>
+                <td class="${activeClass("kp_pct")}">${formatHomeMetric(r.kp_pct, 2)}%</td>
+                <td class="${activeClass("dpm")}">${Math.round(Number(r.dpm || 0))}</td>
+                <td class="${activeClass("kpm")}">${formatHomeMetric(r.kpm, 2)}</td>
+                <td class="${activeClass("ccpm")}">${formatHomeMetric(r.ccpm, 2)}</td>
+                <td class="${activeClass("tank_pct")}">${formatHomeMetric(r.tank_pct, 2)}%</td>
             </tr>
         `;
-
     });
 
-        html += `
+    html += `
             </tbody>
         </table>
+        </div>
     `;
 
     el.innerHTML = html;
@@ -426,66 +413,56 @@ function renderChampionTendencies(metricName){
 
     const tendencies =
         dashboardData
-            .champion_engine    
+            .champion_engine
             .champion_tendencies;
 
-    const rows = [];
+    const rows = Object.keys(tendencies).map(championName => ({
+        champion: championName,
+        ...tendencies[championName]
+    }));
 
-    Object.keys(tendencies).forEach(championName => {
-
-        const tendency =
-            tendencies[championName];
-
-        rows.push({
-            champion: championName,
-            ...tendency
-        });
-
-    });
-
-    rows.sort(
-        (a, b) => b[metricName] - a[metricName]
-    );
+    rows.sort((a, b) => Number(b[metricName] || 0) - Number(a[metricName] || 0));
 
     if(rows.length === 0){
         el.innerHTML = "<p>No hay datos suficientes.</p>";
         return;
     }
 
+    const metricClass = key =>
+        metricName === key ? "specialization-stat" : "";
+
     let html = `
-        <table>
+        <table class="champion-tendencies-table">
             <thead>
                 <tr>
                     <th>#</th>
                     <th>Champion</th>
-                    <th>Players</th>
-                    <th>Score</th>
-                    <th class="${metricName === "kp" ? "specialization-stat" : ""}">KP%</th>
-                    <th class="${metricName === "kill" ? "specialization-stat" : ""}">Kill%</th>
-                    <th class="${metricName === "dmg_share" ? "specialization-stat" : ""}">Damage</th>
-                    <th class="${metricName === "cc_share" ? "specialization-stat" : ""}">Control</th>
-                    <th class="${metricName === "tank_share" ? "specialization-stat" : ""}">Tank</th>
+                    <th>Profiles</th>
+                    <th>Games</th>
+                    <th class="${metricClass("kp_pct")}">KP%</th>
+                    <th class="${metricClass("dpm")}">DPM</th>
+                    <th class="${metricClass("kpm")}">KPM</th>
+                    <th class="${metricClass("ccpm")}">CCPM</th>
+                    <th class="${metricClass("tank_pct")}">Tank%</th>
                 </tr>
             </thead>
             <tbody>
     `;
 
     rows.forEach((r, index) => {
-
         html += `
             <tr>
                 <td>${index + 1}</td>
-                <td>${r.champion}</td>
-                <td>${r.players}</td>
-                <td>${r.score}</td>
-                <td class="${metricName === "kp" ? "specialization-stat" : ""}">${r.kp.toFixed(1)}%</td>
-                <td class="${metricName === "kill" ? "specialization-stat" : ""}">${r.kill.toFixed(1)}%</td>
-                <td class="${metricName === "dmg_share" ? "specialization-stat" : ""}">${r.dmg_share.toFixed(1)}%</td>
-                <td class="${metricName === "cc_share" ? "specialization-stat" : ""}">${r.cc_share.toFixed(1)}%</td>
-                <td class="${metricName === "tank_share" ? "specialization-stat" : ""}">${r.tank_share.toFixed(1)}%</td>
+                <td>${escapeHtml(r.champion)}</td>
+                <td>${Number(r.profiles || 0)}</td>
+                <td>${Number(r.games || 0)}</td>
+                <td class="${metricClass("kp_pct")}">${formatHomeMetric(r.kp_pct)}%</td>
+                <td class="${metricClass("dpm")}">${Math.round(Number(r.dpm || 0))}</td>
+                <td class="${metricClass("kpm")}">${formatHomeMetric(r.kpm)}</td>
+                <td class="${metricClass("ccpm")}">${formatHomeMetric(r.ccpm)}</td>
+                <td class="${metricClass("tank_pct")}">${formatHomeMetric(r.tank_pct)}%</td>
             </tr>
         `;
-
     });
 
     html += `
@@ -570,7 +547,7 @@ function buildChampionHistoryPanel(player){
                     <strong>${escapeHtml(
                         player.name === "Champion Baseline"
                             ? "‹ Champion Reference ›"
-                            : player.name
+                            : formatPlayerName(player.name)
                     )}</strong>
                     <span class="champion-history-match-count">
                         Based on ${games} match${games === 1 ? "" : "es"}
@@ -759,75 +736,57 @@ function buildChampionRankingTable(
         <h3>Champion Ranking</h3>
 
         <div class="champion-ranking-wrap">
-        <table class="champion-ranking-table">
+        <table class="champion-ranking-table champion-ranking-table-g4">
         <thead>
             <tr>
-                <th rowspan="2">#</th>
-                <th rowspan="2">Player</th>
-                <th rowspan="2">Games</th>
-                <th rowspan="2" class="score-stat">Score</th>
-
-                <th rowspan="2">KILL%</th>
-                <th rowspan="2">KP</th>
-                <th rowspan="2">KP%</th>
-                <th class="metric-group" colspan="2">DMG</th>
-                <th rowspan="2">UTIL</th>
-                <th class="metric-group secondary-stat" colspan="2">CC</th>
-                <th class="metric-group secondary-stat" colspan="2">TANK</th>
-            </tr>
-            <tr>
-                <th class="metric-block-left">DMG</th>
-                <th class="metric-block-right metric-share">Share</th>
-
-                <th class="metric-block-left secondary-stat">CC</th>
-                <th class="metric-block-right secondary-stat">Share</th>
-
-                <th class="metric-block-left secondary-stat">TANK</th>
-                <th class="metric-block-right secondary-stat">Share</th>
+                <th>#</th>
+                <th>Player</th>
+                <th>Games</th>
+                <th class="score-stat">Score</th>
+                <th>KPM</th>
+                <th>KILL%</th>
+                <th>KP%</th>
+                <th>DPM</th>
+                <th>DMG%</th>
+                <th>CCPM</th>
+                <th>TANK%</th>
+                <th class="component-offense">Offense</th>
+                <th class="component-presence">Presence</th>
+                <th class="component-utility">Utility</th>
             </tr>
         </thead>
         <tbody>
     `;
 
     [...championProfile]
-        .sort((a, b) => b.global_avg - a.global_avg)
+        .sort((a, b) => Number(b.global_avg || 0) - Number(a.global_avg || 0))
         .forEach((profile, index) => {
 
-            const isReference =
-                profile.name === "Champion Baseline";
+            const isReference = profile.name === "Champion Baseline";
+            const displayName = isReference
+                ? "‹ Champion Reference ›"
+                : formatPlayerName(profile.name);
 
-            const displayName =
-                isReference
-                    ? "‹ Champion Reference ›"
-                    : profile.name;
+            const isSelected = Boolean(
+                selectedProfileName
+                && (
+                    isReference
+                        ? selectedProfileName === "Champion Reference"
+                        : profile.name === selectedProfileName
+                )
+            );
 
-            const isSelected =
-                Boolean(
-                    selectedProfileName
-                    && (
-                        isReference
-                            ? selectedProfileName === "Champion Reference"
-                            : displayName === selectedProfileName
-                    )
-                );
-
-            const isExpandable = true;
-
-            const rowKey =
-                `champion-profile-${index}`;
-
+            const rowKey = `champion-profile-${index}`;
             const rowClasses = [
                 "champion-ranking-row",
-                isSelected
-                    ? "selected-player-row"
-                    : "",
-                isReference
-                    ? "champion-reference-row"
-                    : "",
+                isSelected ? "selected-player-row" : "",
+                isReference ? "champion-reference-row" : "",
                 "champion-history-toggle"
-            ]
-                .filter(Boolean)
-                .join(" ");
+            ].filter(Boolean).join(" ");
+
+            const offense = profile.global_avg_offense ?? profile.global_avg_dmg ?? 0;
+            const presence = profile.global_avg_presence ?? profile.global_avg_kp ?? 0;
+            const utility = profile.global_avg_utility ?? profile.global_avg_util ?? 0;
 
             html += `
                 <tr
@@ -837,32 +796,22 @@ function buildChampionRankingTable(
                     role="button"
                     aria-expanded="false"
                 >
-                    <td>
+                    <td class="champion-rank-cell">
                         <span class="champion-expand-arrow">▸</span>
                         ${index + 1}
                     </td>
 
-                    <td>
+                    <td class="champion-player-cell">
                         <div class="champion-ranking-player-name">
                             ${escapeHtml(displayName)}
 
-                            ${isSelected
-                                ? `
-                                    <span class="selected-player-badge">
-                                        SELECTED PROFILE
-                                    </span>
-                                `
-                                : ""
-                            }
+                            ${isSelected ? `
+                                <span class="selected-player-badge">SELECTED PROFILE</span>
+                            ` : ""}
 
-                            ${isReference
-                                ? `
-                                    <span class="champion-reference-badge">
-                                        CHAMPION REFERENCE
-                                    </span>
-                                `
-                                : ""
-                            }
+                            ${isReference ? `
+                                <span class="champion-reference-badge">CHAMPION REFERENCE</span>
+                            ` : ""}
                         </div>
 
                         <div class="champion-ranking-titles">
@@ -874,7 +823,7 @@ function buildChampionRankingTable(
 
                     <td>
                         <div class="profile-games-cell">
-                            <span>${profile.global_games}</span>
+                            <span>${profile.global_games ?? profile.games ?? 0}</span>
                             <button
                                 class="profile-matches-toggle"
                                 type="button"
@@ -885,76 +834,26 @@ function buildChampionRankingTable(
                         </div>
                     </td>
 
-                    <td class="score-stat">
-                        ${profile.global_avg}
-                    </td>
-
-                    <td>
-                        ${Number(
-                            profile.avg_kill_pct || 0
-                        ).toFixed(1)}%
-                    </td>
-
-                    <td>
-                        ${profile.global_avg_kp}
-                    </td>
-
-                    <td>
-                        ${Number(
-                            profile.avg_kp_pct || 0
-                        ).toFixed(1)}%
-                    </td>
-
-                    <td class="metric-block-left">
-                        ${profile.global_avg_dmg}
-                    </td>
-
-                    <td class="metric-block-right">
-                        ${Number(
-                            profile.avg_dmg_share || 0
-                        ).toFixed(1)}%
-                    </td>
-
-                    <td>
-                        ${profile.global_avg_util}
-                    </td>
-
-                    <td class="metric-block-left secondary-stat">
-                        ${profile.global_avg_cc}
-                    </td>
-
-                    <td class="metric-block-right secondary-stat">
-                        ${Number(
-                            profile.avg_cc_share || 0
-                        ).toFixed(1)}%
-                    </td>
-
-                    <td class="metric-block-left secondary-stat">
-                        ${profile.global_avg_tank}
-                    </td>
-
-                    <td class="metric-block-right secondary-stat">
-                        ${Number(
-                            profile.avg_tank_share || 0
-                        ).toFixed(1)}%
-                    </td>
+                    <td class="score-stat">${formatHomeMetric(profile.global_avg)}</td>
+                    <td>${formatHomeMetric(profile.avg_kpm)}</td>
+                    <td>${formatHomeMetric(profile.avg_kill_pct)}%</td>
+                    <td>${formatHomeMetric(profile.avg_kp_pct)}%</td>
+                    <td>${formatHomeMetric(profile.avg_dpm, 0)}</td>
+                    <td>${formatHomeMetric(profile.avg_dmg_share)}%</td>
+                    <td>${formatHomeMetric(profile.avg_ccpm)}</td>
+                    <td>${formatHomeMetric(profile.avg_tank_share)}%</td>
+                    <td class="component-offense">${formatHomeMetric(offense)}</td>
+                    <td class="component-presence">${formatHomeMetric(presence)}</td>
+                    <td class="component-utility">${formatHomeMetric(utility)}</td>
                 </tr>
 
-                <tr
-                    id="${rowKey}-matches"
-                    class="profile-matches-row"
-                    hidden
-                >
+                <tr id="${rowKey}-matches" class="profile-matches-row" hidden>
                     <td colspan="14">
                         ${buildProfileMatchesPanel(profile, {showPlayer: isReference})}
                     </td>
                 </tr>
 
-                <tr
-                    id="${rowKey}"
-                    class="champion-history-row"
-                    hidden
-                >
+                <tr id="${rowKey}" class="champion-history-row" hidden>
                     <td colspan="14">
                         ${buildChampionHistoryPanel(profile)}
                     </td>
@@ -1084,10 +983,22 @@ function renderPlayerProfile(playerName){
             0
         );
 
-    const allMatchAvg =
+    const weightedProfileAvg =
         allMatchGames > 0
-            ? (allMatchTotal / allMatchGames).toFixed(2)
-            : "0.00";
+            ? allMatchTotal / allMatchGames
+            : 0;
+
+    const officialRankingRow = isChampionReference
+        ? null
+        : (dashboardData?.current_split?.global_ranking || []).find(
+            row => row.name === playerName
+        );
+
+    // The player summary must use the same official score shown on Home and
+    // in the split ranking. Champion History remains a per-champion view.
+    const allMatchAvg = isChampionReference
+        ? formatHomeMetric(weightedProfileAvg)
+        : formatHomeMetric(officialRankingRow?.global_avg ?? weightedProfileAvg);
 
     document.getElementById(
         "players-player-results"
@@ -1102,7 +1013,7 @@ function renderPlayerProfile(playerName){
                         Used as the reference baseline.
                     </p>
                 `
-                : `<h3>${escapeHtml(playerName)}</h3>`}
+                : `<h3>${escapeHtml(formatPlayerName(playerName))}</h3>`}
 
             <div class="summary-cards">
                 <div class="summary-card">
@@ -1235,7 +1146,7 @@ function renderPlayerChampionDetail(champion, playerName){
             id="player-champion-back-button"
             type="button"
         >
-            ← Back to ${escapeHtml(playerName)} history
+            ← Back to ${escapeHtml(formatPlayerName(playerName))} history
         </button>
 
         <div class="player-champion-comparison-header">
@@ -1243,7 +1154,7 @@ function renderPlayerChampionDetail(champion, playerName){
             <h3>${escapeHtml(championName)}</h3>
             <p>
                 Comparing
-                <strong>${escapeHtml(playerName)}</strong>
+                <strong>${escapeHtml(formatPlayerName(playerName))}</strong>
                 with the other observed profiles for this champion.
             </p>
         </div>
@@ -1347,29 +1258,35 @@ function renderPlayerChampionHighlights(elementId, highlights){
             : [];
 
         const championRows = champions.length > 0
-            ? champions.map((champion, championIndex) => `
-                <tr>
-                    <td class="home-champion-rank">#${championIndex + 1}</td>
-                    <td class="home-champion-name">
-                        <span class="home-champion-name-line">
-                            <span>${champion.champion || "-"}</span>
-                            ${renderChampionTitleIcons(champion.titles)}
-                        </span>
-                    </td>
-                    <td>${formatHomeMetric(champion.games, 0)}</td>
-                    <td>${formatHomeMetric(champion.score_avg)}</td>
-                    <td>${formatHomeMetric(champion.kill_pct)}%</td>
-                    <td>${formatHomeMetric(champion.kp_score)}</td>
-                    <td>${formatHomeMetric(champion.kp_pct)}%</td>
-                    <td>${formatHomeMetric(champion.dmg_score)}</td>
-                    <td>${formatHomeMetric(champion.dmg_pct)}%</td>
-                    <td>${formatHomeMetric(champion.utility_score)}</td>
-                    <td>${formatHomeMetric(champion.cc_score)}</td>
-                    <td>${formatHomeMetric(champion.cc_pct)}%</td>
-                    <td>${formatHomeMetric(champion.tank_score)}</td>
-                    <td>${formatHomeMetric(champion.tank_pct)}%</td>
-                </tr>
-            `).join("")
+            ? champions.map((champion, championIndex) => {
+                const offense = champion.offense ?? champion.dmg_score ?? 0;
+                const presence = champion.presence ?? champion.kp_score ?? 0;
+                const utility = champion.utility ?? champion.utility_score ?? 0;
+
+                return `
+                    <tr>
+                        <td class="home-champion-rank">#${championIndex + 1}</td>
+                        <td class="home-champion-name">
+                            <span class="home-champion-name-line">
+                                <span>${escapeHtml(champion.champion || "-")}</span>
+                                ${renderChampionTitleIcons(champion.titles)}
+                            </span>
+                        </td>
+                        <td>${formatHomeMetric(champion.games, 0)}</td>
+                        <td class="score-stat">${formatHomeMetric(champion.score_avg)}</td>
+                        <td>${formatHomeMetric(champion.kpm, 2)}</td>
+                        <td>${formatHomeMetric(champion.kill_pct)}%</td>
+                        <td>${formatHomeMetric(champion.kp_pct)}%</td>
+                        <td>${formatHomeMetric(champion.dpm, 0)}</td>
+                        <td>${formatHomeMetric(champion.dmg_pct)}%</td>
+                        <td>${formatHomeMetric(champion.ccpm, 2)}</td>
+                        <td>${formatHomeMetric(champion.tank_pct)}%</td>
+                        <td class="home-component-stat home-offense-stat">${formatHomeMetric(offense)}</td>
+                        <td class="home-component-stat home-presence-stat">${formatHomeMetric(presence)}</td>
+                        <td class="home-component-stat home-utility-stat">${formatHomeMetric(utility)}</td>
+                    </tr>
+                `;
+            }).join("")
             : `
                 <tr>
                     <td colspan="14" class="home-no-qualified-champion">
@@ -1383,7 +1300,7 @@ function renderPlayerChampionHighlights(elementId, highlights){
                 <div class="home-player-card-header">
                     <div>
                         <div class="home-player-name">
-                            ${player.player || "-"}
+                            ${escapeHtml(formatPlayerName(player.player || "-"))}
                         </div>
                         <div class="home-player-card-label">
                             Best observed champion results
@@ -1391,7 +1308,7 @@ function renderPlayerChampionHighlights(elementId, highlights){
                     </div>
 
                     <div class="home-player-global-avg">
-                        <span>GLOBAL AVG</span>
+                        <span>AVG SCORE</span>
                         <strong>${formatHomeMetric(player.global_avg)}</strong>
                     </div>
                 </div>
@@ -1403,17 +1320,17 @@ function renderPlayerChampionHighlights(elementId, highlights){
                                 <th>#</th>
                                 <th>Champion</th>
                                 <th>Games</th>
-                                <th>Score</th>
+                                <th class="score-stat">Score</th>
+                                <th>KPM</th>
                                 <th>Kill%</th>
-                                <th>KP</th>
                                 <th>KP%</th>
-                                <th>DMG</th>
+                                <th>DPM</th>
                                 <th>DMG%</th>
-                                <th>Utility</th>
-                                <th>CC</th>
-                                <th>CC%</th>
-                                <th>Tank</th>
+                                <th>CCPM</th>
                                 <th>Tank%</th>
+                                <th class="home-component-head home-offense-head">Offense</th>
+                                <th class="home-component-head home-presence-head">Presence</th>
+                                <th class="home-component-head home-utility-head">Utility</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1425,7 +1342,6 @@ function renderPlayerChampionHighlights(elementId, highlights){
         `;
     }).join("");
 }
-
 
 function renderGlobalRanking(elementId, ranking){
   const el = document.getElementById(elementId);
@@ -1443,11 +1359,9 @@ function renderGlobalRanking(elementId, ranking){
           <th>Jugador</th>
           <th>Games</th>
           <th class="score-stat">Score</th>
-          <th>DMG</th>
-          <th>KP</th>
-          <th>UTIL</th>
-          <th class="secondary-stat">CC</th>
-          <th class="secondary-stat">TANK</th>
+          <th class="split-offense-head">Offense</th>
+          <th class="split-presence-head">Presence</th>
+          <th class="split-utility-head">Utility</th>
         </tr>
       </thead>
       <tbody>
@@ -1460,19 +1374,17 @@ function renderGlobalRanking(elementId, ranking){
       <tr class="${rankClass}">
         <td>${i + 1}</td>
         <td>
-          ${r.name}
+          ${escapeHtml(formatPlayerName(r.name))}
           <br>
           😈${r.global_god_count} (${r.global_god_count}/${r.games})
           🏅${r.global_alpha_count} (${r.global_alpha_count}/${r.games})
           🍦${r.global_cono_count} (${r.global_cono_count}/${r.games})
         </td>
         <td>${r.games}</td>
-        <td class="score-stat">${r.global_avg}</td>
-        <td>${r.global_avg_dmg}</td>
-        <td>${r.global_avg_kp}</td>
-        <td>${r.global_avg_util}</td>
-        <td class="secondary-stat">${r.global_avg_cc}</td>
-        <td class="secondary-stat">${r.global_avg_tank}</td>
+        <td class="score-stat">${formatHomeMetric(r.global_avg)}</td>
+        <td class="split-component-stat split-offense-stat">${formatHomeMetric(r.global_avg_offense ?? r.global_avg_dmg)}</td>
+        <td class="split-component-stat split-presence-stat">${formatHomeMetric(r.global_avg_presence ?? r.global_avg_kp)}</td>
+        <td class="split-component-stat split-utility-stat">${formatHomeMetric(r.global_avg_utility ?? r.global_avg_util)}</td>
       </tr>
     `;
   });
@@ -1701,9 +1613,27 @@ function renderPlayerContext(player, isRemake = false){
 
     return `
         <div class="match-context-panel">
-            <div class="match-context-identity">
-                <strong>${escapeHtml(player.name)}</strong>
-                <span>${escapeHtml(player.champion)}</span>
+            <div class="match-context-header">
+                <div class="match-context-identity">
+                    <strong>${escapeHtml(formatPlayerName(player.name))}</strong>
+                    <span>${escapeHtml(player.champion)}</span>
+                </div>
+                ${isRemake ? "" : `
+                <div class="match-context-components" aria-label="Score components">
+                    <div class="match-context-component offense-component">
+                        <span>Offense</span>
+                        <strong>${formatMatchScore(player.offense)}</strong>
+                    </div>
+                    <div class="match-context-component presence-component">
+                        <span>Presence</span>
+                        <strong>${formatMatchScore(player.presence)}</strong>
+                    </div>
+                    <div class="match-context-component utility-component">
+                        <span>Utility</span>
+                        <strong>${formatMatchScore(player.utility)}</strong>
+                    </div>
+                </div>
+                `}
             </div>
 
             <div class="match-context-stats">
@@ -1788,8 +1718,13 @@ function getTeamLabel(teamId){
     return { label: "", title: "Unknown team", className: "team-unknown" };
 }
 
-function formatMatchPlayerName(playerName){
+function formatPlayerName(playerName){
     return String(playerName || "").split("#", 1)[0];
+}
+
+// Alias de compatibilidad para enlaces de partidas existentes.
+function formatMatchPlayerName(playerName){
+    return formatPlayerName(playerName);
 }
 
 function getMatchSortValue(player, key){
@@ -1867,6 +1802,18 @@ function renderMatchTitleIcons(titles){
         .join("");
 }
 
+function formatMatchRate(value, digits = 3){
+    const number = Number(value);
+    if(!Number.isFinite(number)){ return "0"; }
+    return number.toFixed(digits).replace(/\.?0+$/, "");
+}
+
+function formatMatchScore(value){
+    const number = Number(value);
+    if(!Number.isFinite(number)){ return "0"; }
+    return number.toFixed(2).replace(/\.?0+$/, "");
+}
+
 function renderMatchExplorer(matchId){
     const match = dashboardData.match_explorer.find(m => m.match_id == matchId);
 
@@ -1890,20 +1837,22 @@ function renderMatchExplorer(matchId){
     </div>
     ${remakeNotice}
     <div class="match-table-wrap">
-    <table class="match-explorer-table">
+    <table class="match-explorer-table match-score-v2-table">
     <thead><tr>
         ${matchSortHeader("Team", "teamId")}
         ${matchSortHeader("Player", "name")}
         ${matchSortHeader("Champion", "champion")}
         ${matchSortHeader("Score", "score")}
-        ${matchSortHeader("Kills", "kills")}
+        ${matchSortHeader("KPM", "kpm")}
         ${matchSortHeader("Kill%", "kill_pct")}
-        ${matchSortHeader("KP", "kp_raw")}
         ${matchSortHeader("KP%", "kp_pct")}
-        ${matchSortHeader("DMG", "damage_raw")}
+        ${matchSortHeader("DPM", "dpm")}
         ${matchSortHeader("DMG%", "dmg_share")}
-        ${matchSortHeader("CC%", "cc_share")}
+        ${matchSortHeader("CCPM", "ccpm")}
         ${matchSortHeader("Tank%", "tank_share")}
+        ${matchSortHeader("Offense", "offense")}
+        ${matchSortHeader("Presence", "presence")}
+        ${matchSortHeader("Utility", "utility")}
     </tr></thead><tbody>`;
 
     sortMatchPlayers(match.players || []).forEach((player, index) => {
@@ -1915,19 +1864,21 @@ function renderMatchExplorer(matchId){
             onclick="toggleMatchContext('${rowId}')"
             onkeydown="if(event.key === 'Enter' || event.key === ' '){event.preventDefault();toggleMatchContext('${rowId}');}">
         <td><span class="match-team-badge ${team.className}" title="${escapeHtml(team.title)}" aria-label="${escapeHtml(team.title)}">${team.label}</span></td>
-        <td title="${escapeHtml(player.name)}">${escapeHtml(formatMatchPlayerName(player.name))}</td>
+        <td title="${escapeHtml(formatPlayerName(player.name))}">${escapeHtml(formatPlayerName(player.name))}</td>
         <td><span class="match-champion-cell"><span class="match-title-icons" aria-label="${escapeHtml((player.titles || []).join(", "))}">${titleIcons}</span><span>${formatChampionName(player)}</span></span></td>
-        <td class="score-stat">${Number(player.score || 0)}</td>
-        <td>${Number(player.kills || 0)}</td>
+        <td class="score-stat">${formatMatchScore(player.score)}</td>
+        <td>${formatMatchRate(player.kpm, 3)}</td>
         <td>${formatMatchPercent(player.kill_pct)}</td>
-        <td>${Number(player.kp_raw || 0)}</td>
         <td>${formatMatchPercent(player.kp_pct)}</td>
-        <td title="${formatContextNumber(player.damage_raw)}">${formatCompactNumber(player.damage_raw)}</td>
+        <td>${formatMatchRate(player.dpm, 0)}</td>
         <td>${formatMatchPercent(player.dmg_share)}</td>
-        <td class="secondary-stat">${formatMatchPercent(player.cc_share)}</td>
-        <td class="secondary-stat">${formatMatchPercent(player.tank_share)}</td>
+        <td>${formatMatchRate(player.ccpm, 3)}</td>
+        <td>${formatMatchPercent(player.tank_share)}</td>
+        <td class="match-composite-stat offense-stat">${formatMatchScore(player.offense)}</td>
+        <td class="match-composite-stat presence-stat">${formatMatchScore(player.presence)}</td>
+        <td class="match-composite-stat utility-stat">${formatMatchScore(player.utility)}</td>
         </tr>
-        <tr id="${rowId}" class="match-context-row" hidden><td colspan="12">${renderPlayerContext(player, match.is_remake)}</td></tr>`;
+        <tr id="${rowId}" class="match-context-row" hidden><td colspan="14">${renderPlayerContext(player, match.is_remake)}</td></tr>`;
     });
 
     html += `</tbody></table></div>`;

@@ -316,9 +316,17 @@ table td {
 .match-player-row.context-open td:first-child::before{transform:rotate(90deg);}
 .match-context-row td{padding:0;background:rgba(2,6,23,.72);white-space:normal;text-align:left!important;}
 .match-context-panel{padding:18px 22px 22px;border-top:1px solid rgba(96,165,250,.35);border-bottom:1px solid rgba(96,165,250,.22);}
-.match-context-identity{display:flex;align-items:baseline;gap:12px;margin-bottom:14px;}
+.match-context-header{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:14px;}
+.match-context-identity{display:flex;align-items:baseline;gap:12px;min-width:0;}
 .match-context-identity strong{color:#f9fafb;font-size:17px;}
 .match-context-identity span{color:#93c5fd;font-weight:bold;}
+.match-context-components{display:flex;align-items:stretch;gap:10px;flex:0 0 auto;}
+.match-context-component{display:flex;align-items:baseline;gap:8px;min-width:112px;padding:9px 12px;border:1px solid rgba(75,85,99,.85);border-radius:10px;background:rgba(17,24,39,.9);}
+.match-context-component span{color:#94a3b8;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;}
+.match-context-component strong{color:#f8fafc;font-size:20px;line-height:1;}
+.offense-component strong{color:#f59e0b;}
+.presence-component strong{color:#60a5fa;}
+.utility-component strong{color:#c084fc;}
 .match-context-stats{display:grid;grid-template-columns:repeat(3,minmax(150px,1fr));gap:10px;margin-bottom:18px;}
 .context-stat-card{display:flex;flex-direction:column;gap:4px;padding:12px 14px;background:rgba(17,24,39,.9);border:1px solid rgba(75,85,99,.85);border-radius:10px;}
 .context-stat-card strong{color:#f9fafb;font-size:21px;}
@@ -331,7 +339,7 @@ table td {
 .context-icon{width:32px;height:32px;object-fit:cover;border-radius:7px;background:#111827;}
 .context-icon-missing{visibility:hidden;width:0;margin:0;}
 .context-empty{color:#9ca3af;font-style:italic;}
-@media (max-width:760px){.match-context-stats{grid-template-columns:1fr}.match-context-panel{padding:16px}}
+@media (max-width:760px){.match-context-header{align-items:flex-start;flex-direction:column;gap:12px}.match-context-components{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.match-context-component{min-width:0;justify-content:center;padding:9px 7px}.match-context-component span{font-size:9px}.match-context-component strong{font-size:18px}.match-context-stats{grid-template-columns:1fr}.match-context-panel{padding:16px}}
 
 
 /* =========================================
@@ -408,12 +416,12 @@ table td {
 
 .home-player-table-wrap{
     width:100%;
-    overflow-x:hidden;
+    overflow-x:auto;
 }
 
 .home-champion-table{
     width:100%;
-    min-width:0;
+    min-width:1160px;
     margin:0;
     table-layout:fixed;
 }
@@ -427,85 +435,51 @@ table td {
 }
 
 .home-champion-table th{
-    padding:9px 3px;
+    padding:8px 2px;
     font-size:9px;
     letter-spacing:0.02em;
 }
 
 .home-champion-table td{
-    padding:10px 3px;
+    padding:9px 2px;
     font-size:12px;
 }
 
+
 .home-champion-table th:nth-child(1),
-.home-champion-table td:nth-child(1){
-    width:3.2%;
-}
-
+.home-champion-table td:nth-child(1){width:3%;}
 .home-champion-table th:nth-child(2),
-.home-champion-table td:nth-child(2){
-    width:16.8%;
-}
-
+.home-champion-table td:nth-child(2){width:11.2%;}
 .home-champion-table th:nth-child(3),
-.home-champion-table td:nth-child(3){
-    width:5.8%;
-}
-
+.home-champion-table td:nth-child(3){width:5.2%;}
 .home-champion-table th:nth-child(4),
-.home-champion-table td:nth-child(4){
-    width:6.6%;
-}
-
+.home-champion-table td:nth-child(4){width:6.2%;}
 .home-champion-table th:nth-child(5),
-.home-champion-table td:nth-child(5){
-    width:6.1%;
-}
-
+.home-champion-table td:nth-child(5){width:5.5%;}
 .home-champion-table th:nth-child(6),
-.home-champion-table td:nth-child(6){
-    width:5.2%;
-}
-
+.home-champion-table td:nth-child(6){width:6.1%;}
 .home-champion-table th:nth-child(7),
-.home-champion-table td:nth-child(7){
-    width:6.1%;
-}
-
+.home-champion-table td:nth-child(7){width:6.1%;}
 .home-champion-table th:nth-child(8),
-.home-champion-table td:nth-child(8){
-    width:5.4%;
-}
-
+.home-champion-table td:nth-child(8){width:5.8%;}
 .home-champion-table th:nth-child(9),
-.home-champion-table td:nth-child(9){
-    width:6.1%;
-}
-
+.home-champion-table td:nth-child(9){width:6.2%;}
 .home-champion-table th:nth-child(10),
-.home-champion-table td:nth-child(10){
-    width:6.1%;
-}
-
+.home-champion-table td:nth-child(10){width:5.9%;}
 .home-champion-table th:nth-child(11),
-.home-champion-table td:nth-child(11){
-    width:5.0%;
-}
-
+.home-champion-table td:nth-child(11){width:6.2%;}
 .home-champion-table th:nth-child(12),
-.home-champion-table td:nth-child(12){
-    width:6.1%;
-}
-
+.home-champion-table td:nth-child(12){width:7.2%;}
 .home-champion-table th:nth-child(13),
-.home-champion-table td:nth-child(13){
-    width:5.4%;
-}
-
+.home-champion-table td:nth-child(13){width:7.2%;}
 .home-champion-table th:nth-child(14),
-.home-champion-table td:nth-child(14){
-    width:6.1%;
-}
+.home-champion-table td:nth-child(14){width:7.2%;}
+
+.home-component-stat,
+.home-component-head{font-weight:800;}
+.home-offense-stat,.home-offense-head{color:#f59e0b;}
+.home-presence-stat,.home-presence-head{color:#60a5fa;}
+.home-utility-stat,.home-utility-head{color:#c084fc;}
 
 .home-champion-rank{
     color:#93c5fd !important;
@@ -570,6 +544,12 @@ table td {
 
 .home-highlights-empty{
     color:#94a3b8;
+}
+
+
+@media (max-width: 1050px){
+    .home-champion-table th:nth-child(n+12),
+    .home-champion-table td:nth-child(n+12){display:none;}
 }
 
 @media (max-width: 1200px){
@@ -1266,3 +1246,153 @@ table td {
         display:none;
     }
 }
+
+/* =========================================
+   MATCH EXPLORER — FIXED REFERENCES 80/20 v1
+   ========================================= */
+.match-score-v2-table{
+    width:100%;
+    min-width:1260px;
+    table-layout:auto;
+}
+.match-score-v2-table th,
+.match-score-v2-table td{
+    padding:11px 7px;
+    text-align:center;
+    font-variant-numeric:tabular-nums;
+}
+.match-score-v2-table th:first-child,
+.match-score-v2-table td:first-child{
+    width:46px;
+    min-width:46px;
+}
+.match-score-v2-table th:nth-child(2),
+.match-score-v2-table td:nth-child(2){
+    width:150px;
+    max-width:150px;
+    text-align:left;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+.match-score-v2-table th:nth-child(3),
+.match-score-v2-table td:nth-child(3){
+    width:145px;
+    max-width:145px;
+    text-align:left;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+.match-score-v2-table .score-stat{
+    color:#60a5fa;
+    font-weight:900;
+}
+.match-composite-stat{
+    font-weight:800;
+    border-left:1px solid rgba(255,255,255,.14);
+}
+.offense-stat{color:#fbbf24;}
+.presence-stat{color:#a78bfa;}
+.utility-stat{color:#34d399;}
+
+/* En pantallas donde las 14 columnas no caben, preservamos primero las
+   métricas observables y desplazamos los tres compuestos al panel contextual. */
+@media (max-width:1450px){
+    .match-score-v2-table{
+        min-width:1030px;
+    }
+    .match-score-v2-table th:nth-child(n+12),
+    .match-score-v2-table td:nth-child(n+12){
+        display:none;
+    }
+    .match-context-row td{
+        display:table-cell!important;
+    }
+}
+
+/* =========================================
+   CHAMPION EXPLORER — G4 SCORE MODEL v2.2
+   ========================================= */
+.champion-ranking-table-g4{
+    width:100%;
+    min-width:1110px;
+    table-layout:fixed;
+}
+.champion-ranking-table-g4 th,
+.champion-ranking-table-g4 td{
+    padding-left:5px;
+    padding-right:5px;
+    text-align:center;
+}
+.champion-ranking-table-g4 th{
+    font-size:12px;
+    letter-spacing:.025em;
+}
+.champion-ranking-table-g4 th:nth-child(1),
+.champion-ranking-table-g4 td:nth-child(1){width:4.5%;}
+.champion-ranking-table-g4 th:nth-child(2),
+.champion-ranking-table-g4 td:nth-child(2){width:19%;text-align:left;}
+.champion-ranking-table-g4 th:nth-child(3),
+.champion-ranking-table-g4 td:nth-child(3){width:5.5%;}
+.champion-ranking-table-g4 th:nth-child(4),
+.champion-ranking-table-g4 td:nth-child(4){width:6.5%;}
+.champion-ranking-table-g4 th:nth-child(n+5),
+.champion-ranking-table-g4 td:nth-child(n+5){width:6.45%;}
+.champion-ranking-table-g4 .champion-ranking-player-name{
+    min-width:0;
+    gap:5px;
+    font-size:18px;
+    line-height:1.15;
+}
+.champion-ranking-table-g4 .champion-ranking-titles{
+    font-size:16px;
+    line-height:1.15;
+}
+.champion-ranking-table-g4 th.score-stat{
+    font-size:16px;
+}
+.champion-ranking-table-g4 td.score-stat{
+    font-size:22px;
+    line-height:1;
+}
+.champion-ranking-table-g4 .champion-reference-badge,
+.champion-ranking-table-g4 .selected-player-badge{
+    padding:2px 6px;
+    font-size:9px;
+}
+.champion-ranking-table-g4 .component-offense{color:#f59e0b;font-weight:800;}
+.champion-ranking-table-g4 .component-presence{color:#60a5fa;font-weight:800;}
+.champion-ranking-table-g4 .component-utility{color:#c084fc;font-weight:800;}
+.champion-ranking-table-g4 .champion-reference-row .component-offense,
+.champion-ranking-table-g4 .champion-reference-row .component-presence,
+.champion-ranking-table-g4 .champion-reference-row .component-utility{filter:brightness(1.12);}
+@media (max-width:1200px){
+    .champion-ranking-table-g4{min-width:1080px;}
+    .champion-ranking-table-g4 th,
+    .champion-ranking-table-g4 td{padding-left:3px;padding-right:3px;font-size:12px;}
+    .champion-ranking-table-g4 .champion-ranking-player-name{font-size:16px;}
+    .champion-ranking-table-g4 td.score-stat{font-size:20px;}
+}
+
+
+/* CHAMPION REPRESENTATIVE — NEW METRICS v2.4 */
+.champion-representative-table-wrap{width:100%;overflow-x:auto;}
+.champion-representative-table{min-width:920px;table-layout:fixed;}
+.champion-representative-table th,.champion-representative-table td{padding-left:8px;padding-right:8px;text-align:center;}
+.champion-representative-table th:nth-child(1),.champion-representative-table td:nth-child(1){width:4%;}
+.champion-representative-table th:nth-child(2),.champion-representative-table td:nth-child(2){width:18%;text-align:left;}
+.champion-representative-table th:nth-child(3),.champion-representative-table td:nth-child(3){width:24%;text-align:left;overflow:hidden;text-overflow:ellipsis;}
+.champion-representative-table th:nth-child(4),.champion-representative-table td:nth-child(4){width:8%;}
+.champion-representative-table th:nth-child(n+5),.champion-representative-table td:nth-child(n+5){width:9.2%;}
+
+
+/* SPLITS — CURRENT SCORING MODEL v3.0 */
+#selected-split-ranking .split-component-stat{font-weight:800;text-align:center;}
+#selected-split-ranking .split-offense-head,
+#selected-split-ranking .split-offense-stat{color:#f59e0b;}
+#selected-split-ranking .split-presence-head,
+#selected-split-ranking .split-presence-stat{color:#60a5fa;}
+#selected-split-ranking .split-utility-head,
+#selected-split-ranking .split-utility-stat{color:#c084fc;}
+#selected-split-ranking table{table-layout:auto;}
+#selected-split-ranking th,
+#selected-split-ranking td{padding-left:12px;padding-right:12px;}

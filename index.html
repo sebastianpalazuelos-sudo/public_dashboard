@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>ARAM Engine Dashboard</title>
-<link rel="stylesheet" href="css/style.css?v=profile-lineage-v1.5">
+<link rel="stylesheet" href="css/style.css?v=splits-current-v3.0">
 </head>
 <body>
 <header>
@@ -24,7 +24,7 @@
 <section>
   <h2>Player Champion Highlights</h2>
   <div class="home-highlights-note">
-    Top 3 champions per player · Minimum 3 matches per champion
+    Top 4 champions per player · Minimum 3 matches per champion
   </div>
   <div id="home-player-champion-highlights"></div>
 </section>
@@ -83,11 +83,11 @@
 
     <select id="champion-representative-metric-select">
       <option value="">Select category...</option>
-      <option value="dmg_share">DMG</option>
-      <option value="cc_share">CC</option>
-      <option value="tank_share">Tank</option>
-      <option value="kp">KP%</option>
-      <option value="kill">Kill%</option>
+      <option value="kp_pct">KP%</option>
+      <option value="dpm">DPM</option>
+      <option value="kpm">KPM</option>
+      <option value="ccpm">CCPM</option>
+      <option value="tank_pct">Tank%</option>
     </select>
 
     <div id="champion-representative-results"></div>
@@ -98,11 +98,11 @@
 
     <select id="champion-tendencies-metric-select">
       <option value="">Select category...</option>
-      <option value="dmg_share">Damage</option>
-      <option value="cc_share">Control</option>
-      <option value="tank_share">Tank</option>
-      <option value="kp">KP%</option>
-      <option value="kill">Kill%</option>
+      <option value="kp_pct">KP%</option>
+      <option value="dpm">DPM</option>
+      <option value="kpm">KPM</option>
+      <option value="ccpm">CCPM</option>
+      <option value="tank_pct">Tank%</option>
     </select>
 
     <div id="champion-tendencies-results"></div>
@@ -150,6 +150,6 @@
 
 </main>
 
-<script src="js/app.js?v=profile-lineage-v1.5"></script>
+<script src="js/app.js?v=splits-current-v3.0"></script>
 </body>
 </html>
