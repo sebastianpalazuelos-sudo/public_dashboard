@@ -503,7 +503,7 @@ function formatChampionContextValue(value, digits = 2){
         return "0";
     }
 
-    return number.toFixed(digits).replace(/\.?0+$/, "");
+    return number.toFixed(digits).replace(/\.0+$/, "");
 }
 
 function renderSignatureEntities(entities, entityType){
@@ -1201,7 +1201,7 @@ function formatHomeMetric(value, digits = 2){
         return "0";
     }
 
-    return number.toFixed(digits).replace(/\.?0+$/, "");
+    return number.toFixed(digits).replace(/\.0+$/, "");
 }
 
 function renderChampionTitleIcons(titles){
@@ -1699,7 +1699,7 @@ function formatCompactNumber(value){
 
     const absolute = Math.abs(number);
     const compact = (divisor, suffix, digits) =>
-        `${(number / divisor).toFixed(digits).replace(/\.?0+$/, "")}${suffix}`;
+        `${(number / divisor).toFixed(digits).replace(/\.0+$/, "")}${suffix}`;
 
     if(absolute >= 1000000){ return compact(1000000, "M", absolute >= 10000000 ? 1 : 2); }
     if(absolute >= 1000){ return compact(1000, "k", absolute >= 100000 ? 0 : 1); }
@@ -1708,7 +1708,7 @@ function formatCompactNumber(value){
 
 function formatMatchPercent(value){
     const number = Number(value);
-    return `${Number.isFinite(number) ? number.toFixed(2).replace(/\.?0+$/, "") : "0"}%`;
+    return `${Number.isFinite(number) ? number.toFixed(2).replace(/\.0+$/, "") : "0"}%`;
 }
 
 function getTeamLabel(teamId){
@@ -1805,13 +1805,13 @@ function renderMatchTitleIcons(titles){
 function formatMatchRate(value, digits = 3){
     const number = Number(value);
     if(!Number.isFinite(number)){ return "0"; }
-    return number.toFixed(digits).replace(/\.?0+$/, "");
+    return number.toFixed(digits).replace(/\.0+$/, "");
 }
 
 function formatMatchScore(value){
     const number = Number(value);
     if(!Number.isFinite(number)){ return "0"; }
-    return number.toFixed(2).replace(/\.?0+$/, "");
+    return number.toFixed(2).replace(/\.0+$/, "");
 }
 
 function renderMatchExplorer(matchId){
