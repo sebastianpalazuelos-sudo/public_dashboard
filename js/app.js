@@ -1843,6 +1843,7 @@ function renderMatchExplorer(matchId){
         ${matchSortHeader("Player", "name")}
         ${matchSortHeader("Champion", "champion")}
         ${matchSortHeader("Score", "score")}
+        ${matchSortHeader("META", "champion_meta")}
         ${matchSortHeader("KPM", "kpm")}
         ${matchSortHeader("Kill%", "kill_pct")}
         ${matchSortHeader("KP%", "kp_pct")}
@@ -1867,6 +1868,7 @@ function renderMatchExplorer(matchId){
         <td title="${escapeHtml(formatPlayerName(player.name))}">${escapeHtml(formatPlayerName(player.name))}</td>
         <td><span class="match-champion-cell"><span class="match-title-icons" aria-label="${escapeHtml((player.titles || []).join(", "))}">${titleIcons}</span><span>${formatChampionName(player)}</span></span></td>
         <td class="score-stat">${formatMatchScore(player.score)}</td>
+        <td>${formatMatchScore(player.champion_meta || 0)}</td>
         <td>${formatMatchRate(player.kpm, 3)}</td>
         <td>${formatMatchPercent(player.kill_pct)}</td>
         <td>${formatMatchPercent(player.kp_pct)}</td>
@@ -1878,7 +1880,7 @@ function renderMatchExplorer(matchId){
         <td class="match-composite-stat presence-stat">${formatMatchScore(player.presence)}</td>
         <td class="match-composite-stat utility-stat">${formatMatchScore(player.utility)}</td>
         </tr>
-        <tr id="${rowId}" class="match-context-row" hidden><td colspan="14">${renderPlayerContext(player, match.is_remake)}</td></tr>`;
+        <tr id="${rowId}" class="match-context-row" hidden><td colspan="15">${renderPlayerContext(player, match.is_remake)}</td></tr>`;
     });
 
     html += `</tbody></table></div>`;

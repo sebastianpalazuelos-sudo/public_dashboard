@@ -52,6 +52,13 @@ header p{
     color:#cbd5e1;
     font-size:15px;
 }
+
+.subtitle{
+    margin:0;
+    color:#cbd5e1;
+    font-size:16px;
+    font-weight:normal;
+}
 .cards{
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
