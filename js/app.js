@@ -486,7 +486,15 @@ function getChampionComparisonProfile(championName){
 
     const championProfile = friendProfiles.map(player => ({...player}));
 
-    if(baseline){
+    // Solo agregar Champion Baseline si hay perfiles de amigos (para comparación)
+    // Si no hay perfiles de amigos, solo mostramos Champion Baseline (como única referencia)
+    if(baseline && friendProfiles.length > 0){
+        championProfile.push({
+            ...baseline,
+            global_games: baseline.games
+        });
+    } else if(baseline && friendProfiles.length === 0){
+        // Si no hay perfiles de amigos, mostramos solo Champion Baseline
         championProfile.push({
             ...baseline,
             global_games: baseline.games
