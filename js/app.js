@@ -751,6 +751,7 @@ function buildChampionRankingTable(
                 <th>Player</th>
                 <th>Games</th>
                 <th class="score-stat">Score</th>
+                <th class="meta-stat">META</th>
                 <th>KPM</th>
                 <th>KILL%</th>
                 <th>KP%</th>
@@ -843,6 +844,7 @@ function buildChampionRankingTable(
                     </td>
 
                     <td class="score-stat">${formatHomeMetric(profile.global_avg)}</td>
+                    <td class="meta-stat">${formatHomeMetric(profile.champion_meta || 0)}</td>
                     <td>${formatHomeMetric(profile.avg_kpm)}</td>
                     <td>${formatHomeMetric(profile.avg_kill_pct)}%</td>
                     <td>${formatHomeMetric(profile.avg_kp_pct)}%</td>
@@ -856,13 +858,13 @@ function buildChampionRankingTable(
                 </tr>
 
                 <tr id="${rowKey}-matches" class="profile-matches-row" hidden>
-                    <td colspan="14">
+                    <td colspan="15">
                         ${buildProfileMatchesPanel(profile, {showPlayer: isReference})}
                     </td>
                 </tr>
 
                 <tr id="${rowKey}" class="champion-history-row" hidden>
-                    <td colspan="14">
+                    <td colspan="15">
                         ${buildChampionHistoryPanel(profile)}
                     </td>
                 </tr>
@@ -1070,6 +1072,7 @@ function renderPlayerChampionTable(playerProfile){
                     <th>Champion</th>
                     <th>Games</th>
                     <th>Score</th>
+                    <th class="meta-stat">META</th>
                 </tr>
             </thead>
             <tbody>
@@ -1098,9 +1101,10 @@ function renderPlayerChampionTable(playerProfile){
                     <strong>${champion.global_avg}</strong>
                     (${champion.global_god ?? 0}😈 ${champion.global_alpha ?? 0}🏅 ${champion.global_cono ?? 0}🍦)
                 </td>
+                <td class="meta-stat">${formatHomeMetric(champion.champion_meta || 0)}</td>
             </tr>
             <tr id="${matchesRowId}" class="profile-matches-row" hidden>
-                <td colspan="4">${buildProfileMatchesPanel(champion)}</td>
+                <td colspan="5">${buildProfileMatchesPanel(champion)}</td>
             </tr>
         `;
     });
@@ -1282,6 +1286,7 @@ function renderPlayerChampionHighlights(elementId, highlights){
                         </td>
                         <td>${formatHomeMetric(champion.games, 0)}</td>
                         <td class="score-stat">${formatHomeMetric(champion.score_avg)}</td>
+                        <td class="meta-stat">${formatHomeMetric(champion.champion_meta || 0)}</td>
                         <td>${formatHomeMetric(champion.kpm, 2)}</td>
                         <td>${formatHomeMetric(champion.kill_pct)}%</td>
                         <td>${formatHomeMetric(champion.kp_pct)}%</td>
@@ -1297,7 +1302,7 @@ function renderPlayerChampionHighlights(elementId, highlights){
             }).join("")
             : `
                 <tr>
-                    <td colspan="14" class="home-no-qualified-champion">
+                    <td colspan="15" class="home-no-qualified-champion">
                         No champion has reached the current minimum of 3 matches.
                     </td>
                 </tr>
@@ -1329,6 +1334,7 @@ function renderPlayerChampionHighlights(elementId, highlights){
                                 <th>Champion</th>
                                 <th>Games</th>
                                 <th class="score-stat">Score</th>
+                                <th class="meta-stat">META</th>
                                 <th>KPM</th>
                                 <th>Kill%</th>
                                 <th>KP%</th>
@@ -1607,6 +1613,17 @@ function renderContextEntities(entities, type){
         if(rarity){ tooltipParts.push(rarity); }
         if(description){ tooltipParts.push(description); }
 
+        // Para augments, intentar obtener descripción del archivo de descripciones
+        if(type === "augment" && !description && dashboardData?.augment_descriptions?.descriptions) {
+            const augmentId = entity.id?.toString();
+            if(augmentId && dashboardData.augment_descriptions.descriptions[augmentId]) {
+                const augmentDescription = dashboardData.augment_descriptions.descriptions[augmentId];
+                if(augmentDescription && !tooltipParts.includes(augmentDescription)) {
+                    tooltipParts.push(augmentDescription);
+                }
+            }
+        }
+
         return `
             <div class="context-entity context-${type}" title="${tooltipParts.join(" — ")}">
                 ${icon ? `<img class="context-icon" src="${icon}" alt="${name}" loading="lazy" onerror="this.classList.add('context-icon-missing')">` : ""}
@@ -1851,7 +1868,6 @@ function renderMatchExplorer(matchId){
         ${matchSortHeader("Player", "name")}
         ${matchSortHeader("Champion", "champion")}
         ${matchSortHeader("Score", "score")}
-        ${matchSortHeader("META", "champion_meta")}
         ${matchSortHeader("KPM", "kpm")}
         ${matchSortHeader("Kill%", "kill_pct")}
         ${matchSortHeader("KP%", "kp_pct")}
@@ -1874,9 +1890,8 @@ function renderMatchExplorer(matchId){
             onkeydown="if(event.key === 'Enter' || event.key === ' '){event.preventDefault();toggleMatchContext('${rowId}');}">
         <td><span class="match-team-badge ${team.className}" title="${escapeHtml(team.title)}" aria-label="${escapeHtml(team.title)}">${team.label}</span></td>
         <td title="${escapeHtml(formatPlayerName(player.name))}">${escapeHtml(formatPlayerName(player.name))}</td>
-        <td><span class="match-champion-cell"><span class="match-title-icons" aria-label="${escapeHtml((player.titles || []).join(", "))}">${titleIcons}</span><span>${formatChampionName(player)}</span></span></td>
+        <td><span class="match-champion-cell"><span class="match-title-icons" aria-label="${escapeHtml((player.titles || []).join(", "))}">${titleIcons}</span><span>${formatChampionName(player)}</span> <span class="match-champion-meta-small">META: ${formatMatchScore(player.champion_meta || 0)}</span></span></td>
         <td class="score-stat">${formatMatchScore(player.score)}</td>
-        <td>${formatMatchScore(player.champion_meta || 0)}</td>
         <td>${formatMatchRate(player.kpm, 3)}</td>
         <td>${formatMatchPercent(player.kill_pct)}</td>
         <td>${formatMatchPercent(player.kp_pct)}</td>
@@ -1888,7 +1903,7 @@ function renderMatchExplorer(matchId){
         <td class="match-composite-stat presence-stat">${formatMatchScore(player.presence)}</td>
         <td class="match-composite-stat utility-stat">${formatMatchScore(player.utility)}</td>
         </tr>
-        <tr id="${rowId}" class="match-context-row" hidden><td colspan="15">${renderPlayerContext(player, match.is_remake)}</td></tr>`;
+        <tr id="${rowId}" class="match-context-row" hidden><td colspan="14">${renderPlayerContext(player, match.is_remake)}</td></tr>`;
     });
 
     html += `</tbody></table></div>`;
