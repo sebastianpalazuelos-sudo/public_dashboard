@@ -7,7 +7,7 @@ const views = {
 };
 
 let dashboardData = null;
-let matchExplorerSort = { key: "score", direction: "desc" };
+let matchExplorerSort = { key: "ratio", direction: "desc" };
 
 let activeViewName = "home";
 
@@ -751,7 +751,6 @@ function buildChampionRankingTable(
                 <th>Player</th>
                 <th>Games</th>
                 <th class="score-stat">Score</th>
-                <th class="meta-stat">META</th>
                 <th>KPM</th>
                 <th>KILL%</th>
                 <th>KP%</th>
@@ -844,7 +843,6 @@ function buildChampionRankingTable(
                     </td>
 
                     <td class="score-stat">${formatHomeMetric(profile.global_avg)}</td>
-                    <td class="meta-stat">${formatHomeMetric(profile.champion_meta || 0)}</td>
                     <td>${formatHomeMetric(profile.avg_kpm)}</td>
                     <td>${formatHomeMetric(profile.avg_kill_pct)}%</td>
                     <td>${formatHomeMetric(profile.avg_kp_pct)}%</td>
@@ -858,7 +856,7 @@ function buildChampionRankingTable(
                 </tr>
 
                 <tr id="${rowKey}-matches" class="profile-matches-row" hidden>
-                    <td colspan="15">
+                    <td colspan="14">
                         ${buildProfileMatchesPanel(profile, {showPlayer: isReference})}
                     </td>
                 </tr>
@@ -919,6 +917,16 @@ function renderChampionProfile(championName){
         <div class="player-profile-card">
             <div class="meta">CHAMPION PROFILE</div>
             <h3>${escapeHtml(championName)}</h3>
+            ${(() => {
+                const championMeta = dashboardData?.champion_engine?.champion_meta?.[championName];
+                const metaScore = championMeta?.score?.p50 || 0;
+                return `
+                    <div class="champion-meta-badge">
+                        <span class="meta-label">META:</span>
+                        <span class="meta-value">${formatHomeMetric(metaScore)}</span>
+                    </div>
+                `;
+            })()}
 
             <div class="summary-cards">
                 <div class="summary-card">
@@ -970,33 +978,39 @@ function renderPlayerProfile(playerName){
 
     const champions =
         Object.values(playerProfile).sort(
-            (a, b) => b.global_avg - a.global_avg
+            (a, b) => {
+                const ratioA = (a.global_avg || 0) / (a.champion_meta || 1);
+                const ratioB = (b.global_avg || 0) / (b.champion_meta || 1);
+                return ratioB - ratioA;
+            }
         );
 
-    const getChampionGames = champion =>
-        champion.global_games ?? champion.games ?? 0;
+    // Calcular Avg Score: ordenar por score → eliminar 30% → promedio simple
+    const sortedByScore = [...champions].sort((a, b) => b.global_avg - a.global_avg);
+    const trimCountScore = Math.floor(sortedByScore.length * 0.3);
+    const scoredChampions = sortedByScore.slice(trimCountScore);
+    
+    const avgScore = scoredChampions.length > 0
+        ? scoredChampions.reduce((sum, c) => sum + c.global_avg, 0) / scoredChampions.length
+        : 0;
 
-    const allMatchGames =
-        champions.reduce(
-            (sum, champion) =>
-                sum + getChampionGames(champion),
-            0
-        );
-
-    const allMatchTotal =
-        champions.reduce(
-            (sum, champion) =>
-                sum + (
-                    champion.global_avg
-                    * getChampionGames(champion)
-                ),
-            0
-        );
-
-    const weightedProfileAvg =
-        allMatchGames > 0
-            ? allMatchTotal / allMatchGames
-            : 0;
+    // Calcular Avg Meta Ratio: ordenar por meta_ratio → eliminar 30% → promedio simple
+    const metaRatiosWithChampions = champions.map(champion => {
+        const score = champion.global_avg;
+        const meta = dashboardData?.champion_engine?.champion_meta?.[champion.champion]?.score?.p50 || 0;
+        const ratio = meta > 0 ? score / meta : 0;
+        return { ratio, champion };
+    });
+    
+    const sortedByMetaRatio = [...metaRatiosWithChampions].sort((a, b) => b.ratio - a.ratio);
+    const trimCountMeta = Math.floor(sortedByMetaRatio.length * 0.3);
+    const scoredMetaRatios = trimCountMeta > 0
+        ? sortedByMetaRatio.slice(0, -trimCountMeta)
+        : sortedByMetaRatio;
+    
+    const avgMetaRatio = scoredMetaRatios.length > 0
+        ? scoredMetaRatios.reduce((sum, x) => sum + x.ratio, 0) / scoredMetaRatios.length
+        : 0;
 
     const officialRankingRow = isChampionReference
         ? null
@@ -1007,8 +1021,8 @@ function renderPlayerProfile(playerName){
     // The player summary must use the same official score shown on Home and
     // in the split ranking. Champion History remains a per-champion view.
     const allMatchAvg = isChampionReference
-        ? formatHomeMetric(weightedProfileAvg)
-        : formatHomeMetric(officialRankingRow?.global_avg ?? weightedProfileAvg);
+        ? formatHomeMetric(avgScore)
+        : formatHomeMetric(officialRankingRow?.global_avg ?? avgScore);
 
     document.getElementById(
         "players-player-results"
@@ -1045,6 +1059,15 @@ function renderPlayerProfile(playerName){
                         ${allMatchAvg}
                     </div>
                 </div>
+
+                <div class="summary-card">
+                    <div class="summary-label">
+                        Avg Meta Ratio
+                    </div>
+                    <div class="summary-value">
+                        ${formatHomeMetric(avgMetaRatio, 3)}
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -1054,13 +1077,44 @@ function renderPlayerProfile(playerName){
     renderPlayerChampionTable(champions);
 }
 
-function renderPlayerChampionTable(playerProfile){
+function renderPlayerChampionTable(
+    playerProfile,
+    activeSortKey = null,
+    activeSortDirection = "desc"
+){
 
     const profileCard = document.querySelector(".player-profile-card");
 
     if(profileCard){
         profileCard.style.display = "block";
     }
+
+        const sortedPlayerProfile = [...playerProfile].sort((a, b) => {
+            if(activeSortKey === "score"){
+                const scoreA = Number(a.global_avg) || 0;
+                const scoreB = Number(b.global_avg) || 0;
+
+                return activeSortDirection === "asc"
+                    ? scoreA - scoreB
+                    : scoreB - scoreA;
+            }
+
+            if(activeSortKey === "ratio"){
+                const ratioA =
+                    (Number(a.global_avg) || 0) /
+                    (Number(a.champion_meta) || 1);
+
+                const ratioB =
+                    (Number(b.global_avg) || 0) /
+                    (Number(b.champion_meta) || 1);
+
+                return activeSortDirection === "asc"
+                    ? ratioA - ratioB
+                    : ratioB - ratioA;
+            }
+
+            return 0;
+        });
 
     let html = `
         <h3>Champion History</h3>
@@ -1071,14 +1125,31 @@ function renderPlayerChampionTable(playerProfile){
                     <th>#</th>
                     <th>Champion</th>
                     <th>Games</th>
-                    <th>Score</th>
+                    <th
+                        class="sortable ${activeSortKey === "score" ? `sort-${activeSortDirection}` : ""}"
+                        data-sort="score"
+                    >
+                        Score${activeSortKey === "score"
+                            ? (activeSortDirection === "asc" ? " ▲" : " ▼")
+                            : " ↕"}
+                    </th>
+
                     <th class="meta-stat">META</th>
+
+                    <th
+                        class="ratio-stat sortable ${activeSortKey === "ratio" ? `sort-${activeSortDirection}` : ""}"
+                        data-sort="ratio"
+                    >
+                        Meta Ratio${activeSortKey === "ratio"
+                            ? (activeSortDirection === "asc" ? " ▲" : " ▼")
+                            : " ↕"}
+                    </th>
                 </tr>
             </thead>
             <tbody>
     `;
 
-    playerProfile.forEach((champion, index) => {
+    sortedPlayerProfile.forEach((champion, index) => {
         const matchesRowId = `player-champion-matches-${index}`;
 
         html += `
@@ -1102,9 +1173,10 @@ function renderPlayerChampionTable(playerProfile){
                     (${champion.global_god ?? 0}😈 ${champion.global_alpha ?? 0}🏅 ${champion.global_cono ?? 0}🍦)
                 </td>
                 <td class="meta-stat">${formatHomeMetric(champion.champion_meta || 0)}</td>
+                <td class="ratio-stat">${formatHomeMetric((champion.global_avg || 0) / (champion.champion_meta || 1), 3)}</td>
             </tr>
             <tr id="${matchesRowId}" class="profile-matches-row" hidden>
-                <td colspan="5">${buildProfileMatchesPanel(champion)}</td>
+                <td colspan="6">${buildProfileMatchesPanel(champion)}</td>
             </tr>
         `;
     });
@@ -1119,10 +1191,28 @@ function renderPlayerChampionTable(playerProfile){
 
     attachProfileMatchInteractions(container);
 
+        // Agregar funcionalidad de ordenamiento
+        container.querySelectorAll(".sortable").forEach(header => {
+            header.addEventListener("click", () => {
+                const sortKey = header.dataset.sort;
+
+                const direction =
+                    activeSortKey === sortKey
+                        ? (activeSortDirection === "asc" ? "desc" : "asc")
+                        : "desc";
+
+                renderPlayerChampionTable(
+                    playerProfile,
+                    sortKey,
+                    direction
+                );
+            });
+        });
+
     container.querySelectorAll(".champion-row").forEach(row => {
         row.addEventListener("click", () => {
             const championIndex = row.dataset.championIndex;
-            const champion = playerProfile[championIndex];
+            const champion = sortedPlayerProfile[championIndex];
 
             renderPlayerChampionDetail(
                 champion,
@@ -1164,6 +1254,16 @@ function renderPlayerChampionDetail(champion, playerName){
         <div class="player-champion-comparison-header">
             <div class="meta">CHAMPION PROFILE COMPARISON</div>
             <h3>${escapeHtml(championName)}</h3>
+            ${(() => {
+                const championMeta = dashboardData?.champion_engine?.champion_meta?.[championName];
+                const metaScore = championMeta?.score?.p50 || 0;
+                return `
+                    <div class="champion-meta-badge">
+                        <span class="meta-label">META:</span>
+                        <span class="meta-value">${formatHomeMetric(metaScore)}</span>
+                    </div>
+                `;
+            })()}
             <p>
                 Comparing
                 <strong>${escapeHtml(formatPlayerName(playerName))}</strong>
@@ -1264,10 +1364,31 @@ function renderPlayerChampionHighlights(elementId, highlights){
         return;
     }
 
-    container.innerHTML = highlights.map((player, playerIndex) => {
-        const champions = Array.isArray(player.champions)
-            ? player.champions
-            : [];
+        const orderedHighlights = [...highlights].sort((a, b) => {
+            const ratioA = Number(a.avg_meta_ratio) || 0;
+            const ratioB = Number(b.avg_meta_ratio) || 0;
+
+            if(ratioA !== ratioB){
+                return ratioB - ratioA;
+            }
+
+            const scoreA = Number(a.global_avg) || 0;
+            const scoreB = Number(b.global_avg) || 0;
+
+            if(scoreA !== scoreB){
+                return scoreB - scoreA;
+            }
+
+            return String(a.player || "").localeCompare(
+                String(b.player || ""),
+                "es"
+            );
+        });
+
+        container.innerHTML = orderedHighlights.map((player, playerIndex) => {
+            const champions = Array.isArray(player.champions)
+                ? player.champions
+                : [];
 
         const championRows = champions.length > 0
             ? champions.map((champion, championIndex) => {
@@ -1285,6 +1406,7 @@ function renderPlayerChampionHighlights(elementId, highlights){
                             </span>
                         </td>
                         <td>${formatHomeMetric(champion.games, 0)}</td>
+                        <td class="ratio-stat">${formatHomeMetric(champion.meta_ratio || 0, 3)}</td>
                         <td class="score-stat">${formatHomeMetric(champion.score_avg)}</td>
                         <td class="meta-stat">${formatHomeMetric(champion.champion_meta || 0)}</td>
                         <td>${formatHomeMetric(champion.kpm, 2)}</td>
@@ -1302,7 +1424,7 @@ function renderPlayerChampionHighlights(elementId, highlights){
             }).join("")
             : `
                 <tr>
-                    <td colspan="15" class="home-no-qualified-champion">
+                    <td colspan="16" class="home-no-qualified-champion">
                         No champion has reached the current minimum of 3 matches.
                     </td>
                 </tr>
@@ -1320,7 +1442,11 @@ function renderPlayerChampionHighlights(elementId, highlights){
                         </div>
                     </div>
 
-                    <div class="home-player-global-avg">
+                    <div class="home-player-global-avg home-meta-ratio-avg">
+                        <span>AVG META RATIO</span>
+                        <strong>${formatHomeMetric(player.avg_meta_ratio || 0, 3)}</strong>
+                    </div>
+                    <div class="home-player-global-avg home-score-avg">
                         <span>AVG SCORE</span>
                         <strong>${formatHomeMetric(player.global_avg)}</strong>
                     </div>
@@ -1333,6 +1459,7 @@ function renderPlayerChampionHighlights(elementId, highlights){
                                 <th>#</th>
                                 <th>Champion</th>
                                 <th>Games</th>
+                                <th class="ratio-stat">Meta Ratio</th>
                                 <th class="score-stat">Score</th>
                                 <th class="meta-stat">META</th>
                                 <th>KPM</th>
@@ -1645,6 +1772,10 @@ function renderPlayerContext(player, isRemake = false){
                 </div>
                 ${isRemake ? "" : `
                 <div class="match-context-components" aria-label="Score components">
+                    <div class="match-context-component score-component">
+                        <span>Score</span>
+                        <strong>${formatMatchScore(player.score)}</strong>
+                    </div>
                     <div class="match-context-component offense-component">
                         <span>Offense</span>
                         <strong>${formatMatchScore(player.offense)}</strong>
@@ -1656,6 +1787,10 @@ function renderPlayerContext(player, isRemake = false){
                     <div class="match-context-component utility-component">
                         <span>Utility</span>
                         <strong>${formatMatchScore(player.utility)}</strong>
+                    </div>
+                    <div class="match-context-component meta-component">
+                        <span>META</span>
+                        <strong>${formatMatchScore(player.champion_meta || 0)}</strong>
                     </div>
                 </div>
                 `}
@@ -1757,6 +1892,11 @@ function getMatchSortValue(player, key){
     if(key === "name" || key === "champion"){
         return String(player[key] || "").toLocaleLowerCase("es");
     }
+    if(key === "ratio"){
+        const score = Number(player.score) || 0;
+        const meta = Number(player.champion_meta) || 0;
+        return meta > 0 ? score / meta : 0;
+    }
     return Number(player[key]) || 0;
 }
 
@@ -1809,6 +1949,7 @@ function attachMatchExplorerSorting(matchId){
                     direction: ["name", "champion", "teamId"].includes(key) ? "asc" : "desc"
                 };
             }
+            renderMatchExplorer(matchId);
             renderMatchExplorer(matchId);
         });
     });
@@ -1867,7 +2008,7 @@ function renderMatchExplorer(matchId){
         ${matchSortHeader("Team", "teamId")}
         ${matchSortHeader("Player", "name")}
         ${matchSortHeader("Champion", "champion")}
-        ${matchSortHeader("Score", "score")}
+        ${matchSortHeader("Meta Ratio", "ratio")}
         ${matchSortHeader("KPM", "kpm")}
         ${matchSortHeader("Kill%", "kill_pct")}
         ${matchSortHeader("KP%", "kp_pct")}
@@ -1890,8 +2031,8 @@ function renderMatchExplorer(matchId){
             onkeydown="if(event.key === 'Enter' || event.key === ' '){event.preventDefault();toggleMatchContext('${rowId}');}">
         <td><span class="match-team-badge ${team.className}" title="${escapeHtml(team.title)}" aria-label="${escapeHtml(team.title)}">${team.label}</span></td>
         <td title="${escapeHtml(formatPlayerName(player.name))}">${escapeHtml(formatPlayerName(player.name))}</td>
-        <td><span class="match-champion-cell"><span class="match-title-icons" aria-label="${escapeHtml((player.titles || []).join(", "))}">${titleIcons}</span><span>${formatChampionName(player)}</span> <span class="match-champion-meta-small">META: ${formatMatchScore(player.champion_meta || 0)}</span></span></td>
-        <td class="score-stat">${formatMatchScore(player.score)}</td>
+        <td><span class="match-champion-cell"><span class="match-title-icons" aria-label="${escapeHtml((player.titles || []).join(", "))}">${titleIcons}</span><span>${formatChampionName(player)}</span></span></td>
+        <td class="ratio-stat">${formatMatchRate((player.score || 0) / (player.champion_meta || 1), 3)}</td>
         <td>${formatMatchRate(player.kpm, 3)}</td>
         <td>${formatMatchPercent(player.kill_pct)}</td>
         <td>${formatMatchPercent(player.kp_pct)}</td>
@@ -1903,7 +2044,7 @@ function renderMatchExplorer(matchId){
         <td class="match-composite-stat presence-stat">${formatMatchScore(player.presence)}</td>
         <td class="match-composite-stat utility-stat">${formatMatchScore(player.utility)}</td>
         </tr>
-        <tr id="${rowId}" class="match-context-row" hidden><td colspan="14">${renderPlayerContext(player, match.is_remake)}</td></tr>`;
+        <tr id="${rowId}" class="match-context-row" hidden><td colspan="15">${renderPlayerContext(player, match.is_remake)}</td></tr>`;
     });
 
     html += `</tbody></table></div>`;
