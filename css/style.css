@@ -1364,6 +1364,11 @@ table td {
     color:#60a5fa;
     font-weight:900;
 }
+.match-score-v2-table .meta-stat{
+    color:#a78bfa;
+    font-weight:800;
+    text-align:center;
+}
 .match-composite-stat{
     font-weight:800;
     border-left:1px solid rgba(255,255,255,.14);
@@ -1371,21 +1376,6 @@ table td {
 .offense-stat{color:#fbbf24;}
 .presence-stat{color:#a78bfa;}
 .utility-stat{color:#34d399;}
-
-/* En pantallas donde las 14 columnas no caben, preservamos primero las
-   métricas observables y desplazamos los tres compuestos al panel contextual. */
-@media (max-width:1450px){
-    .match-score-v2-table{
-        min-width:1030px;
-    }
-    .match-score-v2-table th:nth-child(n+12),
-    .match-score-v2-table td:nth-child(n+12){
-        display:none;
-    }
-    .match-context-row td{
-        display:table-cell!important;
-    }
-}
 
 /* =========================================
    CHAMPION EXPLORER — G4 SCORE MODEL v2.2

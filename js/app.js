@@ -1916,7 +1916,7 @@ function sortMatchPlayers(players){
 
 function matchSortHeader(label, key){
 
-    const sortable = !["teamId", "name", "champion"].includes(key);
+    const sortable = !["teamId", "name", "champion", "meta"].includes(key);
 
     const active = sortable && matchExplorerSort.key === key;
 
@@ -2008,6 +2008,8 @@ function renderMatchExplorer(matchId){
         ${matchSortHeader("Team", "teamId")}
         ${matchSortHeader("Player", "name")}
         ${matchSortHeader("Champion", "champion")}
+        ${matchSortHeader("Score", "score")}
+        ${matchSortHeader("META", "meta")}
         ${matchSortHeader("Meta Ratio", "ratio")}
         ${matchSortHeader("KPM", "kpm")}
         ${matchSortHeader("Kill%", "kill_pct")}
@@ -2016,9 +2018,6 @@ function renderMatchExplorer(matchId){
         ${matchSortHeader("DMG%", "dmg_share")}
         ${matchSortHeader("CCPM", "ccpm")}
         ${matchSortHeader("Tank%", "tank_share")}
-        ${matchSortHeader("Offense", "offense")}
-        ${matchSortHeader("Presence", "presence")}
-        ${matchSortHeader("Utility", "utility")}
     </tr></thead><tbody>`;
 
     sortMatchPlayers(match.players || []).forEach((player, index) => {
@@ -2032,6 +2031,8 @@ function renderMatchExplorer(matchId){
         <td><span class="match-team-badge ${team.className}" title="${escapeHtml(team.title)}" aria-label="${escapeHtml(team.title)}">${team.label}</span></td>
         <td title="${escapeHtml(formatPlayerName(player.name))}">${escapeHtml(formatPlayerName(player.name))}</td>
         <td><span class="match-champion-cell"><span class="match-title-icons" aria-label="${escapeHtml((player.titles || []).join(", "))}">${titleIcons}</span><span>${formatChampionName(player)}</span></span></td>
+        <td class="score-stat">${formatMatchScore(player.score)}</td>
+        <td class="meta-stat">${formatMatchScore(player.champion_meta || 0)}</td>
         <td class="ratio-stat">${formatMatchRate((player.score || 0) / (player.champion_meta || 1), 3)}</td>
         <td>${formatMatchRate(player.kpm, 3)}</td>
         <td>${formatMatchPercent(player.kill_pct)}</td>
@@ -2040,11 +2041,8 @@ function renderMatchExplorer(matchId){
         <td>${formatMatchPercent(player.dmg_share)}</td>
         <td>${formatMatchRate(player.ccpm, 3)}</td>
         <td>${formatMatchPercent(player.tank_share)}</td>
-        <td class="match-composite-stat offense-stat">${formatMatchScore(player.offense)}</td>
-        <td class="match-composite-stat presence-stat">${formatMatchScore(player.presence)}</td>
-        <td class="match-composite-stat utility-stat">${formatMatchScore(player.utility)}</td>
         </tr>
-        <tr id="${rowId}" class="match-context-row" hidden><td colspan="15">${renderPlayerContext(player, match.is_remake)}</td></tr>`;
+        <tr id="${rowId}" class="match-context-row" hidden><td colspan="13">${renderPlayerContext(player, match.is_remake)}</td></tr>`;
     });
 
     html += `</tbody></table></div>`;
