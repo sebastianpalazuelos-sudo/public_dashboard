@@ -14,7 +14,9 @@
     <button class="tab-button active" data-view="home">HOME</button>
     <button class="tab-button" data-view="players">PROFILES</button>
     <button class="tab-button" data-view="champions">CHAMPIONS</button>
+    <button class="tab-button" data-view="synergies">SYNERGIES</button>
     <button class="tab-button" data-view="matches">MATCHES</button>
+    <button class="tab-button" data-view="methodology">METHODOLOGY</button>
     <button class="tab-button" data-view="splits">SPLITS</button>
     </nav>
 </header>
@@ -84,7 +86,7 @@
 
     <select id="champion-representative-metric-select">
       <option value="">Select category...</option>
-      <option value="kp_pct">KP%</option>
+      <option value="kda">KDA</option>
       <option value="dpm">DPM</option>
       <option value="kpm">KPM</option>
       <option value="ccpm">CCPM</option>
@@ -99,7 +101,7 @@
 
     <select id="champion-tendencies-metric-select">
       <option value="">Select category...</option>
-      <option value="kp_pct">KP%</option>
+      <option value="kda">KDA</option>
       <option value="dpm">DPM</option>
       <option value="kpm">KPM</option>
       <option value="ccpm">CCPM</option>
@@ -145,6 +147,173 @@
 
 <div id="match-results"></div>
 
+</section>
+
+</div>
+
+<div id="view-synergies" class="app-view">
+
+<section>
+  <h2>⚡ Synergies</h2>
+  <div class="synergies-container">
+    <div class="synergies-controls">
+      <div class="synergy-select-group">
+        <label>Player A</label>
+        <select id="synergy-player-a">
+          <option value="">Select Player A...</option>
+        </select>
+        <div id="synergy-player-a-stats"></div>
+      </div>
+      <div class="synergy-select-group">
+        <label>Player B</label>
+        <select id="synergy-player-b">
+          <option value="">Select Player B...</option>
+        </select>
+        <div id="synergy-player-b-stats"></div>
+      </div>
+      <div class="synergy-select-group">
+        <label>Player C</label>
+        <select id="synergy-player-c">
+          <option value="">Select Player C...</option>
+        </select>
+        <div id="synergy-player-c-stats"></div>
+      </div>
+      <div class="synergy-select-group">
+        <label>Player D</label>
+        <select id="synergy-player-d">
+          <option value="">Select Player D...</option>
+        </select>
+        <div id="synergy-player-d-stats"></div>
+      </div>
+      <div class="synergy-select-group">
+        <label>Player E</label>
+        <select id="synergy-player-e">
+          <option value="">Select Player E...</option>
+        </select>
+        <div id="synergy-player-e-stats"></div>
+      </div>
+    </div>
+    <div id="synergy-results"></div>
+  </div>
+</section>
+
+</div>
+
+<div id="view-methodology" class="app-view">
+
+<section>
+  <h2>📊 Metodología del Sistema de Scoring</h2>
+  
+  <div class="methodology-content">
+    <div class="methodology-section">
+      <h3>Filosofía General</h3>
+      <p>El sistema mide qué tan valioso fue un jugador para ganar la partida considerando distintas formas de aportar al equipo desde lo cuantificable. Por eso separa el desempeño en tres dimensiones independientes:</p>
+      <ul>
+        <li><strong>Offense</strong> - Presión ofensiva</li>
+        <li><strong>Presence</strong> - Impacto durante la partida</li>
+        <li><strong>Utility</strong> - Valor sin daño/kills</li>
+      </ul>
+      <p>Cada dimensión representa una forma distinta de generar valor, evitando que una sola estadística domine la evaluación.</p>
+    </div>
+
+    <div class="methodology-section">
+      <h3>Offense</h3>
+      <p><strong>Mide:</strong> Capacidad de generar presión ofensiva</p>
+      <p><strong>Componentes:</strong></p>
+      <ul>
+        <li>KPM (Kills por minuto)</li>
+        <li>DPM (Daño por minuto)</li>
+      </ul>
+      <p><strong>Fórmula:</strong></p>
+      <ul>
+        <li>80% mejor categoría entre KPM/DPM</li>
+        <li>20% segunda categoría</li>
+      </ul>
+      <p><strong>Por qué:</strong> Un asesino puede destacar por KPM, un mago de poke por DPM. Ambos pueden tener contribución ofensiva válida aunque no brillen en la otra métrica.</p>
+    </div>
+
+    <div class="methodology-section">
+      <h3>Presence</h3>
+      <p><strong>Mide:</strong> Impacto generado durante el tiempo activo en la partida</p>
+      <p><strong>Componentes:</strong></p>
+      <ul>
+        <li>KDA = (Kills + Assists) / Muertes (si muertes=0, se usa 1)</li>
+        <li>Mejor categoría entre: KPM, DPM, CCPM</li>
+      </ul>
+      <p><strong>Fórmula:</strong></p>
+      <ul>
+        <li>80% KDA Score</li>
+        <li>20% mejor categoría secundaria</li>
+      </ul>
+      <p><strong>Lógica:</strong> Participar en eliminaciones es importante, sobrevivir también, pero debe existir alguna forma concreta de influencia. Combina eficiencia personal (KDA) con especialidad destacada.</p>
+    </div>
+
+    <div class="methodology-section">
+      <h3>Utility</h3>
+      <p><strong>Mide:</strong> Valor generado sin depender exclusivamente de daño/kills</p>
+      <p><strong>Componentes:</strong></p>
+      <ul>
+        <li>CCPM (Control de masas por minuto)</li>
+        <li>Tank Share (Proporción de daño absorbido)</li>
+      </ul>
+      <p><strong>Fórmula:</strong></p>
+      <ul>
+        <li>80% mejor categoría</li>
+        <li>20% segunda categoría</li>
+      </ul>
+      <p><strong>Por qué:</strong> Valora correctamente iniciadores, tanques, soportes y campeones de control que aportan enormemente aunque no lidere daño/kills.</p>
+    </div>
+
+    <div class="methodology-section">
+      <h3>Sistema de Scoring de Métricas</h3>
+      <p>Cada métrica se convierte a un score de 0 a 10 mediante referencias fijas por percentiles:</p>
+      <p><strong>Ejemplo KDA:</strong></p>
+      <ul>
+        <li>5 puntos = valor al percentil 44.1% (KDA: 3.23)</li>
+        <li>10 puntos = valor al percentil 86.3% (KDA: 7.80)</li>
+      </ul>
+      <p>Esto permite comparar partidas diferentes bajo la misma escala estable.</p>
+      <p><strong>Métricas actuales:</strong></p>
+      <ul>
+        <li>KPM, DPM, KDA, CCPM, Tank Share</li>
+      </ul>
+    </div>
+
+    <div class="methodology-section">
+      <h3>Score Global</h3>
+      <p><strong>Fórmula:</strong> Offense + Presence + Utility</p>
+      <p>Cada dimensión tiene el mismo peso en el resultado final, evitando dominio de una sola estadística.</p>
+    </div>
+
+    <div class="methodology-section">
+      <h3>Meta de Campeones</h3>
+      <p>El sistema construye un perfil histórico para cada campeón basado en:</p>
+      <ul>
+        <li>Partidas contra oponentes registrados</li>
+        <li>Promedios históricos de perfiles de amigos</li>
+      </ul>
+      <p>Esto permite comparar el rendimiento del jugador contra lo que normalmente logra ese campeón.</p>
+    </div>
+
+    <div class="methodology-section">
+      <h3>Meta Ratio</h3>
+      <p><strong>Pregunta que responde:</strong> ¿Qué tan por encima/por debajo del estándar histórico de su campeón rindió?</p>
+      <ul>
+        <li><strong>1.00</strong> = rendimiento esperado</li>
+        <li><strong>> 1.00</strong> = por encima del meta</li>
+        <li><strong>< 1.00</strong> = por debajo del meta</li>
+      </ul>
+      <p>Permite comparar jugadores con campeones diferentes bajo la misma escala.</p>
+    </div>
+
+    <div class="methodology-section">
+      <h3>Títulos (God, Alpha, Cono)</h3>
+      <p>Se asignan mediante rankings relativos dentro de cada partida contra los otros 9 jugadores, no solo por daño/kills.</p>
+      <p><strong>God:</strong> Top 2 en ≥3 categorías (DMGpm, KDA, KILLSpm, CCpm, TANK%) + Top 2 en score total. Gana el con mayor score.</p>
+      <p><strong>Alpha:</strong> Tiene dos categorías de distinto tipo en top 2 + Top 2 en score total. (Excluyendo al God). Gana el con mayor score.</p>
+      <p><strong>Cono:</strong> Bottom 2 en ≥3 categorías + Bottom 2 en score total + NO top 2 en ninguna categoría. Gana el con menor score.</p>
+    </div>
+  </div>
 </section>
 
 </div>

@@ -2,7 +2,9 @@ const views = {
     home: document.getElementById("view-home"),
     players: document.getElementById("view-players"),
     champions: document.getElementById("view-champions"),
+    synergies: document.getElementById("view-synergies"),
     matches: document.getElementById("view-matches"),
+    methodology: document.getElementById("view-methodology"),
     splits: document.getElementById("view-splits"),
 };
 
@@ -143,6 +145,7 @@ async function loadDashboard(){
     loadChampionTendenciesSelect();
     loadMatchExplorerSelect();
     loadSplitsSelect();
+    loadSynergiesSelect();
     showChampionSubview("explorer");
   }catch(error){
     document.body.innerHTML+=`<main><section><p class="error">${error.message}</p><p>Verificá que index.html y dashboard_data.json estén en la misma carpeta.</p></section></main>`;
@@ -177,6 +180,263 @@ document.querySelectorAll(".champion-subtab-button").forEach(button => {
         showChampionSubview(nextSubview);
     });
 });
+
+function loadSynergiesSelect(){
+    const playerASelect = document.getElementById("synergy-player-a");
+    const playerBSelect = document.getElementById("synergy-player-b");
+    const playerCSelect = document.getElementById("synergy-player-c");
+    const playerDSelect = document.getElementById("synergy-player-d");
+    const playerESelect = document.getElementById("synergy-player-e");
+
+    if(!playerASelect || !playerBSelect || !playerCSelect || !playerDSelect || !playerESelect){
+        return;
+    }
+
+    const playerNames = Object.keys(
+        dashboardData.champion_engine.player_champion_profiles
+    ).sort();
+
+    playerASelect.innerHTML = '<option value="">Select Player A...</option>';
+    playerBSelect.innerHTML = '<option value="">Select Player B...</option>';
+    playerCSelect.innerHTML = '<option value="">Select Player C...</option>';
+    playerDSelect.innerHTML = '<option value="">Select Player D...</option>';
+    playerESelect.innerHTML = '<option value="">Select Player E...</option>';
+
+    playerNames.forEach(playerName => {
+        const optionA = document.createElement("option");
+        optionA.value = playerName;
+        optionA.textContent = formatPlayerName(playerName);
+        playerASelect.appendChild(optionA);
+
+        const optionB = document.createElement("option");
+        optionB.value = playerName;
+        optionB.textContent = formatPlayerName(playerName);
+        playerBSelect.appendChild(optionB);
+
+        const optionC = document.createElement("option");
+        optionC.value = playerName;
+        optionC.textContent = formatPlayerName(playerName);
+        playerCSelect.appendChild(optionC);
+
+        const optionD = document.createElement("option");
+        optionD.value = playerName;
+        optionD.textContent = formatPlayerName(playerName);
+        playerDSelect.appendChild(optionD);
+
+        const optionE = document.createElement("option");
+        optionE.value = playerName;
+        optionE.textContent = formatPlayerName(playerName);
+        playerESelect.appendChild(optionE);
+    });
+
+    playerASelect.addEventListener("change", () => {
+        updatePlayerStats(playerASelect.value, "a");
+        calculateSynergy();
+    });
+    playerBSelect.addEventListener("change", () => {
+        updatePlayerStats(playerBSelect.value, "b");
+        calculateSynergy();
+    });
+    playerCSelect.addEventListener("change", () => {
+        updatePlayerStats(playerCSelect.value, "c");
+        calculateSynergy();
+    });
+    playerDSelect.addEventListener("change", () => {
+        updatePlayerStats(playerDSelect.value, "d");
+        calculateSynergy();
+    });
+    playerESelect.addEventListener("change", () => {
+        updatePlayerStats(playerESelect.value, "e");
+        calculateSynergy();
+    });
+}
+
+function updatePlayerStats(playerName, playerType){
+    const statsDiv = document.getElementById(`synergy-player-${playerType}-stats`);
+    if(!statsDiv) return;
+
+    if(!playerName){
+        statsDiv.innerHTML = "";
+        return;
+    }
+
+    // Get player's individual averages from ranking
+    const ranking = dashboardData?.current_split?.global_ranking || [];
+    const playerData = ranking.find(r => r.name === playerName);
+
+    if(playerData){
+        statsDiv.innerHTML = `
+            <div class="synergy-player-stats">
+                <div class="synergy-player-stat">
+                    <span class="stat-label score-label">Score:</span>
+                    <span class="stat-value score-value">${formatHomeMetric(playerData.global_avg)}</span>
+                </div>
+                <div class="synergy-player-stat">
+                    <span class="stat-label meta-label">Meta Ratio:</span>
+                    <span class="stat-value meta-value">${formatHomeMetric(playerData.avg_meta_ratio || 0, 3)}</span>
+                </div>
+            </div>
+        `;
+    } else {
+        statsDiv.innerHTML = `<div class="synergy-player-stats">No data available</div>`;
+    }
+}
+
+function calculateSynergy(){
+    console.log("Calculando sinergia...");
+    const playerA = document.getElementById("synergy-player-a").value;
+    const playerB = document.getElementById("synergy-player-b").value;
+    const playerC = document.getElementById("synergy-player-c").value;
+    const playerD = document.getElementById("synergy-player-d").value;
+    const playerE = document.getElementById("synergy-player-e").value;
+    const resultsDiv = document.getElementById("synergy-results");
+
+    console.log("Player A:", playerA, "Player B:", playerB, "Player C:", playerC, "Player D:", playerD, "Player E:", playerE);
+
+    // Verificar que al menos 2 jugadores estén seleccionados
+    const selectedPlayers = [playerA, playerB, playerC, playerD, playerE].filter(p => p);
+    if(selectedPlayers.length < 2){
+        resultsDiv.innerHTML = `<p class="synergy-empty">Select at least 2 players to analyze synergy</p>`;
+        return;
+    }
+
+    // Verificar que no haya duplicados
+    const uniquePlayers = [...new Set(selectedPlayers)];
+    if(uniquePlayers.length !== selectedPlayers.length){
+        resultsDiv.innerHTML = `<p class="synergy-empty">Select different players</p>`;
+        return;
+    }
+
+    // Find matches where all selected players played together on the same team
+    const matches = dashboardData.match_explorer || [];
+    console.log("Total matches:", matches.length);
+    const sharedMatches = [];
+
+    matches.forEach(match => {
+        const players = match.players || [];
+        const playerData = {};
+
+        selectedPlayers.forEach(playerName => {
+            playerData[playerName] = players.find(p => p.name === playerName);
+        });
+
+        // Verificar que todos los jugadores seleccionados estén en la partida
+        const allPresent = selectedPlayers.every(playerName => playerData[playerName]);
+        if(!allPresent) return;
+
+        // Verificar que todos estén en el mismo equipo
+        const teamIds = selectedPlayers.map(playerName => playerData[playerName].teamId);
+        const sameTeam = teamIds.every(teamId => teamId === teamIds[0]);
+
+        if(sameTeam){
+            sharedMatches.push({
+                match_id: match.match_id,
+                ...playerData
+            });
+        }
+    });
+
+    console.log("Shared matches:", sharedMatches.length);
+
+    if(sharedMatches.length === 0){
+        resultsDiv.innerHTML = `<p class="synergy-empty">No matches found where all selected players played together</p>`;
+        return;
+    }
+
+    if(sharedMatches.length < 3){
+        resultsDiv.innerHTML = `<p class="synergy-empty">Only ${sharedMatches.length} match(es) together (minimum 3 for reliable data)</p>`;
+        return;
+    }
+
+    console.log("Calculating averages for selected players...");
+
+    // Calculate averages for each selected player
+    const playerStats = {};
+    selectedPlayers.forEach(playerName => {
+        try {
+            // Apply bottom 15% trim like the backend does
+            const playerScores = sharedMatches.map(m => m[playerName].score);
+            playerScores.sort((a, b) => b - a); // Sort descending
+            const trimCount = Math.floor(playerScores.length * 0.15);
+            const trimmedScores = playerScores.slice(0, -trimCount || playerScores.length);
+            
+            const avgScore = trimmedScores.reduce((sum, score) => sum + score, 0) / trimmedScores.length;
+            
+            // For meta ratio, we need to calculate it the same way
+            const playerMetaRatios = sharedMatches.map(m => m[playerName].score / (m[playerName].champion_meta || 1));
+            playerMetaRatios.sort((a, b) => b - a); // Sort descending
+            const trimCountMeta = Math.floor(playerMetaRatios.length * 0.15);
+            const trimmedMetaRatios = playerMetaRatios.slice(0, -trimCountMeta || playerMetaRatios.length);
+            const avgMetaRatio = trimmedMetaRatios.reduce((sum, ratio) => sum + ratio, 0) / trimmedMetaRatios.length;
+            
+            playerStats[playerName] = { avgScore, avgMetaRatio };
+
+            // Debug logs
+            const ranking = dashboardData?.current_split?.global_ranking || [];
+            const playerData = ranking.find(r => r.name === playerName);
+            console.log(`${playerName}: Avg with team (trimmed)=${avgScore.toFixed(2)}, Global avg=${playerData?.global_avg?.toFixed(2)}, Diff=${(avgScore - playerData?.global_avg).toFixed(2)}`);
+        } catch (error) {
+            console.error(`Error calculating stats for ${playerName}:`, error);
+        }
+    });
+
+    // Build results HTML
+    let columnsHtml = '';
+    selectedPlayers.forEach((playerName, index) => {
+        const playerClasses = ['player-a', 'player-b', 'player-c', 'player-d', 'player-e'];
+        const playerClass = playerClasses[index] || 'player-a';
+        const stats = playerStats[playerName];
+
+        // Get player's individual averages from ranking
+        const ranking = dashboardData?.current_split?.global_ranking || [];
+        const playerData = ranking.find(r => r.name === playerName);
+        const baseAvg = playerData?.global_avg || 0;
+        const baseMeta = playerData?.avg_meta_ratio || 0;
+
+        const scoreDiff = stats.avgScore - baseAvg;
+        const metaDiff = stats.avgMetaRatio - baseMeta;
+
+        columnsHtml += `
+            <div class="synergy-stats-col ${playerClass}">
+                <h4>${escapeHtml(formatPlayerName(playerName))}</h4>
+                <div class="synergy-stat">
+                    <div class="synergy-stat-label score-label">Score</div>
+                    <div class="synergy-stat-value score-value">
+                        ${formatHomeMetric(stats.avgScore)}
+                        <span class="synergy-diff ${scoreDiff > 0 ? "diff-positive" : "diff-negative"}">
+                            ${scoreDiff > 0 ? `+${formatHomeMetric(scoreDiff)}` : formatHomeMetric(scoreDiff)}
+                        </span>
+                    </div>
+                </div>
+                <div class="synergy-stat">
+                    <div class="synergy-stat-label meta-label">Meta Ratio</div>
+                    <div class="synergy-stat-value meta-value">
+                        ${formatHomeMetric(stats.avgMetaRatio, 3)}
+                        <span class="synergy-diff ${metaDiff > 0 ? "diff-positive" : "diff-negative"}">
+                            ${metaDiff > 0 ? `+${formatHomeMetric(metaDiff, 3)}` : formatHomeMetric(metaDiff, 3)}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    resultsDiv.innerHTML = `
+        <div class="synergy-results-card">
+            <div class="synergy-players">
+                ${selectedPlayers.map((p, i) => {
+                    const playerClasses = ['synergy-player-a', 'synergy-player-b', 'synergy-player-c', 'synergy-player-d', 'synergy-player-e'];
+                    const playerClass = playerClasses[i] || 'synergy-player-a';
+                    return `<span class="${playerClass}">${escapeHtml(formatPlayerName(p))}</span>`;
+                }).join(' <span>+</span> ')}
+            </div>
+            <h3>${sharedMatches.length} matches together</h3>
+            <div class="synergy-stats">
+                ${columnsHtml}
+            </div>
+        </div>
+    `;
+}
 
 function loadPlayersSelect(){
 
@@ -344,7 +604,7 @@ function renderChampionRepresentatives(metricName){
                     <th>Champion</th>
                     <th>Profile</th>
                     <th>Games</th>
-                    <th class="${activeClass("kp_pct")}">KP%</th>
+                    <th class="${activeClass("kda")}">KDA</th>
                     <th class="${activeClass("dpm")}">DPM</th>
                     <th class="${activeClass("kpm")}">KPM</th>
                     <th class="${activeClass("ccpm")}">CCPM</th>
@@ -365,7 +625,7 @@ function renderChampionRepresentatives(metricName){
                 <td>${escapeHtml(r.champion)}</td>
                 <td>${escapeHtml(profileName)}</td>
                 <td>${Number(r.games || 0)}</td>
-                <td class="${activeClass("kp_pct")}">${formatHomeMetric(r.kp_pct, 2)}%</td>
+                <td class="${activeClass("kda")}">${formatHomeMetric(r.kda, 2)}</td>
                 <td class="${activeClass("dpm")}">${Math.round(Number(r.dpm || 0))}</td>
                 <td class="${activeClass("kpm")}">${formatHomeMetric(r.kpm, 2)}</td>
                 <td class="${activeClass("ccpm")}">${formatHomeMetric(r.ccpm, 2)}</td>
@@ -439,7 +699,7 @@ function renderChampionTendencies(metricName){
                     <th>Champion</th>
                     <th>Profiles</th>
                     <th>Games</th>
-                    <th class="${metricClass("kp_pct")}">KP%</th>
+                    <th class="${metricClass("kda")}">KDA</th>
                     <th class="${metricClass("dpm")}">DPM</th>
                     <th class="${metricClass("kpm")}">KPM</th>
                     <th class="${metricClass("ccpm")}">CCPM</th>
@@ -456,7 +716,7 @@ function renderChampionTendencies(metricName){
                 <td>${escapeHtml(r.champion)}</td>
                 <td>${Number(r.profiles || 0)}</td>
                 <td>${Number(r.games || 0)}</td>
-                <td class="${metricClass("kp_pct")}">${formatHomeMetric(r.kp_pct)}%</td>
+                <td class="${metricClass("kda")}">${formatHomeMetric(r.kda)}</td>
                 <td class="${metricClass("dpm")}">${Math.round(Number(r.dpm || 0))}</td>
                 <td class="${metricClass("kpm")}">${formatHomeMetric(r.kpm)}</td>
                 <td class="${metricClass("ccpm")}">${formatHomeMetric(r.ccpm)}</td>
@@ -753,7 +1013,7 @@ function buildChampionRankingTable(
                 <th class="score-stat">Score</th>
                 <th>KPM</th>
                 <th>KILL%</th>
-                <th>KP%</th>
+                <th>KDA</th>
                 <th>DPM</th>
                 <th>DMG%</th>
                 <th>CCPM</th>
@@ -845,7 +1105,7 @@ function buildChampionRankingTable(
                     <td class="score-stat">${formatHomeMetric(profile.global_avg)}</td>
                     <td>${formatHomeMetric(profile.avg_kpm)}</td>
                     <td>${formatHomeMetric(profile.avg_kill_pct)}%</td>
-                    <td>${formatHomeMetric(profile.avg_kp_pct)}%</td>
+                    <td>${formatHomeMetric(profile.avg_kda)}</td>
                     <td>${formatHomeMetric(profile.avg_dpm, 0)}</td>
                     <td>${formatHomeMetric(profile.avg_dmg_share)}%</td>
                     <td>${formatHomeMetric(profile.avg_ccpm)}</td>
@@ -1411,7 +1671,7 @@ function renderPlayerChampionHighlights(elementId, highlights){
                         <td class="meta-stat">${formatHomeMetric(champion.champion_meta || 0)}</td>
                         <td>${formatHomeMetric(champion.kpm, 2)}</td>
                         <td>${formatHomeMetric(champion.kill_pct)}%</td>
-                        <td>${formatHomeMetric(champion.kp_pct)}%</td>
+                        <td>${formatHomeMetric(champion.kda)}</td>
                         <td>${formatHomeMetric(champion.dpm, 0)}</td>
                         <td>${formatHomeMetric(champion.dmg_pct)}%</td>
                         <td>${formatHomeMetric(champion.ccpm, 2)}</td>
@@ -1464,7 +1724,7 @@ function renderPlayerChampionHighlights(elementId, highlights){
                                 <th class="meta-stat">META</th>
                                 <th>KPM</th>
                                 <th>Kill%</th>
-                                <th>KP%</th>
+                                <th>KDA</th>
                                 <th>DPM</th>
                                 <th>DMG%</th>
                                 <th>CCPM</th>
@@ -2013,7 +2273,7 @@ function renderMatchExplorer(matchId){
         ${matchSortHeader("Meta Ratio", "ratio")}
         ${matchSortHeader("KPM", "kpm")}
         ${matchSortHeader("Kill%", "kill_pct")}
-        ${matchSortHeader("KP%", "kp_pct")}
+        ${matchSortHeader("KDA", "kda")}
         ${matchSortHeader("DPM", "dpm")}
         ${matchSortHeader("DMG%", "dmg_share")}
         ${matchSortHeader("CCPM", "ccpm")}
@@ -2036,7 +2296,7 @@ function renderMatchExplorer(matchId){
         <td class="ratio-stat">${formatMatchRate((player.score || 0) / (player.champion_meta || 1), 3)}</td>
         <td>${formatMatchRate(player.kpm, 3)}</td>
         <td>${formatMatchPercent(player.kill_pct)}</td>
-        <td>${formatMatchPercent(player.kp_pct)}</td>
+        <td>${formatMatchRate(player.kda, 2)}</td>
         <td>${formatMatchRate(player.dpm, 0)}</td>
         <td>${formatMatchPercent(player.dmg_share)}</td>
         <td>${formatMatchRate(player.ccpm, 3)}</td>

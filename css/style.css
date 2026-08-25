@@ -1373,6 +1373,229 @@ table td {
     font-weight:800;
     border-left:1px solid rgba(255,255,255,.14);
 }
+
+/* =========================================
+   SYNERGIES
+   ========================================= */
+.synergies-container{
+    max-width:1200px;
+    margin:0 auto;
+}
+.synergies-controls{
+    display:flex;
+    gap:20px;
+    margin-bottom:24px;
+    flex-wrap:wrap;
+}
+.synergy-select-group{
+    flex:1;
+    min-width:200px;
+}
+.synergy-select-group label{
+    display:block;
+    margin-bottom:8px;
+    color:#94a3b8;
+    font-size:12px;
+    font-weight:700;
+    text-transform:uppercase;
+}
+.synergy-select-group select{
+    width:100%;
+    padding:10px 12px;
+    border:1px solid rgba(75,85,99,.85);
+    border-radius:8px;
+    background:rgba(17,24,39,.9);
+    color:#f8fafc;
+    font-size:14px;
+}
+.synergy-select-group select:focus{
+    outline:none;
+    border-color:#60a5fa;
+}
+.synergy-player-stats{
+    margin-top:12px;
+    padding:12px;
+    background:rgba(30,41,59,.8);
+    border:1px solid rgba(75,85,99,.85);
+    border-radius:8px;
+}
+.synergy-player-stat{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:8px;
+}
+.synergy-player-stat:last-child{
+    margin-bottom:0;
+}
+.synergy-player-stat .stat-label{
+    color:#94a3b8;
+    font-size:11px;
+    font-weight:700;
+}
+.synergy-player-stat .stat-value{
+    font-size:14px;
+    font-weight:700;
+}
+.synergy-player-stat .score-value{
+    color:#1e3a8a;
+}
+.synergy-player-stat .meta-value{
+    color:#059669;
+}
+#synergy-results{
+    text-align:center;
+}
+.synergy-empty{
+    padding:40px;
+    color:#94a3b8;
+    font-style:italic;
+}
+.synergy-results-card{
+    background:rgba(17,24,39,.9);
+    border:1px solid rgba(75,85,99,.85);
+    border-radius:12px;
+    padding:24px;
+    text-align:center;
+}
+.synergy-results-card h3{
+    margin:0 0 16px 0;
+    color:#f8fafc;
+}
+.synergy-stats{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap:16px;
+    margin-top:20px;
+}
+.synergy-stats-col{
+    padding:0 16px;
+    border-right:1px solid rgba(75,85,99,.5);
+}
+.synergy-stats-col:last-child{
+    border-right:none;
+}
+.synergy-stats-col h4{
+    margin:0 0 12px 0;
+    font-size:14px;
+    font-weight:700;
+    text-transform:uppercase;
+}
+.synergy-player-a h4{
+    color:#fbbf24;
+}
+.synergy-player-b h4{
+    color:#c084fc;
+}
+.synergy-player-c h4{
+    color:#22c55e;
+}
+.synergy-player-d h4{
+    color:#f97316;
+}
+.synergy-player-e h4{
+    color:#06b6d4;
+}
+.synergy-stat{
+    background:rgba(30,41,59,.8);
+    border:1px solid rgba(75,85,99,.85);
+    border-radius:8px;
+    padding:16px;
+}
+.synergy-stat-value{
+    font-size:24px;
+    font-weight:800;
+    color:#f8fafc;
+    margin:8px 0 4px 0;
+}
+.synergy-stat-label.score-label{
+    color:#1e3a8a;
+}
+.synergy-stat-label.meta-label{
+    color:#059669;
+}
+.synergy-stat-value .diff-positive{
+    color:#ec4899;
+}
+.synergy-stat-value .diff-negative{
+    color:#ef4444;
+}
+.synergy-diff{
+    margin-left:8px;
+    font-size:18px;
+    font-weight:700;
+}
+.synergy-stat-label{
+    color:#94a3b8;
+    font-size:12px;
+    font-weight:700;
+    text-transform:uppercase;
+}
+.synergy-players{
+    display:flex;
+    justify-content:center;
+    gap:16px;
+    margin-bottom:20px;
+    font-size:18px;
+    font-weight:700;
+}
+.synergy-player-a{
+    color:#fbbf24;
+}
+.synergy-player-b{
+    color:#c084fc;
+}
+.synergy-player-c{
+    color:#22c55e;
+}
+.synergy-player-d{
+    color:#f97316;
+}
+.synergy-player-e{
+    color:#06b6d4;
+}
+
+/* =========================================
+   METHODOLOGY
+   ========================================= */
+.methodology-content{
+    max-width:1200px;
+    margin:0 auto;
+}
+.methodology-section{
+    background:rgba(17,24,39,.9);
+    border:1px solid rgba(75,85,99,.85);
+    border-radius:12px;
+    padding:24px;
+    margin-bottom:24px;
+}
+.methodology-section h3{
+    margin:0 0 16px 0;
+    color:#f8fafc;
+    font-size:18px;
+    font-weight:700;
+}
+.methodology-section p{
+    color:#cbd5e1;
+    line-height:1.6;
+    margin-bottom:12px;
+}
+.methodology-section ul{
+    color:#cbd5e1;
+    line-height:1.6;
+    margin:12px 0;
+    padding-left:20px;
+}
+.methodology-section li{
+    margin-bottom:8px;
+}
+.methodology-section strong{
+    color:#f8fafc;
+    font-weight:700;
+}
+
+
+
 .offense-stat{color:#fbbf24;}
 .presence-stat{color:#a78bfa;}
 .utility-stat{color:#34d399;}
