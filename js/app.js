@@ -1373,6 +1373,15 @@ function renderPlayerChampionTable(
                     : ratioB - ratioA;
             }
 
+            if(activeSortKey === "games"){
+                const gamesA = Number(a.global_games) || 0;
+                const gamesB = Number(b.global_games) || 0;
+
+                return activeSortDirection === "asc"
+                    ? gamesA - gamesB
+                    : gamesB - gamesA;
+            }
+
             return 0;
         });
 
@@ -1384,7 +1393,14 @@ function renderPlayerChampionTable(
                 <tr>
                     <th>#</th>
                     <th>Champion</th>
-                    <th>Games</th>
+                    <th
+                        class="sortable ${activeSortKey === "games" ? `sort-${activeSortDirection}` : ""}"
+                        data-sort="games"
+                    >
+                        Games${activeSortKey === "games"
+                            ? (activeSortDirection === "asc" ? " ▲" : " ▼")
+                            : " ↕"}
+                    </th>
                     <th
                         class="sortable ${activeSortKey === "score" ? `sort-${activeSortDirection}` : ""}"
                         data-sort="score"
@@ -1451,23 +1467,21 @@ function renderPlayerChampionTable(
 
     attachProfileMatchInteractions(container);
 
-        // Agregar funcionalidad de ordenamiento
-        container.querySelectorAll(".sortable").forEach(header => {
-            header.addEventListener("click", () => {
-                const sortKey = header.dataset.sort;
+    // Agregar funcionalidad de ordenamiento
+    container.querySelectorAll(".sortable").forEach(header => {
+        header.addEventListener("click", () => {
+            const sortKey = header.dataset.sort;
+            const hasDirection = header.classList.contains("sort-asc") || header.classList.contains("sort-desc");
+            const currentDirection = header.classList.contains("sort-asc") ? "asc" : "desc";
+            const newDirection = hasDirection ? (currentDirection === "asc" ? "desc" : "asc") : "desc";
 
-                const direction =
-                    activeSortKey === sortKey
-                        ? (activeSortDirection === "asc" ? "desc" : "asc")
-                        : "desc";
-
-                renderPlayerChampionTable(
-                    playerProfile,
-                    sortKey,
-                    direction
-                );
-            });
+            renderPlayerChampionTable(
+                playerProfile,
+                sortKey,
+                newDirection
+            );
         });
+    });
 
     container.querySelectorAll(".champion-row").forEach(row => {
         row.addEventListener("click", () => {

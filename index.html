@@ -207,18 +207,20 @@
   <div class="methodology-content">
     <div class="methodology-section">
       <h3>Filosofía General</h3>
-      <p>El sistema mide qué tan valioso fue un jugador para ganar la partida considerando distintas formas de aportar al equipo desde lo cuantificable. Por eso separa el desempeño en tres dimensiones independientes:</p>
+      <p>El sistema parte de dos conceptos principales: Score y Meta Ratio.</p>
+      <p>El Score representa el valor cuantificable que un jugador genera durante una partida. Cada campeón tiene un kit diferente con lo cual algunos inherentemente suelen sumar más score que otros. El sistema transforma esas contribuciones en puntos comparables y construye a partir de ellos tres dimensiones de desempeño:</p>
       <ul>
         <li><strong>Offense</strong> - Presión ofensiva</li>
         <li><strong>Presence</strong> - Impacto durante la partida</li>
-        <li><strong>Utility</strong> - Valor sin daño/kills</li>
+        <li><strong>Utility</strong> - Valor generado más allá del daño y las kills</li>
       </ul>
-      <p>Cada dimensión representa una forma distinta de generar valor, evitando que una sola estadística domine la evaluación.</p>
+      <p>El Meta Ratio agrega una segunda capa de comparación: en lugar de evaluar únicamente cuánto produjo un jugador en términos absolutos, compara su rendimiento con el rendimiento histórico esperado del campeón que utilizó.</p>
+      <p>De esta manera, el sistema puede comparar jugadores utilizando campeones con funciones y formas de aportar muy diferentes, sin asumir que todos los campeones deben producir el mismo tipo de estadísticas para ser considerados valiosos.</p>
     </div>
 
     <div class="methodology-section">
       <h3>Offense</h3>
-      <p><strong>Mide:</strong> Capacidad de generar presión ofensiva</p>
+      <p><strong>Mide:</strong> Capacidad de generar presión ofensiva.</p>
       <p><strong>Componentes:</strong></p>
       <ul>
         <li>KPM (Kills por minuto)</li>
@@ -229,28 +231,30 @@
         <li>80% mejor categoría entre KPM/DPM</li>
         <li>20% segunda categoría</li>
       </ul>
-      <p><strong>Por qué:</strong> Un asesino puede destacar por KPM, un mago de poke por DPM. Ambos pueden tener contribución ofensiva válida aunque no brillen en la otra métrica.</p>
     </div>
 
     <div class="methodology-section">
       <h3>Presence</h3>
-      <p><strong>Mide:</strong> Impacto generado durante el tiempo activo en la partida</p>
+      <p><strong>Mide:</strong> Impacto generado durante el tiempo activo en la partida.</p>
       <p><strong>Componentes:</strong></p>
       <ul>
-        <li>KDA = (Kills + Assists) / Muertes (si muertes=0, se usa 1)</li>
-        <li>Mejor categoría entre: KPM, DPM, CCPM</li>
+        <li>KDA = (Kills + Assists) / Muertes (si muertes = 0, se utiliza 1)</li>
+        <li>KPM</li>
+        <li>DPM</li>
+        <li>CCPM</li>
+        <li>Tank Share</li>
       </ul>
       <p><strong>Fórmula:</strong></p>
       <ul>
         <li>80% KDA Score</li>
-        <li>20% mejor categoría secundaria</li>
+        <li>20% mejor categoría entre KPM, DPM, CCPM y Tank Share</li>
       </ul>
-      <p><strong>Lógica:</strong> Participar en eliminaciones es importante, sobrevivir también, pero debe existir alguna forma concreta de influencia. Combina eficiencia personal (KDA) con especialidad destacada.</p>
+      <p><strong>Lógica:</strong> La participación en eliminaciones y la capacidad de mantenerse efectivo con pocas muertes representan una parte fundamental del impacto individual. El 20% restante reconoce la principal especialidad mediante la cual el jugador generó influencia durante la partida, ya sea kills, daño, control de masas o absorción de daño.</p>
     </div>
 
     <div class="methodology-section">
       <h3>Utility</h3>
-      <p><strong>Mide:</strong> Valor generado sin depender exclusivamente de daño/kills</p>
+      <p><strong>Mide:</strong> Valor generado sin depender exclusivamente del daño o las kills.</p>
       <p><strong>Componentes:</strong></p>
       <ul>
         <li>CCPM (Control de masas por minuto)</li>
@@ -261,57 +265,63 @@
         <li>80% mejor categoría</li>
         <li>20% segunda categoría</li>
       </ul>
-      <p><strong>Por qué:</strong> Valora correctamente iniciadores, tanques, soportes y campeones de control que aportan enormemente aunque no lidere daño/kills.</p>
+      <p><strong>Por qué:</strong> Permite valorar iniciadores, tanques, y campeones de control que pueden aportar significativamente aunque no lideren daño o kills.</p>
+      <p><strong>Nota:</strong> Deja de lado Campeones support con escudos y curaciones porque el cliente no entrega esos datos.</p>
     </div>
 
     <div class="methodology-section">
       <h3>Sistema de Scoring de Métricas</h3>
-      <p>Cada métrica se convierte a un score de 0 a 10 mediante referencias fijas por percentiles:</p>
+      <p>Cada métrica se convierte a un score de 0 a 10 mediante referencias fijas por percentiles.</p>
       <p><strong>Ejemplo KDA:</strong></p>
       <ul>
         <li>5 puntos = valor al percentil 44.1% (KDA: 3.23)</li>
         <li>10 puntos = valor al percentil 86.3% (KDA: 7.80)</li>
       </ul>
-      <p>Esto permite comparar partidas diferentes bajo la misma escala estable.</p>
+      <p>Esto permite convertir métricas de escalas y unidades diferentes en una escala común de 0 a 10.</p>
       <p><strong>Métricas actuales:</strong></p>
       <ul>
-        <li>KPM, DPM, KDA, CCPM, Tank Share</li>
+        <li>KPM</li>
+        <li>DPM</li>
+        <li>KDA</li>
+        <li>CCPM</li>
+        <li>Tank Share</li>
       </ul>
     </div>
 
     <div class="methodology-section">
       <h3>Score Global</h3>
       <p><strong>Fórmula:</strong> Offense + Presence + Utility</p>
-      <p>Cada dimensión tiene el mismo peso en el resultado final, evitando dominio de una sola estadística.</p>
+      <p>Cada dimensión tiene el mismo peso en el resultado final, evitando que una única forma de contribución domine la evaluación.</p>
     </div>
 
     <div class="methodology-section">
       <h3>Meta de Campeones</h3>
-      <p>El sistema construye un perfil histórico para cada campeón basado en:</p>
+      <p>El sistema construye un perfil histórico para cada campeón a partir de:</p>
       <ul>
-        <li>Partidas contra oponentes registrados</li>
+        <li>Partidas de los jugadores contra los que nos enfrentamos</li>
         <li>Promedios históricos de perfiles de amigos</li>
       </ul>
-      <p>Esto permite comparar el rendimiento del jugador contra lo que normalmente logra ese campeón.</p>
+      <p>Este perfil representa el rendimiento que históricamente produce ese campeón dentro del sistema.</p>
     </div>
 
     <div class="methodology-section">
       <h3>Meta Ratio</h3>
-      <p><strong>Pregunta que responde:</strong> ¿Qué tan por encima/por debajo del estándar histórico de su campeón rindió?</p>
+      <p><strong>Pregunta que responde:</strong> ¿Qué tan por encima o por debajo del rendimiento histórico esperado de su campeón jugó el jugador?</p>
       <ul>
         <li><strong>1.00</strong> = rendimiento esperado</li>
         <li><strong>> 1.00</strong> = por encima del meta</li>
         <li><strong>< 1.00</strong> = por debajo del meta</li>
       </ul>
-      <p>Permite comparar jugadores con campeones diferentes bajo la misma escala.</p>
+      <p>El Meta Ratio permite normalizar las diferencias naturales entre campeones. Un campeón puede generar valor principalmente mediante daño, otro mediante kills, otro mediante CC y otro mediante absorción de daño. En lugar de comparar directamente esas cantidades, el Meta Ratio compara el rendimiento de cada jugador con el estándar histórico de su propio campeón.</p>
+      <p>Esto permite evaluar el desempeño relativo del jugador sin penalizarlo por utilizar un campeón cuyo kit genera valor de una manera diferente.</p>
     </div>
 
     <div class="methodology-section">
       <h3>Títulos (God, Alpha, Cono)</h3>
-      <p>Se asignan mediante rankings relativos dentro de cada partida contra los otros 9 jugadores, no solo por daño/kills.</p>
-      <p><strong>God:</strong> Top 2 en ≥3 categorías (DMGpm, KDA, KILLSpm, CCpm, TANK%) + Top 2 en score total. Gana el con mayor score.</p>
-      <p><strong>Alpha:</strong> Tiene dos categorías de distinto tipo en top 2 + Top 2 en score total. (Excluyendo al God). Gana el con mayor score.</p>
-      <p><strong>Cono:</strong> Bottom 2 en ≥3 categorías + Bottom 2 en score total + NO top 2 en ninguna categoría. Gana el con menor score.</p>
+      <p>Se asignan mediante rankings relativos dentro de cada partida contra los otros 9 jugadores, considerando las principales métricas de desempeño.</p>
+      <p><strong>God:</strong> Top 2 en ≥3 categorías (DMPM, KDA, KILLSpm, CCPM, TANK%) + Top 2 en Meta Ratio. Gana el de mayor Meta Ratio.</p>
+      <p><strong>Alpha:</strong> Tiene dos categorías de distinto tipo en Top 2 + Top 2 en Meta Ratio. (Excluyendo al God). Gana el de mayor Meta Ratio.</p>
+      <p><strong>Cono:</strong> Bottom 2 en ≥3 categorías + Bottom 2 en Meta Ratio + NO Top 2 en ninguna categoría. Gana el de menor Meta Ratio.</p>
     </div>
   </div>
 </section>
@@ -320,6 +330,6 @@
 
 </main>
 
-<script src="js/app.js?v=splits-current-v3.0"></script>
+<script src="js/app.js?v=methodology-update-v1"></script>
 </body>
 </html>
