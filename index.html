@@ -16,7 +16,7 @@
     <button class="tab-button" data-view="champions">CHAMPIONS</button>
     <button class="tab-button" data-view="synergies">SYNERGIES</button>
     <button class="tab-button" data-view="matches">MATCHES</button>
-    <button class="tab-button" data-view="methodology">METHODOLOGY</button>
+    <button class="tab-button" data-view="methodology">PARA PATO</button>
     <button class="tab-button" data-view="splits">SPLITS</button>
     </nav>
 </header>
@@ -206,17 +206,13 @@
   
   <div class="methodology-content">
     <div class="methodology-section">
-      <h3>Filosofía General</h3>
-      <p>El sistema parte de dos conceptos principales: Score y Meta Ratio.</p>
-      <p>El Score representa el valor cuantificable que un jugador genera durante una partida. Cada campeón tiene un kit diferente con lo cual algunos inherentemente suelen sumar más score que otros. El sistema transforma esas contribuciones en puntos comparables y construye a partir de ellos tres dimensiones de desempeño:</p>
-      <ul>
-        <li><strong>Offense</strong> - Presión ofensiva</li>
-        <li><strong>Presence</strong> - Impacto durante la partida</li>
-        <li><strong>Utility</strong> - Valor generado más allá del daño y las kills</li>
-      </ul>
-      <p>El Meta Ratio agrega una segunda capa de comparación: en lugar de evaluar únicamente cuánto produjo un jugador en términos absolutos, compara su rendimiento con el rendimiento histórico esperado del campeón que utilizó.</p>
-      <p>De esta manera, el sistema puede comparar jugadores utilizando campeones con funciones y formas de aportar muy diferentes, sin asumir que todos los campeones deben producir el mismo tipo de estadísticas para ser considerados valiosos.</p>
-    </div>
+  <h3>Filosofía General</h3>
+  <p>El sistema se construye sobre tres conceptos principales: <strong>Score, Meta y P95R</strong>.</p>
+  <p>El <strong>Score</strong> representa el valor cuantificable generado por un jugador durante una partida y se construye a partir de cinco métricas <em>raw</em>: <strong>Kills por minuto, Daño por minuto, KDA, CC por minuto y Tank Share</strong>.</p>
+  <p>Estas métricas no tienen el mismo significado para todos los campeones. Es esperable que determinados tipos de campeones dominen naturalmente algunas de ellas: un <em>damage dealer</em> debería generar mucho daño, mientras que un <em>enchanter</em> puede presentar un KDA elevado. Sin embargo, esto no implica que dichos valores representen por sí mismos un desempeño excepcional.</p>
+  <p>El <strong>Meta</strong> establece el rendimiento histórico esperado para cada campeón, mientras que el <strong>P95R</strong> compara el rendimiento observado con el <strong>rendimiento excepcional esperado (percentil 95)</strong>.</p>
+  <p>De esta forma, el sistema evalúa el desempeño <strong>en relación con el rendimiento excepcional del campeón utilizado</strong>, evitando que las características inherentes de su función se conviertan automáticamente en una ventaja. Así, un jugador no es recompensado simplemente por producir mas en una métrica que su campeón naturalmente domina, sino por <strong>superar el rendimiento que normalmente alcanza ese campeón</strong>.</p>
+</div>
 
     <div class="methodology-section">
       <h3>Offense</h3>
@@ -305,23 +301,25 @@
     </div>
 
     <div class="methodology-section">
-      <h3>Meta Ratio</h3>
-      <p><strong>Pregunta que responde:</strong> ¿Qué tan por encima o por debajo del rendimiento histórico esperado de su campeón jugó el jugador?</p>
+      <h3>P95R (Percentil 95 Ratio)</h3>
+      <p><strong>Pregunta que responde:</strong> ¿Qué tan cerca del techo histórico de su campeón jugó el jugador?</p>
+      <p>El P95R parte de comparar el Score de la partida contra el Score mediano histórico del campeón (P50), y luego se normaliza contra su máximo estadístico (P95). En la práctica el valor mostrado equivale a Score / P95 del campeón.</p>
       <ul>
-        <li><strong>1.00</strong> = rendimiento esperado</li>
-        <li><strong>> 1.00</strong> = por encima del meta</li>
-        <li><strong>< 1.00</strong> = por debajo del meta</li>
+        <li><strong>1.00</strong> = rendimiento a la altura del techo estadístico del campeón</li>
+        <li><strong>> 1.00</strong> = partida excepcional, por encima de ese techo</li>
+        <li><strong>< 1.00</strong> = por debajo del techo del campeón</li>
       </ul>
-      <p>El Meta Ratio permite normalizar las diferencias naturales entre campeones. Un campeón puede generar valor principalmente mediante daño, otro mediante kills, otro mediante CC y otro mediante absorción de daño. En lugar de comparar directamente esas cantidades, el Meta Ratio compara el rendimiento de cada jugador con el estándar histórico de su propio campeón.</p>
+      <p>El P95R permite normalizar las diferencias naturales entre campeones. Un campeón puede generar valor principalmente mediante daño, otro mediante kills, otro mediante CC y otro mediante absorción de daño. En lugar de comparar directamente esas cantidades, el P95R compara el rendimiento de cada jugador con el estándar histórico de su propio campeón.</p>
+      <p>La normalización por P95 corrige además la dispersión: sin ella, los campeones con un meta bajo inflaban su ratio y los de meta alto quedaban comprimidos. Al dividir por el máximo estadístico de cada campeón, todos comparten la misma escala.</p>
       <p>Esto permite evaluar el desempeño relativo del jugador sin penalizarlo por utilizar un campeón cuyo kit genera valor de una manera diferente.</p>
     </div>
 
     <div class="methodology-section">
       <h3>Títulos (God, Alpha, Cono)</h3>
       <p>Se asignan mediante rankings relativos dentro de cada partida contra los otros 9 jugadores, considerando las principales métricas de desempeño.</p>
-      <p><strong>God:</strong> Top 2 en ≥3 categorías (DMPM, KDA, KILLSpm, CCPM, TANK%) + Top 2 en Meta Ratio. Gana el de mayor Meta Ratio.</p>
-      <p><strong>Alpha:</strong> Tiene dos categorías de distinto tipo en Top 2 + Top 2 en Meta Ratio. (Excluyendo al God). Gana el de mayor Meta Ratio.</p>
-      <p><strong>Cono:</strong> Bottom 2 en ≥3 categorías + Bottom 2 en Meta Ratio + NO Top 2 en ninguna categoría. Gana el de menor Meta Ratio.</p>
+      <p><strong>God:</strong> Top 2 en ≥3 categorías (DMPM, KDA, KILLSpm, CCPM, TANK%) + Top 2 en P95R. Gana el de mayor P95R.</p>
+      <p><strong>Alpha:</strong> Tiene dos categorías de distinto tipo en Top 2 + Top 2 en P95R. (Excluyendo al God). Gana el de mayor P95R.</p>
+      <p><strong>Cono:</strong> Bottom 2 en ≥3 categorías + Bottom 2 en P95R + NO Top 2 en ninguna categoría. Gana el de menor P95R.</p>
     </div>
   </div>
 </section>

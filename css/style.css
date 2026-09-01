@@ -324,7 +324,7 @@ table td {
 
 /* MATCH CONTEXT */
 .match-table-wrap{width:100%;overflow-x:auto;}
-.match-explorer-table{min-width:1080px;}
+.match-explorer-table{min-width:840px;}
 .match-player-row{cursor:pointer;outline:none;}
 .match-player-row:hover,.match-player-row:focus,.match-player-row.context-open{background:rgba(59,130,246,0.16);}
 .match-player-row td:first-child::before{content:"▸";display:inline-block;width:18px;color:#93c5fd;transition:transform .15s ease;}
@@ -349,11 +349,14 @@ table td {
 .offense-component strong{color:#f59e0b;}
 .presence-component strong{color:#60a5fa;}
 .utility-component strong{color:#c084fc;}
-.match-context-stats{display:grid;grid-template-columns:repeat(3,minmax(150px,1fr));gap:10px;margin-bottom:18px;}
-.context-stat-card{display:flex;flex-direction:column;gap:4px;padding:12px 14px;background:rgba(17,24,39,.9);border:1px solid rgba(75,85,99,.85);border-radius:10px;}
+/* Cinco columnas fijas: las métricas RAW entran siempre en una sola línea. */
+.match-context-stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:0;}
+/* Los tres shares conservan el ancho de columna y quedan centrados en la fila. */
+.match-context-shares .context-stat-card:first-child{grid-column:2;}
+.context-stat-card{display:flex;flex-direction:column;gap:4px;padding:10px 12px;background:rgba(17,24,39,.9);border:1px solid rgba(75,85,99,.85);border-radius:10px;}
 .context-stat-card strong{color:#f9fafb;font-size:21px;}
 .context-stat-card span:last-child{color:#9ca3af;font-size:12px;}
-.context-stat-label{color:#93c5fd;font-size:12px;font-weight:bold;letter-spacing:.04em;text-transform:uppercase;}
+.context-stat-label{color:#93c5fd;font-size:11px;font-weight:bold;letter-spacing:.04em;text-transform:uppercase;}
 .match-context-group{margin-top:14px;}
 .match-context-group h4{margin:0 0 9px;color:#cbd5e1;font-size:13px;letter-spacing:.04em;text-transform:uppercase;}
 .context-entities{display:flex;flex-wrap:wrap;gap:9px;}
@@ -361,7 +364,41 @@ table td {
 .context-icon{width:32px;height:32px;object-fit:cover;border-radius:7px;background:#111827;}
 .context-icon-missing{visibility:hidden;width:0;margin:0;}
 .context-empty{color:#9ca3af;font-style:italic;}
-@media (max-width:760px){.match-context-header{align-items:flex-start;flex-direction:column;gap:12px}.match-context-components{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.match-context-component{min-width:0;justify-content:center;padding:9px 7px}.match-context-component span{font-size:9px}.match-context-component strong{font-size:18px}.match-context-stats{grid-template-columns:1fr}.match-context-panel{padding:16px}}
+@media (max-width:760px){.match-context-header{align-items:flex-start;flex-direction:column;gap:12px}.match-context-components{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.match-context-component{min-width:0;justify-content:center;padding:9px 7px}.match-context-component span{font-size:9px}.match-context-component strong{font-size:18px}.match-context-stats{grid-template-columns:1fr}.match-context-shares .context-stat-card:first-child{grid-column:auto}.match-context-panel{padding:16px}}
+@media (max-width:1100px) and (min-width:761px){
+    .match-context-stats{grid-template-columns:repeat(3,minmax(0,1fr));}
+    .match-context-shares .context-stat-card:first-child{grid-column:auto;}
+}
+
+/* Posición de la métrica dentro de los diez jugadores de la partida. */
+.context-stat-rank{
+    align-self:flex-start;
+    padding:2px 7px;
+    border:1px solid rgba(96,165,250,.45);
+    border-radius:6px;
+    background:rgba(96,165,250,.12);
+    color:#93c5fd;
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:.04em;
+}
+.match-context-breakdown .context-stat-card strong{color:#e2e8f0;}
+
+/* Duración de la partida, junto al ID en el encabezado. */
+.match-duration{
+    display:inline-flex;
+    align-items:center;
+    padding:5px 12px;
+    border:1px solid rgba(148,163,184,.5);
+    border-radius:8px;
+    background:rgba(148,163,184,.12);
+    color:#cbd5e1;
+    font-size:17px;
+    font-weight:800;
+    letter-spacing:.06em;
+    line-height:1;
+    font-variant-numeric:tabular-nums;
+}
 
 
 /* =========================================
@@ -1123,19 +1160,19 @@ table td {
 }
 
 .context-stat-card{
-    gap:6px;
+    gap:5px;
 }
 
 .context-stat-card strong{
     color:#f8fafc;
-    font-size:30px;
+    font-size:21px;
     line-height:1;
     letter-spacing:-0.025em;
 }
 
 .context-stat-card small{
     color:#9ca3af;
-    font-size:12px;
+    font-size:11px;
     font-weight:600;
 }
 
@@ -1361,7 +1398,7 @@ table td {
     text-overflow:ellipsis;
 }
 .match-score-v2-table .score-stat{
-    color:#60a5fa;
+    color:#22c55e;
     font-weight:900;
 }
 .match-score-v2-table .meta-stat{
@@ -1369,6 +1406,15 @@ table td {
     font-weight:800;
     text-align:center;
 }
+.match-score-v2-table .match-offense-stat,
+.match-score-v2-table .match-presence-stat,
+.match-score-v2-table .match-utility-stat{
+    font-weight:800;
+    text-align:center;
+}
+.match-score-v2-table .match-offense-stat{color:#f59e0b;}
+.match-score-v2-table .match-presence-stat{color:#60a5fa;}
+.match-score-v2-table .match-utility-stat{color:#c084fc;}
 .match-composite-stat{
     font-weight:800;
     border-left:1px solid rgba(255,255,255,.14);

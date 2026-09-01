@@ -13,6 +13,29 @@ let matchExplorerSort = { key: "ratio", direction: "desc" };
 
 let activeViewName = "home";
 
+// P95R (Meta Ratio normalizado): MR = score / META(p50), escalado por el máximo
+// estadístico del campeón (p95 / p50). Debe reflejar el mismo cálculo del motor.
+function getChampionMetaP95(championName){
+    return Number(
+        dashboardData?.champion_engine?.champion_meta?.[championName]?.score?.p95
+    ) || 0;
+}
+
+function normalizeMetaRatio(score, meta, metaP95){
+    const metaValue = Number(meta) || 0;
+
+    if(metaValue <= 0){
+        return 0;
+    }
+
+    const metaRatio = (Number(score) || 0) / metaValue;
+    const metaRatioMaxStatistical = (Number(metaP95) || 0) / metaValue;
+
+    return metaRatioMaxStatistical > 0
+        ? metaRatio / metaRatioMaxStatistical
+        : metaRatio;
+}
+
 function resetPlayersView(){
     const select = document.getElementById("players-player-select");
     const results = document.getElementById("players-player-results");
@@ -272,7 +295,7 @@ function updatePlayerStats(playerName, playerType){
                     <span class="stat-value score-value">${formatHomeMetric(playerData.global_avg)}</span>
                 </div>
                 <div class="synergy-player-stat">
-                    <span class="stat-label meta-label">Meta Ratio:</span>
+                    <span class="stat-label meta-label">P95R:</span>
                     <span class="stat-value meta-value">${formatHomeMetric(playerData.avg_meta_ratio || 0, 3)}</span>
                 </div>
             </div>
@@ -362,8 +385,12 @@ function calculateSynergy(){
             
             const avgScore = trimmedScores.reduce((sum, score) => sum + score, 0) / trimmedScores.length;
             
-            // For meta ratio, we need to calculate it the same way
-            const playerMetaRatios = sharedMatches.map(m => m[playerName].score / (m[playerName].champion_meta || 1));
+            // For meta ratio normalized, we need to calculate it the same way
+            const playerMetaRatios = sharedMatches.map(m => normalizeMetaRatio(
+                m[playerName].score,
+                m[playerName].champion_meta,
+                m[playerName].champion_meta_p95 || getChampionMetaP95(m[playerName].champion)
+            ));
             playerMetaRatios.sort((a, b) => b - a); // Sort descending
             const trimCountMeta = Math.floor(playerMetaRatios.length * 0.15);
             const trimmedMetaRatios = playerMetaRatios.slice(0, -trimCountMeta || playerMetaRatios.length);
@@ -409,7 +436,7 @@ function calculateSynergy(){
                     </div>
                 </div>
                 <div class="synergy-stat">
-                    <div class="synergy-stat-label meta-label">Meta Ratio</div>
+                    <div class="synergy-stat-label meta-label">P95R</div>
                     <div class="synergy-stat-value meta-value">
                         ${formatHomeMetric(stats.avgMetaRatio, 3)}
                         <span class="synergy-diff ${metaDiff > 0 ? "diff-positive" : "diff-negative"}">
@@ -1239,8 +1266,16 @@ function renderPlayerProfile(playerName){
     const champions =
         Object.values(playerProfile).sort(
             (a, b) => {
-                const ratioA = (a.global_avg || 0) / (a.champion_meta || 1);
-                const ratioB = (b.global_avg || 0) / (b.champion_meta || 1);
+                const ratioA = normalizeMetaRatio(
+                    a.global_avg,
+                    a.champion_meta,
+                    a.champion_meta_p95 || getChampionMetaP95(a.champion)
+                );
+                const ratioB = normalizeMetaRatio(
+                    b.global_avg,
+                    b.champion_meta,
+                    b.champion_meta_p95 || getChampionMetaP95(b.champion)
+                );
                 return ratioB - ratioA;
             }
         );
@@ -1256,9 +1291,12 @@ function renderPlayerProfile(playerName){
 
     // Calcular Avg Meta Ratio: ordenar por meta_ratio → eliminar 30% → promedio simple
     const metaRatiosWithChampions = champions.map(champion => {
-        const score = champion.global_avg;
         const meta = dashboardData?.champion_engine?.champion_meta?.[champion.champion]?.score?.p50 || 0;
-        const ratio = meta > 0 ? score / meta : 0;
+        const ratio = normalizeMetaRatio(
+            champion.global_avg,
+            meta,
+            getChampionMetaP95(champion.champion)
+        );
         return { ratio, champion };
     });
     
@@ -1322,7 +1360,7 @@ function renderPlayerProfile(playerName){
 
                 <div class="summary-card">
                     <div class="summary-label">
-                        Avg Meta Ratio
+                        Avg P95R
                     </div>
                     <div class="summary-value">
                         ${formatHomeMetric(avgMetaRatio, 3)}
@@ -1360,13 +1398,17 @@ function renderPlayerChampionTable(
             }
 
             if(activeSortKey === "ratio"){
-                const ratioA =
-                    (Number(a.global_avg) || 0) /
-                    (Number(a.champion_meta) || 1);
+                const ratioA = normalizeMetaRatio(
+                    a.global_avg,
+                    a.champion_meta,
+                    a.champion_meta_p95 || getChampionMetaP95(a.champion)
+                );
 
-                const ratioB =
-                    (Number(b.global_avg) || 0) /
-                    (Number(b.champion_meta) || 1);
+                const ratioB = normalizeMetaRatio(
+                    b.global_avg,
+                    b.champion_meta,
+                    b.champion_meta_p95 || getChampionMetaP95(b.champion)
+                );
 
                 return activeSortDirection === "asc"
                     ? ratioA - ratioB
@@ -1416,7 +1458,7 @@ function renderPlayerChampionTable(
                         class="ratio-stat sortable ${activeSortKey === "ratio" ? `sort-${activeSortDirection}` : ""}"
                         data-sort="ratio"
                     >
-                        Meta Ratio${activeSortKey === "ratio"
+                        P95R${activeSortKey === "ratio"
                             ? (activeSortDirection === "asc" ? " ▲" : " ▼")
                             : " ↕"}
                     </th>
@@ -1449,7 +1491,7 @@ function renderPlayerChampionTable(
                     (${champion.global_god ?? 0}😈 ${champion.global_alpha ?? 0}🏅 ${champion.global_cono ?? 0}🍦)
                 </td>
                 <td class="meta-stat">${formatHomeMetric(champion.champion_meta || 0)}</td>
-                <td class="ratio-stat">${formatHomeMetric((champion.global_avg || 0) / (champion.champion_meta || 1), 3)}</td>
+                <td class="ratio-stat">${formatHomeMetric(normalizeMetaRatio(champion.global_avg, champion.champion_meta, champion.champion_meta_p95 || getChampionMetaP95(champion.champion)), 3)}</td>
             </tr>
             <tr id="${matchesRowId}" class="profile-matches-row" hidden>
                 <td colspan="6">${buildProfileMatchesPanel(champion)}</td>
@@ -1680,7 +1722,7 @@ function renderPlayerChampionHighlights(elementId, highlights){
                             </span>
                         </td>
                         <td>${formatHomeMetric(champion.games, 0)}</td>
-                        <td class="ratio-stat">${formatHomeMetric(champion.meta_ratio || 0, 3)}</td>
+                        <td class="ratio-stat">${formatHomeMetric(champion.meta_ratio_normalized ?? champion.meta_ratio ?? 0, 3)}</td>
                         <td class="score-stat">${formatHomeMetric(champion.score_avg)}</td>
                         <td class="meta-stat">${formatHomeMetric(champion.champion_meta || 0)}</td>
                         <td>${formatHomeMetric(champion.kpm, 2)}</td>
@@ -1717,7 +1759,7 @@ function renderPlayerChampionHighlights(elementId, highlights){
                     </div>
 
                     <div class="home-player-global-avg home-meta-ratio-avg">
-                        <span>AVG META RATIO</span>
+                        <span>AVG P95R</span>
                         <strong>${formatHomeMetric(player.avg_meta_ratio || 0, 3)}</strong>
                     </div>
                     <div class="home-player-global-avg home-score-avg">
@@ -1733,7 +1775,7 @@ function renderPlayerChampionHighlights(elementId, highlights){
                                 <th>#</th>
                                 <th>Champion</th>
                                 <th>Games</th>
-                                <th class="ratio-stat">Meta Ratio</th>
+                                <th class="ratio-stat">P95R</th>
                                 <th class="score-stat">Score</th>
                                 <th class="meta-stat">META</th>
                                 <th>KPM</th>
@@ -2034,6 +2076,65 @@ function renderContextEntities(entities, type){
     }).join("");
 }
 
+// Posición de la métrica dentro de la partida. Los ranks vienen del motor
+// (GLOBAL_ROLE_DATA), que es el mismo insumo que decide God/Alpha/Cono.
+function renderMetricRank(rank){
+    const position = Number(rank) || 0;
+
+    if(position <= 0){
+        return "";
+    }
+
+    return `<span class="context-stat-rank">#${position} de 10</span>`;
+}
+
+function renderMetricBreakdown(player){
+    const context = player.context || {};
+    const ranks = player.ranks || {};
+
+    const metrics = [
+        {
+            label: "Kills / min",
+            value: formatMatchRate(player.kpm, 3),
+            rank: ranks.kpm,
+            detail: `${formatContextNumber(player.kills)} kills`
+        },
+        {
+            label: "Damage / min",
+            value: formatMatchRate(player.dpm, 0),
+            rank: ranks.dpm,
+            detail: `${formatContextNumber(player.damage_raw)} de daño total`
+        },
+        {
+            label: "KDA",
+            value: formatMatchRate(player.kda, 2),
+            rank: ranks.kda,
+            detail: `${formatContextNumber(player.kills)} / ${formatContextNumber(context.deaths)} / ${formatContextNumber(player.assists)}`
+        },
+        {
+            label: "CC / min",
+            value: formatMatchRate(player.ccpm, 3),
+            rank: ranks.ccpm,
+            detail: `${formatMatchPercent(player.cc_share)} del CC del equipo`
+        },
+        {
+            label: "Tank %",
+            value: formatMatchPercent(player.tank_share),
+            rank: ranks.tank,
+            detail: `${formatContextNumber(player.tank_raw)} absorbidos`
+        }
+    ];
+
+    return metrics.map(metric => `
+        <div class="context-stat-card">
+            <span class="context-stat-label">${metric.label}</span>
+            <strong>${metric.value}</strong>
+            ${renderMetricRank(metric.rank)}
+            <small>${metric.detail}</small>
+        </div>
+    `).join("");
+}
+
 function renderPlayerContext(player, isRemake = false){
     const context = player.context || {};
 
@@ -2044,49 +2145,37 @@ function renderPlayerContext(player, isRemake = false){
                     <strong>${escapeHtml(formatPlayerName(player.name))}</strong>
                     <span>${escapeHtml(player.champion)}</span>
                 </div>
-                ${isRemake ? "" : `
-                <div class="match-context-components" aria-label="Score components">
-                    <div class="match-context-component score-component">
-                        <span>Score</span>
-                        <strong>${formatMatchScore(player.score)}</strong>
-                    </div>
-                    <div class="match-context-component offense-component">
-                        <span>Offense</span>
-                        <strong>${formatMatchScore(player.offense)}</strong>
-                    </div>
-                    <div class="match-context-component presence-component">
-                        <span>Presence</span>
-                        <strong>${formatMatchScore(player.presence)}</strong>
-                    </div>
-                    <div class="match-context-component utility-component">
-                        <span>Utility</span>
-                        <strong>${formatMatchScore(player.utility)}</strong>
-                    </div>
-                    <div class="match-context-component meta-component">
-                        <span>META</span>
-                        <strong>${formatMatchScore(player.champion_meta || 0)}</strong>
-                    </div>
-                </div>
-                `}
             </div>
 
-            <div class="match-context-stats">
-                <div class="context-stat-card">
-                    <span class="context-stat-label">Death Share</span>
-                    <strong>${context.deaths_pct || 0}%</strong>
-                    <small>${formatContextNumber(context.deaths)} deaths</small>
+            ${isRemake ? "" : `
+            <div class="match-context-group">
+                <h4>Métricas RAW y posición en la partida</h4>
+                <div class="match-context-stats match-context-breakdown">
+                    ${renderMetricBreakdown(player)}
                 </div>
+            </div>
+            `}
 
-                <div class="context-stat-card">
-                    <span class="context-stat-label">Minion Share</span>
-                    <strong>${context.minions_pct || 0}%</strong>
-                    <small>${formatContextNumber(context.minions)} minions</small>
-                </div>
+            <div class="match-context-group">
+                <h4>Share del equipo</h4>
+                <div class="match-context-stats match-context-shares">
+                    <div class="context-stat-card">
+                        <span class="context-stat-label">Kill Share</span>
+                        <strong>${formatMatchPercent(player.kill_pct)}</strong>
+                        <small>${formatContextNumber(player.kills)} kills</small>
+                    </div>
 
-                <div class="context-stat-card">
-                    <span class="context-stat-label">Gold Share</span>
-                    <strong>${context.gold_spent_pct || 0}%</strong>
-                    <small>${formatContextNumber(context.gold_spent)} gold spent</small>
+                    <div class="context-stat-card">
+                        <span class="context-stat-label">Damage Share</span>
+                        <strong>${formatMatchPercent(player.dmg_share)}</strong>
+                        <small>${formatContextNumber(player.damage_raw)} de daño</small>
+                    </div>
+
+                    <div class="context-stat-card">
+                        <span class="context-stat-label">Death Share</span>
+                        <strong>${context.deaths_pct || 0}%</strong>
+                        <small>${formatContextNumber(context.deaths)} deaths</small>
+                    </div>
                 </div>
             </div>
 
@@ -2167,9 +2256,11 @@ function getMatchSortValue(player, key){
         return String(player[key] || "").toLocaleLowerCase("es");
     }
     if(key === "ratio"){
-        const score = Number(player.score) || 0;
-        const meta = Number(player.champion_meta) || 0;
-        return meta > 0 ? score / meta : 0;
+        return normalizeMetaRatio(
+            player.score,
+            player.champion_meta,
+            player.champion_meta_p95 || getChampionMetaP95(player.champion)
+        );
     }
     return Number(player[key]) || 0;
 }
@@ -2190,7 +2281,7 @@ function sortMatchPlayers(players){
 
 function matchSortHeader(label, key){
 
-    const sortable = !["teamId", "name", "champion", "meta"].includes(key);
+    const sortable = !["teamId", "name", "champion"].includes(key);
 
     const active = sortable && matchExplorerSort.key === key;
 
@@ -2224,7 +2315,6 @@ function attachMatchExplorerSorting(matchId){
                 };
             }
             renderMatchExplorer(matchId);
-            renderMatchExplorer(matchId);
         });
     });
 }
@@ -2254,6 +2344,17 @@ function formatMatchScore(value){
     return number.toFixed(2).replace(/\.0+$/, "");
 }
 
+function formatMatchDuration(seconds){
+    const total = Number(seconds) || 0;
+
+    if(total <= 0){
+        return "";
+    }
+
+    const minutes = Math.floor(total / 60);
+    return `${minutes}:${String(total % 60).padStart(2, "0")}`;
+}
+
 function renderMatchExplorer(matchId){
     const match = dashboardData.match_explorer.find(m => m.match_id == matchId);
 
@@ -2270,10 +2371,17 @@ function renderMatchExplorer(matchId){
         ? `<div class="match-remake-notice">Esta partida fue anulada oficialmente por Riot y no participa en estadísticas, rankings ni análisis.</div>`
         : "";
 
+    const duration = formatMatchDuration(match.duration_seconds);
+
+    const durationHeader = duration
+        ? `<span class="match-duration" title="Duración de la partida">${duration}</span>`
+        : "";
+
     let html = `
     <div class="match-heading ${match.is_remake ? "match-heading-remake" : ""}">
         <h3>${escapeHtml(match.match_id)}</h3>
         ${remakeHeader}
+        ${durationHeader}
     </div>
     ${remakeNotice}
     <div class="match-table-wrap">
@@ -2282,16 +2390,12 @@ function renderMatchExplorer(matchId){
         ${matchSortHeader("Team", "teamId")}
         ${matchSortHeader("Player", "name")}
         ${matchSortHeader("Champion", "champion")}
+        ${matchSortHeader("P95R", "ratio")}
+        ${matchSortHeader("META", "champion_meta")}
         ${matchSortHeader("Score", "score")}
-        ${matchSortHeader("META", "meta")}
-        ${matchSortHeader("Meta Ratio", "ratio")}
-        ${matchSortHeader("KPM", "kpm")}
-        ${matchSortHeader("Kill%", "kill_pct")}
-        ${matchSortHeader("KDA", "kda")}
-        ${matchSortHeader("DPM", "dpm")}
-        ${matchSortHeader("DMG%", "dmg_share")}
-        ${matchSortHeader("CCPM", "ccpm")}
-        ${matchSortHeader("Tank%", "tank_share")}
+        ${matchSortHeader("Offense", "offense")}
+        ${matchSortHeader("Presence", "presence")}
+        ${matchSortHeader("Utility", "utility")}
     </tr></thead><tbody>`;
 
     sortMatchPlayers(match.players || []).forEach((player, index) => {
@@ -2305,18 +2409,14 @@ function renderMatchExplorer(matchId){
         <td><span class="match-team-badge ${team.className}" title="${escapeHtml(team.title)}" aria-label="${escapeHtml(team.title)}">${team.label}</span></td>
         <td title="${escapeHtml(formatPlayerName(player.name))}">${escapeHtml(formatPlayerName(player.name))}</td>
         <td><span class="match-champion-cell"><span class="match-title-icons" aria-label="${escapeHtml((player.titles || []).join(", "))}">${titleIcons}</span><span>${formatChampionName(player)}</span></span></td>
-        <td class="score-stat">${formatMatchScore(player.score)}</td>
+        <td class="ratio-stat">${formatMatchRate(normalizeMetaRatio(player.score, player.champion_meta, player.champion_meta_p95 || getChampionMetaP95(player.champion)), 3)}</td>
         <td class="meta-stat">${formatMatchScore(player.champion_meta || 0)}</td>
-        <td class="ratio-stat">${formatMatchRate((player.score || 0) / (player.champion_meta || 1), 3)}</td>
-        <td>${formatMatchRate(player.kpm, 3)}</td>
-        <td>${formatMatchPercent(player.kill_pct)}</td>
-        <td>${formatMatchRate(player.kda, 2)}</td>
-        <td>${formatMatchRate(player.dpm, 0)}</td>
-        <td>${formatMatchPercent(player.dmg_share)}</td>
-        <td>${formatMatchRate(player.ccpm, 3)}</td>
-        <td>${formatMatchPercent(player.tank_share)}</td>
+        <td class="score-stat">${formatMatchScore(player.score)}</td>
+        <td class="match-offense-stat">${formatMatchScore(player.offense)}</td>
+        <td class="match-presence-stat">${formatMatchScore(player.presence)}</td>
+        <td class="match-utility-stat">${formatMatchScore(player.utility)}</td>
         </tr>
-        <tr id="${rowId}" class="match-context-row" hidden><td colspan="13">${renderPlayerContext(player, match.is_remake)}</td></tr>`;
+        <tr id="${rowId}" class="match-context-row" hidden><td colspan="9">${renderPlayerContext(player, match.is_remake)}</td></tr>`;
     });
 
     html += `</tbody></table></div>`;
