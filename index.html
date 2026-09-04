@@ -16,8 +16,7 @@
     <button class="tab-button" data-view="champions">CHAMPIONS</button>
     <button class="tab-button" data-view="synergies">SYNERGIES</button>
     <button class="tab-button" data-view="matches">MATCHES</button>
-    <button class="tab-button" data-view="methodology">PARA PATO</button>
-    <button class="tab-button" data-view="splits">SPLITS</button>
+    <button class="tab-button" data-view="methodology">METODOLOGIA</button>    <button class="tab-button" data-view="splits">SPLITS</button>
     </nav>
 </header>
 
@@ -202,127 +201,43 @@
 <div id="view-methodology" class="app-view">
 
 <section>
+
   <h2>📊 Metodología del Sistema de Scoring</h2>
-  
+
   <div class="methodology-content">
-    <div class="methodology-section">
-  <h3>Filosofía General</h3>
-  <p>El sistema se construye sobre tres conceptos principales: <strong>Score, Meta y P95R</strong>.</p>
-  <p>El <strong>Score</strong> representa el valor cuantificable generado por un jugador durante una partida y se construye a partir de cinco métricas <em>raw</em>: <strong>Kills por minuto, Daño por minuto, KDA, CC por minuto y Tank Share</strong>.</p>
-  <p>Estas métricas no tienen el mismo significado para todos los campeones. Es esperable que determinados tipos de campeones dominen naturalmente algunas de ellas: un <em>damage dealer</em> debería generar mucho daño, mientras que un <em>enchanter</em> puede presentar un KDA elevado. Sin embargo, esto no implica que dichos valores representen por sí mismos un desempeño excepcional.</p>
-  <p>El <strong>Meta</strong> establece el rendimiento histórico esperado para cada campeón, mientras que el <strong>P95R</strong> compara el rendimiento observado con el <strong>rendimiento excepcional esperado (percentil 95)</strong>.</p>
-  <p>De esta forma, el sistema evalúa el desempeño <strong>en relación con el rendimiento excepcional del campeón utilizado</strong>, evitando que las características inherentes de su función se conviertan automáticamente en una ventaja. Así, un jugador no es recompensado simplemente por producir mas en una métrica que su campeón naturalmente domina, sino por <strong>superar el rendimiento que normalmente alcanza ese campeón</strong>.</p>
+
+```
+<div class="methodology-section">
+
+<h3>Filosofía y Descubrimientos</h3>
+
+  <p>El objetivo inicial del sistema fue construir una herramienta capaz de valorar con la mayor precisión posible la <strong>performance de un jugador en cada partida</strong>. Durante su desarrollo se probaron distintas fórmulas, ponderaciones y métodos de normalización, buscando una forma consistente de transformar las métricas disponibles en una valoración del rendimiento.</p>
+
+  <p>En la mayoría de los casos, los distintos modelos producían resultados similares a las valoraciones observadas de Riot. Sin embargo, también aparecían excepciones puntuales que resultaban difíciles de justificar o que generaban resultados controvertidos. Al analizar múltiples partidas, surgió además un patrón más estable: a medida que se acumulaban observaciones, las posiciones relativas de los jugadores tendían a conservar cierta consistencia al analizarlos desde diferentes perspectivas.</p>
+
+  <p>El desarrollo permitió identificar dos límites fundamentales: <strong>la capacidad del modelador para representar correctamente el rendimiento y la ausencia de datos relevantes en la información disponible del cliente</strong>. Esto marcó una diferencia importante entre lo que el sistema podía calcular y lo que realmente podía demostrar.</p>
+
+  <p>La conclusión fue simplificar el problema. En lugar de intentar construir una fórmula capaz de resolver aspectos que requieren información que los datos disponibles no contienen, el sistema se concentra en <strong>medir de forma transparente y reproducible aquello que puede observarse</strong>.</p>
+
+  <p>El modelo actual resume el rendimiento de cada partida a partir de <strong>seis dimensiones observables</strong>: KPM, DPM, CCPM, Tank Share, KDA y Gold SPM. Estas dimensiones permiten representar distintas formas de contribución del jugador y reducir la dependencia de una única métrica.</p>
+
+  <p>Cada dimensión se transforma en una puntuación común de <strong>0 a 10</strong> y las seis puntuaciones se integran en un Score Global de la partida. Este resultado permite describir el rendimiento observable de un jugador, pero no elimina una limitación fundamental: los campeones no tienen las mismas posibilidades de producir rendimiento en cada dimensión.</p>
+
+  <p>Por esta razón, el sistema construye también una <strong>referencia histórica para cada campeón</strong>. Esta referencia permite interpretar el resultado de una partida dentro del contexto estadístico propio del campeón utilizado, en lugar de comparar directamente valores que pueden tener comportamientos naturales diferentes.</p>
+
+  <p>El primer intento para realizar esta comparación fue el <strong>Meta Ratio</strong>, que relacionaba el Score de una partida con el rendimiento histórico de su campeón. Sin embargo, se detectó que esta relación podía estar sesgada por las diferencias de escala entre campeones.</p>
+
+  <p>La solución fue utilizar una referencia basada en la propia distribución histórica de cada campeón: el <strong>percentil 95 (P95)</strong>. Un percentil expresa la posición relativa de un valor dentro de una distribución: de forma intuitiva, los percentiles bajos representan resultados poco destacados y los percentiles altos resultados cada vez más excepcionales. El P95 identifica un nivel de rendimiento que se encuentra por encima de aproximadamente el 95% de las observaciones históricas del campeón.</p>
+
+  <p>A partir de esta referencia se construyó el <strong>P95R</strong>, cuyo objetivo es expresar el rendimiento de una partida en relación con ese nivel excepcional histórico, manteniendo el contexto propio de cada campeón.</p>
+
 </div>
 
-    <div class="methodology-section">
-      <h3>Offense</h3>
-      <p><strong>Mide:</strong> Capacidad de generar presión ofensiva.</p>
-      <p><strong>Componentes:</strong></p>
-      <ul>
-        <li>KPM (Kills por minuto)</li>
-        <li>DPM (Daño por minuto)</li>
-      </ul>
-      <p><strong>Fórmula:</strong></p>
-      <ul>
-        <li>80% mejor categoría entre KPM/DPM</li>
-        <li>20% segunda categoría</li>
-      </ul>
-    </div>
 
-    <div class="methodology-section">
-      <h3>Presence</h3>
-      <p><strong>Mide:</strong> Impacto generado durante el tiempo activo en la partida.</p>
-      <p><strong>Componentes:</strong></p>
-      <ul>
-        <li>KDA = (Kills + Assists) / Muertes (si muertes = 0, se utiliza 1)</li>
-        <li>KPM</li>
-        <li>DPM</li>
-        <li>CCPM</li>
-        <li>Tank Share</li>
-      </ul>
-      <p><strong>Fórmula:</strong></p>
-      <ul>
-        <li>80% KDA Score</li>
-        <li>20% mejor categoría entre KPM, DPM, CCPM y Tank Share</li>
-      </ul>
-      <p><strong>Lógica:</strong> La participación en eliminaciones y la capacidad de mantenerse efectivo con pocas muertes representan una parte fundamental del impacto individual. El 20% restante reconoce la principal especialidad mediante la cual el jugador generó influencia durante la partida, ya sea kills, daño, control de masas o absorción de daño.</p>
-    </div>
-
-    <div class="methodology-section">
-      <h3>Utility</h3>
-      <p><strong>Mide:</strong> Valor generado sin depender exclusivamente del daño o las kills.</p>
-      <p><strong>Componentes:</strong></p>
-      <ul>
-        <li>CCPM (Control de masas por minuto)</li>
-        <li>Tank Share (Proporción de daño absorbido)</li>
-      </ul>
-      <p><strong>Fórmula:</strong></p>
-      <ul>
-        <li>80% mejor categoría</li>
-        <li>20% segunda categoría</li>
-      </ul>
-      <p><strong>Por qué:</strong> Permite valorar iniciadores, tanques, y campeones de control que pueden aportar significativamente aunque no lideren daño o kills.</p>
-      <p><strong>Nota:</strong> Deja de lado Campeones support con escudos y curaciones porque el cliente no entrega esos datos.</p>
-    </div>
-
-    <div class="methodology-section">
-      <h3>Sistema de Scoring de Métricas</h3>
-      <p>Cada métrica se convierte a un score de 0 a 10 mediante referencias fijas por percentiles.</p>
-      <p><strong>Ejemplo KDA:</strong></p>
-      <ul>
-        <li>5 puntos = valor al percentil 44.1% (KDA: 3.23)</li>
-        <li>10 puntos = valor al percentil 86.3% (KDA: 7.80)</li>
-      </ul>
-      <p>Esto permite convertir métricas de escalas y unidades diferentes en una escala común de 0 a 10.</p>
-      <p><strong>Métricas actuales:</strong></p>
-      <ul>
-        <li>KPM</li>
-        <li>DPM</li>
-        <li>KDA</li>
-        <li>CCPM</li>
-        <li>Tank Share</li>
-      </ul>
-    </div>
-
-    <div class="methodology-section">
-      <h3>Score Global</h3>
-      <p><strong>Fórmula:</strong> Offense + Presence + Utility</p>
-      <p>Cada dimensión tiene el mismo peso en el resultado final, evitando que una única forma de contribución domine la evaluación.</p>
-    </div>
-
-    <div class="methodology-section">
-      <h3>Meta de Campeones</h3>
-      <p>El sistema construye un perfil histórico para cada campeón a partir de:</p>
-      <ul>
-        <li>Partidas de los jugadores contra los que nos enfrentamos</li>
-        <li>Promedios históricos de perfiles de amigos</li>
-      </ul>
-      <p>Este perfil representa el rendimiento que históricamente produce ese campeón dentro del sistema.</p>
-    </div>
-
-    <div class="methodology-section">
-      <h3>P95R (Percentil 95 Ratio)</h3>
-      <p><strong>Pregunta que responde:</strong> ¿Qué tan cerca del techo histórico de su campeón jugó el jugador?</p>
-      <p>El P95R parte de comparar el Score de la partida contra el Score mediano histórico del campeón (P50), y luego se normaliza contra su máximo estadístico (P95). En la práctica el valor mostrado equivale a Score / P95 del campeón.</p>
-      <ul>
-        <li><strong>1.00</strong> = rendimiento a la altura del techo estadístico del campeón</li>
-        <li><strong>> 1.00</strong> = partida excepcional, por encima de ese techo</li>
-        <li><strong>< 1.00</strong> = por debajo del techo del campeón</li>
-      </ul>
-      <p>El P95R permite normalizar las diferencias naturales entre campeones. Un campeón puede generar valor principalmente mediante daño, otro mediante kills, otro mediante CC y otro mediante absorción de daño. En lugar de comparar directamente esas cantidades, el P95R compara el rendimiento de cada jugador con el estándar histórico de su propio campeón.</p>
-      <p>La normalización por P95 corrige además la dispersión: sin ella, los campeones con un meta bajo inflaban su ratio y los de meta alto quedaban comprimidos. Al dividir por el máximo estadístico de cada campeón, todos comparten la misma escala.</p>
-      <p>Esto permite evaluar el desempeño relativo del jugador sin penalizarlo por utilizar un campeón cuyo kit genera valor de una manera diferente.</p>
-    </div>
-
-    <div class="methodology-section">
-      <h3>Títulos (God, Alpha, Cono)</h3>
-      <p>Se asignan mediante rankings relativos dentro de cada partida contra los otros 9 jugadores, considerando las principales métricas de desempeño.</p>
-      <p><strong>God:</strong> Top 2 en ≥3 categorías (DMPM, KDA, KILLSpm, CCPM, TANK%) + Top 2 en P95R. Gana el de mayor P95R.</p>
-      <p><strong>Alpha:</strong> Tiene dos categorías de distinto tipo en Top 2 + Top 2 en P95R. (Excluyendo al God). Gana el de mayor P95R.</p>
-      <p><strong>Cono:</strong> Bottom 2 en ≥3 categorías + Bottom 2 en P95R + NO Top 2 en ninguna categoría. Gana el de menor P95R.</p>
-    </div>
   </div>
+
 </section>
+
 
 </div>
 

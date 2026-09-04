@@ -351,6 +351,9 @@ table td {
 .utility-component strong{color:#c084fc;}
 /* Cinco columnas fijas: las métricas RAW entran siempre en una sola línea. */
 .match-context-stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:0;}
+.score-metrics-grid{grid-template-columns:repeat(6,minmax(0,1fr));}
+.score-metric-card{min-width:0;justify-content:space-between;}
+.score-metric-card strong{font-size:24px;}
 /* Los tres shares conservan el ancho de columna y quedan centrados en la fila. */
 .match-context-shares .context-stat-card:first-child{grid-column:2;}
 .context-stat-card{display:flex;flex-direction:column;gap:4px;padding:10px 12px;background:rgba(17,24,39,.9);border:1px solid rgba(75,85,99,.85);border-radius:10px;}
@@ -364,9 +367,10 @@ table td {
 .context-icon{width:32px;height:32px;object-fit:cover;border-radius:7px;background:#111827;}
 .context-icon-missing{visibility:hidden;width:0;margin:0;}
 .context-empty{color:#9ca3af;font-style:italic;}
-@media (max-width:760px){.match-context-header{align-items:flex-start;flex-direction:column;gap:12px}.match-context-components{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.match-context-component{min-width:0;justify-content:center;padding:9px 7px}.match-context-component span{font-size:9px}.match-context-component strong{font-size:18px}.match-context-stats{grid-template-columns:1fr}.match-context-shares .context-stat-card:first-child{grid-column:auto}.match-context-panel{padding:16px}}
+@media (max-width:760px){.match-context-header{align-items:flex-start;flex-direction:column;gap:12px}.match-context-components{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.match-context-component{min-width:0;justify-content:center;padding:9px 7px}.match-context-component span{font-size:9px}.match-context-component strong{font-size:18px}.match-context-stats{grid-template-columns:1fr}.score-metrics-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.match-context-shares .context-stat-card:first-child{grid-column:auto}.match-context-panel{padding:16px}}
 @media (max-width:1100px) and (min-width:761px){
     .match-context-stats{grid-template-columns:repeat(3,minmax(0,1fr));}
+    .score-metrics-grid{grid-template-columns:repeat(3,minmax(0,1fr));}
     .match-context-shares .context-stat-card:first-child{grid-column:auto;}
 }
 
@@ -382,6 +386,9 @@ table td {
     font-weight:800;
     letter-spacing:.04em;
 }
+.context-stat-rank.metric-rank-top1{border-color:rgba(250,204,21,.65);background:rgba(250,204,21,.14);color:#fde68a;}
+.context-stat-rank.metric-rank-top2{border-color:rgba(148,163,184,.7);background:rgba(148,163,184,.14);color:#e2e8f0;}
+.context-stat-rank.metric-rank-bottom{border-color:rgba(239,68,68,.65);background:rgba(239,68,68,.14);color:#fca5a5;}
 .match-context-breakdown .context-stat-card strong{color:#e2e8f0;}
 
 /* Duración de la partida, junto al ID en el encabezado. */
