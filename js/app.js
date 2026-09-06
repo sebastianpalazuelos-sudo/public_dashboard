@@ -9,7 +9,7 @@ const views = {
 };
 
 let dashboardData = null;
-let matchExplorerSort = { key: "ratio", direction: "desc" };
+let matchExplorerSort = { key: "match_impact", direction: "desc" };
 
 let activeViewName = "home";
 
@@ -340,7 +340,7 @@ function calculateSynergy(){
         const playerData = {};
 
         selectedPlayers.forEach(playerName => {
-            playerData[playerName] = players.find(p => p.name === playerName);
+            playerData[playerName] = players.find(p => (p.identity || p.name) === playerName);
         });
 
         // Verificar que todos los jugadores seleccionados estén en la partida
@@ -764,11 +764,43 @@ function renderChampionTendencies(metricName){
     el.innerHTML = html;
 }
 
+function getPlayerChampionProfile(playerName){
+    const profiles = dashboardData?.champion_engine?.player_champion_profiles || {};
+    if(!playerName) return null;
+    if(profiles[playerName]) return profiles[playerName];
+
+    const aliases = dashboardData?.player_identities || {};
+    for(const [canonicalName, accountNames] of Object.entries(aliases)){
+        const names = Array.isArray(accountNames) ? accountNames : [];
+        if(canonicalName === playerName || names.includes(playerName)){
+            if(profiles[canonicalName]) return profiles[canonicalName];
+            for(const accountName of names){
+                if(profiles[accountName]) return profiles[accountName];
+            }
+        }
+    }
+
+    const normalized = String(playerName).trim().toLowerCase();
+    const matchedKey = Object.keys(profiles).find(
+        key => String(key).trim().toLowerCase() === normalized
+    );
+    return matchedKey ? profiles[matchedKey] : null;
+}
+
+function getChampionPerformance(championName){
+    const performance = dashboardData?.champion_engine?.champion_performance || {};
+    if(!championName) return [];
+    if(Array.isArray(performance[championName])) return performance[championName];
+
+    const normalized = String(championName).trim().toLowerCase();
+    const key = Object.keys(performance).find(
+        name => String(name).trim().toLowerCase() === normalized
+    );
+    return key && Array.isArray(performance[key]) ? performance[key] : [];
+}
+
 function getChampionComparisonProfile(championName){
-    const friendProfiles =
-        dashboardData
-            .champion_engine
-            .champion_performance[championName] ?? [];
+    const friendProfiles = getChampionPerformance(championName);
 
     const baseline =
         dashboardData
@@ -947,7 +979,6 @@ function buildProfileMatchesPanel(profile, options = {}){
             </div>
             <div class="profile-match-list">
                 ${matches.map(match => {
-                    const titleIcons = renderMatchTitleIcons(match.titles);
                     const playerText = showPlayer && match.player
                         ? `<span class="profile-match-player">${escapeHtml(formatMatchPlayerName(match.player))}</span>`
                         : "";
@@ -962,7 +993,7 @@ function buildProfileMatchesPanel(profile, options = {}){
                         >
                             <span class="profile-match-id">${escapeHtml(match.match_id)}</span>
                             ${playerText}
-                            <span class="profile-match-score">${titleIcons ? `${titleIcons} ` : ""}${Number(match.score || 0)}</span>
+                            <span class="profile-match-score">${Number(match.score || 0)}</span>
                             ${dateText ? `<span class="profile-match-date">${dateText}</span>` : ""}
                             <span class="profile-match-open">Ver partida →</span>
                         </button>
@@ -1184,12 +1215,6 @@ function buildChampionRankingTable(
                                 <span class="champion-reference-badge">CHAMPION REFERENCE</span>
                             ` : ""}
                         </div>
-
-                        <div class="champion-ranking-titles">
-                            😈${profile.global_god ?? 0}
-                            🏅${profile.global_alpha ?? 0}
-                            🍦${profile.global_cono ?? 0}
-                        </div>
                     </td>
 
                     <td>
@@ -1325,11 +1350,21 @@ function renderPlayerProfile(playerName){
 
     }else{
 
-        playerProfile =
-            dashboardData
-                .champion_engine
-                .player_champion_profiles[playerName];
+        playerProfile = getPlayerChampionProfile(playerName);
 
+    }
+
+    if(!playerProfile){
+        const results = document.getElementById("players-player-results");
+        if(results){
+            results.innerHTML = `
+                <div class="player-profile-card">
+                    <div class="meta">PLAYER CHAMPION PROFILE</div>
+                    <p>No hay datos de perfil disponibles para ${escapeHtml(formatPlayerName(playerName))}.</p>
+                </div>
+            `;
+        }
+        return;
     }
 
     const championCount =
@@ -1715,38 +1750,6 @@ function formatHomeMetric(value, digits = 2){
     return number.toFixed(digits).replace(/\.0+$/, "");
 }
 
-function renderChampionTitleIcons(titles){
-    const safeTitles = titles || {};
-    const titleParts = [];
-
-    const godCount = Number(safeTitles.god) || 0;
-    const alphaCount = Number(safeTitles.alpha) || 0;
-    const conoCount = Number(safeTitles.cono) || 0;
-
-    if(godCount > 0){
-        titleParts.push(
-            `<span class="home-title-icon home-title-god" title="GOD ×${godCount}">😈<small>×${godCount}</small></span>`
-        );
-    }
-
-    if(alphaCount > 0){
-        titleParts.push(
-            `<span class="home-title-icon home-title-alpha" title="ALPHA ×${alphaCount}">🏅<small>×${alphaCount}</small></span>`
-        );
-    }
-
-    if(conoCount > 0){
-        titleParts.push(
-            `<span class="home-title-icon home-title-cono" title="CONO ×${conoCount}">🍦<small>×${conoCount}</small></span>`
-        );
-    }
-
-    return titleParts.length > 0
-        ? `<span class="home-champion-titles">${titleParts.join("")}</span>`
-        : "";
-}
-
-
 function renderPlayerChampionHighlights(elementId, highlights){
     const container = document.getElementById(elementId);
 
@@ -1804,7 +1807,6 @@ function renderPlayerChampionHighlights(elementId, highlights){
                         <td class="home-champion-name">
                             <span class="home-champion-name-line">
                                 <span>${escapeHtml(champion.champion || "-")}</span>
-                                ${renderChampionTitleIcons(champion.titles)}
                             </span>
                         </td>
                         <td>${formatHomeMetric(champion.games, 0)}</td>
@@ -1913,10 +1915,6 @@ function renderGlobalRanking(elementId, ranking){
         <td>${i + 1}</td>
         <td>
           ${escapeHtml(formatPlayerName(r.name))}
-          <br>
-          😈${r.global_god_count} (${r.global_god_count}/${r.games})
-          🏅${r.global_alpha_count} (${r.global_alpha_count}/${r.games})
-          🍦${r.global_cono_count} (${r.global_cono_count}/${r.games})
         </td>
         <td>${r.games}</td>
         <td class="score-stat">${formatHomeMetric(r.global_avg)}</td>
@@ -2225,6 +2223,9 @@ function renderPlayerContext(player, isRemake = false, matchPlayers = []){
                 <div class="match-context-identity">
                     <strong>${escapeHtml(formatPlayerName(player.name))}</strong>
                     <span>${escapeHtml(player.champion)}</span>
+                    <span class="match-context-meta" title="Meta histórico del campeón">Meta ${formatMatchScore(player.champion_meta || 0)}</span>
+                    <span class="match-context-score" title="Score global absoluto de la partida">Score ${formatMatchScore(player.score)}</span>
+                    <span class="match-context-impact" title="Match Impact: impacto relativo dentro de esta partida">MI ${formatMatchScore(player.match_impact || 0)}</span>
                 </div>
             </div>
 
@@ -2255,6 +2256,12 @@ function renderPlayerContext(player, isRemake = false, matchPlayers = []){
                         <span class="context-stat-label">Death Share</span>
                         <strong>${context.deaths_pct || 0}%</strong>
                         <small>${formatContextNumber(context.deaths)} deaths</small>
+                    </div>
+
+                    <div class="context-stat-card">
+                        <span class="context-stat-label">Minion Share</span>
+                        <strong>${context.minions_pct || 0}%</strong>
+                        <small>${formatContextNumber(context.minions)} minions</small>
                     </div>
                 </div>
             </div>
@@ -2342,6 +2349,9 @@ function getMatchSortValue(player, key){
             player.champion_meta_p95 || getChampionMetaP95(player.champion)
         );
     }
+    if(key === "match_impact"){
+        return Number(player.match_impact) || 0;
+    }
 
     const scoreKeyBySortKey = {
         kpm_score: "kpm",
@@ -2375,7 +2385,8 @@ function sortMatchPlayers(players){
 
 function matchSortHeader(label, key){
 
-    const sortable = !["teamId", "name", "champion"].includes(key);
+    // Team is intentionally not sortable: Blue must always be above Red.
+    const sortable = key !== "teamId";
 
     const active = sortable && matchExplorerSort.key === key;
 
@@ -2405,25 +2416,13 @@ function attachMatchExplorerSorting(matchId){
             }else{
                 matchExplorerSort = {
                     key,
-                    direction: ["name", "champion", "teamId"].includes(key) ? "asc" : "desc"
+                    // Numeric metrics default to descending; text columns to ascending.
+                    direction: ["name", "champion"].includes(key) ? "asc" : "desc"
                 };
             }
             renderMatchExplorer(matchId);
         });
     });
-}
-
-function renderMatchTitleIcons(titles){
-    const iconByTitle = {
-        GOD: "😈",
-        ALPHA: "🏅",
-        CONO: "🍦"
-    };
-
-    return (Array.isArray(titles) ? titles : [])
-        .map(title => iconByTitle[String(title).toUpperCase()] || "")
-        .filter(Boolean)
-        .join("");
 }
 
 function formatMatchRate(value, digits = 3){
@@ -2460,13 +2459,10 @@ function renderMatchExplorer(matchId){
     const remakeHeader = match.is_remake
         ? `<span class="match-remake-badge">REMAKE</span>`
         : "";
-
     const remakeNotice = match.is_remake
         ? `<div class="match-remake-notice">Esta partida fue anulada oficialmente por Riot y no participa en estadísticas, rankings ni análisis.</div>`
         : "";
-
     const duration = formatMatchDuration(match.duration_seconds);
-
     const durationHeader = duration
         ? `<span class="match-duration" title="Duración de la partida">${duration}</span>`
         : "";
@@ -2485,8 +2481,7 @@ function renderMatchExplorer(matchId){
         ${matchSortHeader("Player", "name")}
         ${matchSortHeader("Champion", "champion")}
         ${matchSortHeader("P95R", "ratio")}
-        ${matchSortHeader("META", "champion_meta")}
-        ${matchSortHeader("Score", "score")}
+        ${matchSortHeader("MI", "match_impact")}
         ${matchSortHeader("KPM", "kpm_score")}
         ${matchSortHeader("DPM", "dpm_score")}
         ${matchSortHeader("KDA", "kda_score")}
@@ -2497,30 +2492,53 @@ function renderMatchExplorer(matchId){
 
     const matchPlayers = (match.players || []).map(player => ({
         ...player,
-        goldpm: getGoldPerMinute(player, match.duration_seconds)
+        goldpm: getGoldPerMinute(player, match.duration_seconds),
+        match_impact: Number(player.match_impact) || 0,
+        p95r: normalizeMetaRatio(player.score, player.champion_meta, player.champion_meta_p95 || getChampionMetaP95(player.champion))
     }));
 
-    sortMatchPlayers(matchPlayers).forEach((player, index) => {
-        const rowId = `match-context-${match.match_id}-${index}`;
-        const team = getTeamLabel(player.teamId);
-        html += `
-        <tr class="match-player-row" data-context-row="${rowId}" aria-expanded="false" tabindex="0"
-            onclick="toggleMatchContext('${rowId}')"
-            onkeydown="if(event.key === 'Enter' || event.key === ' '){event.preventDefault();toggleMatchContext('${rowId}');}">
-        <td><span class="match-team-badge ${team.className}" title="${escapeHtml(team.title)}" aria-label="${escapeHtml(team.title)}">${team.label}</span></td>
-        <td title="${escapeHtml(formatPlayerName(player.name))}">${escapeHtml(formatPlayerName(player.name))}</td>
-        <td><span class="match-champion-cell"><span>${formatChampionName(player)}</span></span></td>
-        <td class="ratio-stat">${formatMatchRate(normalizeMetaRatio(player.score, player.champion_meta, player.champion_meta_p95 || getChampionMetaP95(player.champion)), 3)}</td>
-        <td class="meta-stat">${formatMatchScore(player.champion_meta || 0)}</td>
-        <td class="score-stat">${formatMatchScore(player.score)}</td>
-        <td>${formatMatchScore(getScoreMetric(player, "kpm"))}</td>
-        <td>${formatMatchScore(getScoreMetric(player, "dpm"))}</td>
-        <td>${formatMatchScore(getScoreMetric(player, "kda"))}</td>
-        <td>${formatMatchScore(getScoreMetric(player, "ccpm"))}</td>
-        <td>${formatMatchScore(getScoreMetric(player, "tank"))}</td>
-        <td>${formatMatchScore(getScoreMetric(player, "goldpm"))}</td>
-        </tr>
-        <tr id="${rowId}" class="match-context-row" hidden><td colspan="12">${renderPlayerContext(player, match.is_remake, matchPlayers)}</td></tr>`;
+    const teamGroups = new Map();
+    matchPlayers.forEach(player => {
+        const teamId = Number(player.teamId);
+        if(!teamGroups.has(teamId)){ teamGroups.set(teamId, []); }
+        teamGroups.get(teamId).push(player);
+    });
+
+    // Team order is fixed: Blue first, Red second.
+    // The selected column is then applied independently inside each team,
+    // so players from Blue can never be interleaved with players from Red.
+    const teamOrder = [100, 200];
+    const orderedTeams = [
+        ...teamOrder.filter(teamId => teamGroups.has(teamId)).map(teamId => [teamId, teamGroups.get(teamId)]),
+        ...[...teamGroups.entries()].filter(([teamId]) => !teamOrder.includes(teamId))
+    ];
+
+    orderedTeams.forEach(([teamId, players]) => {
+        const team = getTeamLabel(teamId);
+        html += `<tr class="match-team-divider ${team.className}"><td colspan="11"><span class="match-team-badge ${team.className}" title="${escapeHtml(team.title)}"></span></td></tr>`;
+
+        // IMPORTANT: sort a copy for this team only. Never sort the full match.
+        const sortedTeamPlayers = sortMatchPlayers(players);
+        sortedTeamPlayers.forEach((player, index) => {
+            const rowId = `match-context-${match.match_id}-${teamId}-${index}`;
+            html += `
+            <tr class="match-player-row" data-context-row="${rowId}" aria-expanded="false" tabindex="0"
+                onclick="toggleMatchContext('${rowId}')"
+                onkeydown="if(event.key === 'Enter' || event.key === ' '){event.preventDefault();toggleMatchContext('${rowId}');}">
+            <td><span class="match-team-badge ${team.className}" title="${escapeHtml(team.title)}" aria-label="${escapeHtml(team.title)}"></span></td>
+            <td title="${escapeHtml(formatPlayerName(player.name))}">${escapeHtml(formatPlayerName(player.name))}</td>
+            <td><span class="match-champion-cell"><span>${formatChampionName(player)}</span></span></td>
+            <td class="ratio-stat">${formatMatchRate(player.p95r, 3)}</td>
+            <td class="impact-stat">${formatMatchScore(player.match_impact)}</td>
+            <td>${formatMatchScore(getScoreMetric(player, "kpm"))}</td>
+            <td>${formatMatchScore(getScoreMetric(player, "dpm"))}</td>
+            <td>${formatMatchScore(getScoreMetric(player, "kda"))}</td>
+            <td>${formatMatchScore(getScoreMetric(player, "ccpm"))}</td>
+            <td>${formatMatchScore(getScoreMetric(player, "tank"))}</td>
+            <td>${formatMatchScore(getScoreMetric(player, "goldpm"))}</td>
+            </tr>
+            <tr id="${rowId}" class="match-context-row" hidden><td colspan="11">${renderPlayerContext(player, match.is_remake, matchPlayers)}</td></tr>`;
+        });
     });
 
     html += `</tbody></table></div>`;
