@@ -636,7 +636,6 @@ function renderChampionRepresentatives(metricName){
                     <th class="${activeClass("kpm")}">KPM</th>
                     <th class="${activeClass("ccpm")}">CCPM</th>
                     <th class="${activeClass("tank_pct")}">Tank%</th>
-                    <th class="${activeClass("goldpm")}">GoldPM</th>
                 </tr>
             </thead>
             <tbody>
@@ -658,7 +657,6 @@ function renderChampionRepresentatives(metricName){
                 <td class="${activeClass("kpm")}">${formatHomeMetric(r.kpm, 2)}</td>
                 <td class="${activeClass("ccpm")}">${formatHomeMetric(r.ccpm, 2)}</td>
                 <td class="${activeClass("tank_pct")}">${formatHomeMetric(r.tank_pct, 2)}%</td>
-                <td class="${activeClass("goldpm")}">${formatHomeMetric(r.goldpm, 2)}</td>
             </tr>
         `;
     });
@@ -733,7 +731,6 @@ function renderChampionTendencies(metricName){
                     <th class="${metricClass("kpm")}">KPM</th>
                     <th class="${metricClass("ccpm")}">CCPM</th>
                     <th class="${metricClass("tank_pct")}">Tank%</th>
-                    <th class="${metricClass("goldpm")}">GoldPM</th>
                 </tr>
             </thead>
             <tbody>
@@ -751,7 +748,6 @@ function renderChampionTendencies(metricName){
                 <td class="${metricClass("kpm")}">${formatHomeMetric(r.kpm)}</td>
                 <td class="${metricClass("ccpm")}">${formatHomeMetric(r.ccpm)}</td>
                 <td class="${metricClass("tank_pct")}">${formatHomeMetric(r.tank_pct)}%</td>
-                <td class="${metricClass("goldpm")}">${formatHomeMetric(r.goldpm)}</td>
             </tr>
         `;
     });
@@ -1067,8 +1063,7 @@ function getScoreMetric(item, key){
         dpm: "global_avg_dpm_score",
         kda: "global_avg_kda_score",
         ccpm: "global_avg_ccpm_score",
-        tank: "global_avg_tank_score",
-        goldpm: "global_avg_gold_score"
+        tank: "global_avg_tank_score"
     };
     const canonicalKey = canonicalKeyByMetric[key];
     const canonicalValue = canonicalKey ? item?.[canonicalKey] : undefined;
@@ -1086,8 +1081,7 @@ function getScoreMetric(item, key){
             dpm: "global_avg_dpm_score",
             kda: "global_avg_kda_score",
             ccpm: "global_avg_ccpm_score",
-            tank: "global_avg_tank_score",
-            goldpm: "global_avg_gold_score"
+            tank: "global_avg_tank_score"
         };
         const aggregateValue = aggregateKeyByMetric[key] ? item?.[aggregateKeyByMetric[key]] : undefined;
         if(Number.isFinite(Number(aggregateValue))){
@@ -1098,8 +1092,7 @@ function getScoreMetric(item, key){
                 dpm: "GLOBAL_DPM PTS",
                 kda: "GLOBAL_KDA PTS",
                 ccpm: "GLOBAL_CCPM PTS",
-                tank: "GLOBAL_TANK PTS",
-                goldpm: "GLOBAL_GOLD PTS"
+                tank: "GLOBAL_TANK PTS"
             };
             const globalKey = globalKeyByMetric[key];
             const globalValue = globalKey ? item?.[globalKey] : undefined;
@@ -1116,8 +1109,7 @@ function getRawMatchMetric(player, key){
         dpm: player?.dpm,
         kda: player?.kda,
         ccpm: player?.ccpm,
-        tank: player?.tank_share,
-        goldpm: player?.gold_spm
+        tank: player?.tank_share
     };
     const value = Number(values[key]);
     return Number.isFinite(value) ? value : 0;
@@ -1158,7 +1150,6 @@ function buildChampionRankingTable(
                 <th>KDA</th>
                 <th>CCPM</th>
                 <th>Tank</th>
-                <th>GoldPM</th>
             </tr>
         </thead>
         <tbody>
@@ -1236,17 +1227,16 @@ function buildChampionRankingTable(
                     <td>${formatHomeMetric(getScoreMetric(profile, "kda"))}</td>
                     <td>${formatHomeMetric(getScoreMetric(profile, "ccpm"))}</td>
                     <td>${formatHomeMetric(getScoreMetric(profile, "tank"))}</td>
-                    <td>${formatHomeMetric(getScoreMetric(profile, "goldpm"))}</td>
                 </tr>
 
                 <tr id="${rowKey}-matches" class="profile-matches-row" hidden>
-                    <td colspan="14">
+                    <td colspan="9">
                         ${buildProfileMatchesPanel(profile, {showPlayer: isReference})}
                     </td>
                 </tr>
 
                 <tr id="${rowKey}" class="champion-history-row" hidden>
-                    <td colspan="15">
+                    <td colspan="9">
                         ${buildChampionHistoryPanel(profile)}
                     </td>
                 </tr>
@@ -1564,7 +1554,6 @@ function renderPlayerChampionTable(
                     <th>KDA</th>
                     <th>CCPM</th>
                     <th>Tank</th>
-                    <th>GoldPM</th>
                     <th class="meta-stat">META</th>
 
                     <th
@@ -1607,12 +1596,11 @@ function renderPlayerChampionTable(
                 <td>${formatHomeMetric(getScoreMetric(champion, "kda"))}</td>
                 <td>${formatHomeMetric(getScoreMetric(champion, "ccpm"))}</td>
                 <td>${formatHomeMetric(getScoreMetric(champion, "tank"))}</td>
-                <td>${formatHomeMetric(getScoreMetric(champion, "goldpm"))}</td>
                 <td class="meta-stat">${formatHomeMetric(champion.champion_meta || 0)}</td>
                 <td class="ratio-stat">${formatHomeMetric(normalizeMetaRatio(champion.global_avg, champion.champion_meta, champion.champion_meta_p95 || getChampionMetaP95(champion.champion)), 3)}</td>
             </tr>
             <tr id="${matchesRowId}" class="profile-matches-row" hidden>
-                <td colspan="12">${buildProfileMatchesPanel(champion)}</td>
+                <td colspan="11">${buildProfileMatchesPanel(champion)}</td>
             </tr>
         `;
     });
@@ -1818,7 +1806,6 @@ function renderPlayerChampionHighlights(elementId, highlights){
                         <td>${formatHomeMetric(getScoreMetric(displayChampion, "kda"))}</td>
                         <td>${formatHomeMetric(getScoreMetric(displayChampion, "ccpm"))}</td>
                         <td>${formatHomeMetric(getScoreMetric(displayChampion, "tank"))}</td>
-                        <td>${formatHomeMetric(getScoreMetric(displayChampion, "goldpm"))}</td>
                     </tr>
                 `;
             }).join("")
@@ -1867,7 +1854,6 @@ function renderPlayerChampionHighlights(elementId, highlights){
                                 <th>KDA</th>
                                 <th>CCPM</th>
                                 <th>Tank</th>
-                                <th>GoldPM</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1901,7 +1887,6 @@ function renderGlobalRanking(elementId, ranking){
           <th>KDA</th>
           <th>CCPM</th>
           <th>Tank</th>
-          <th>GoldPM</th>
         </tr>
       </thead>
       <tbody>
@@ -1923,7 +1908,6 @@ function renderGlobalRanking(elementId, ranking){
         <td>${formatHomeMetric(getScoreMetric(r, "kda"))}</td>
         <td>${formatHomeMetric(getScoreMetric(r, "ccpm"))}</td>
         <td>${formatHomeMetric(getScoreMetric(r, "tank"))}</td>
-        <td>${formatHomeMetric(getScoreMetric(r, "goldpm"))}</td>
       </tr>
     `;
   });
@@ -2193,8 +2177,7 @@ function renderMetricBreakdown(player, matchPlayers){
         { label: "DPM", key: "dpm", digits: 0 },
         { label: "KDA", key: "kda", digits: 2 },
         { label: "CCPM", key: "ccpm", digits: 3 },
-        { label: "Tank %", key: "tank", percent: true },
-        { label: "Gold / min", key: "goldpm", digits: 2 }
+        { label: "Tank %", key: "tank", percent: true }
     ];
 
     return metrics.map(metric => {
@@ -2262,6 +2245,12 @@ function renderPlayerContext(player, isRemake = false, matchPlayers = []){
                         <span class="context-stat-label">Minion Share</span>
                         <strong>${context.minions_pct || 0}%</strong>
                         <small>${formatContextNumber(context.minions)} minions</small>
+                    </div>
+
+                    <div class="context-stat-card">
+                        <span class="context-stat-label">Gold Share</span>
+                        <strong>${context.gold_spent_pct || 0}%</strong>
+                        <small>${formatContextNumber(player.gold_spm)} gold/min</small>
                     </div>
                 </div>
             </div>
@@ -2358,8 +2347,7 @@ function getMatchSortValue(player, key){
         dpm_score: "dpm",
         kda_score: "kda",
         ccpm_score: "ccpm",
-        tank_score: "tank",
-        gold_score: "goldpm"
+        tank_score: "tank"
     };
 
     if(scoreKeyBySortKey[key]){
@@ -2487,12 +2475,10 @@ function renderMatchExplorer(matchId){
         ${matchSortHeader("KDA", "kda_score")}
         ${matchSortHeader("CCPM", "ccpm_score")}
         ${matchSortHeader("Tank", "tank_score")}
-        ${matchSortHeader("GoldPM", "goldpm")}
     </tr></thead><tbody>`;
 
     const matchPlayers = (match.players || []).map(player => ({
         ...player,
-        goldpm: getGoldPerMinute(player, match.duration_seconds),
         match_impact: Number(player.match_impact) || 0,
         p95r: normalizeMetaRatio(player.score, player.champion_meta, player.champion_meta_p95 || getChampionMetaP95(player.champion))
     }));
@@ -2515,7 +2501,7 @@ function renderMatchExplorer(matchId){
 
     orderedTeams.forEach(([teamId, players]) => {
         const team = getTeamLabel(teamId);
-        html += `<tr class="match-team-divider ${team.className}"><td colspan="11"><span class="match-team-badge ${team.className}" title="${escapeHtml(team.title)}"></span></td></tr>`;
+        html += `<tr class="match-team-divider ${team.className}"><td colspan="10"><span class="match-team-badge ${team.className}" title="${escapeHtml(team.title)}"></span></td></tr>`;
 
         // IMPORTANT: sort a copy for this team only. Never sort the full match.
         const sortedTeamPlayers = sortMatchPlayers(players);
@@ -2535,9 +2521,8 @@ function renderMatchExplorer(matchId){
             <td>${formatMatchScore(getScoreMetric(player, "kda"))}</td>
             <td>${formatMatchScore(getScoreMetric(player, "ccpm"))}</td>
             <td>${formatMatchScore(getScoreMetric(player, "tank"))}</td>
-            <td>${formatMatchScore(getScoreMetric(player, "goldpm"))}</td>
             </tr>
-            <tr id="${rowId}" class="match-context-row" hidden><td colspan="11">${renderPlayerContext(player, match.is_remake, matchPlayers)}</td></tr>`;
+            <tr id="${rowId}" class="match-context-row" hidden><td colspan="10">${renderPlayerContext(player, match.is_remake, matchPlayers)}</td></tr>`;
         });
     });
 
