@@ -1874,6 +1874,8 @@ function renderGlobalRanking(elementId, ranking){
     return;
   }
 
+  ranking = ranking.slice().sort((a, b) => Number(b.avg_meta_ratio || 0) - Number(a.avg_meta_ratio || 0));
+
   let html = `
     <table>
       <thead>
@@ -1881,7 +1883,7 @@ function renderGlobalRanking(elementId, ranking){
           <th>#</th>
           <th>Jugador</th>
           <th>Games</th>
-          <th class="score-stat">Score</th>
+          <th class="ratio-stat">P95R</th>
           <th>KPM</th>
           <th>DPM</th>
           <th>KDA</th>
@@ -1902,7 +1904,7 @@ function renderGlobalRanking(elementId, ranking){
           ${escapeHtml(formatPlayerName(r.name))}
         </td>
         <td>${r.games}</td>
-        <td class="score-stat">${formatHomeMetric(r.global_avg)}</td>
+        <td class="ratio-stat">${formatHomeMetric(r.avg_meta_ratio, 3)}</td>
         <td>${formatHomeMetric(getScoreMetric(r, "kpm"))}</td>
         <td>${formatHomeMetric(getScoreMetric(r, "dpm"))}</td>
         <td>${formatHomeMetric(getScoreMetric(r, "kda"))}</td>
@@ -2208,7 +2210,7 @@ function renderPlayerContext(player, isRemake = false, matchPlayers = []){
                     <span>${escapeHtml(player.champion)}</span>
                     <span class="match-context-meta" title="Meta histórico del campeón">Meta ${formatMatchScore(player.champion_meta || 0)}</span>
                     <span class="match-context-score" title="Score global absoluto de la partida">Score ${formatMatchScore(player.score)}</span>
-                    <span class="match-context-impact" title="Match Impact: impacto relativo dentro de esta partida">MI ${formatMatchScore(player.match_impact || 0)}</span>
+                    <span class="match-context-impact" title="P95R: score relativo al potencial del campeón">P95R ${formatMatchRate(player.p95r, 3)}</span>
                 </div>
             </div>
 
@@ -2468,7 +2470,6 @@ function renderMatchExplorer(matchId){
         ${matchSortHeader("Team", "teamId")}
         ${matchSortHeader("Player", "name")}
         ${matchSortHeader("Champion", "champion")}
-        ${matchSortHeader("P95R", "ratio")}
         ${matchSortHeader("MI", "match_impact")}
         ${matchSortHeader("KPM", "kpm_score")}
         ${matchSortHeader("DPM", "dpm_score")}
@@ -2501,7 +2502,7 @@ function renderMatchExplorer(matchId){
 
     orderedTeams.forEach(([teamId, players]) => {
         const team = getTeamLabel(teamId);
-        html += `<tr class="match-team-divider ${team.className}"><td colspan="10"><span class="match-team-badge ${team.className}" title="${escapeHtml(team.title)}"></span></td></tr>`;
+        html += `<tr class="match-team-divider ${team.className}"><td colspan="9"><span class="match-team-badge ${team.className}" title="${escapeHtml(team.title)}"></span></td></tr>`;
 
         // IMPORTANT: sort a copy for this team only. Never sort the full match.
         const sortedTeamPlayers = sortMatchPlayers(players);
@@ -2514,7 +2515,6 @@ function renderMatchExplorer(matchId){
             <td><span class="match-team-badge ${team.className}" title="${escapeHtml(team.title)}" aria-label="${escapeHtml(team.title)}"></span></td>
             <td title="${escapeHtml(formatPlayerName(player.name))}">${escapeHtml(formatPlayerName(player.name))}</td>
             <td><span class="match-champion-cell"><span>${formatChampionName(player)}</span></span></td>
-            <td class="ratio-stat">${formatMatchRate(player.p95r, 3)}</td>
             <td class="impact-stat">${formatMatchScore(player.match_impact)}</td>
             <td>${formatMatchScore(getScoreMetric(player, "kpm"))}</td>
             <td>${formatMatchScore(getScoreMetric(player, "dpm"))}</td>
@@ -2522,7 +2522,7 @@ function renderMatchExplorer(matchId){
             <td>${formatMatchScore(getScoreMetric(player, "ccpm"))}</td>
             <td>${formatMatchScore(getScoreMetric(player, "tank"))}</td>
             </tr>
-            <tr id="${rowId}" class="match-context-row" hidden><td colspan="10">${renderPlayerContext(player, match.is_remake, matchPlayers)}</td></tr>`;
+            <tr id="${rowId}" class="match-context-row" hidden><td colspan="9">${renderPlayerContext(player, match.is_remake, matchPlayers)}</td></tr>`;
         });
     });
 

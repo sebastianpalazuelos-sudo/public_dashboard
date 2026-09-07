@@ -206,32 +206,37 @@
 
   <div class="methodology-content">
 
-```
 <div class="methodology-section">
 
-<h3>Filosofía y Descubrimientos</h3>
+<h3>Filosofía</h3>
 
-  <p>El objetivo inicial del sistema fue construir una herramienta capaz de valorar con la mayor precisión posible la <strong>performance de un jugador en cada partida</strong>. Durante su desarrollo se probaron distintas fórmulas, ponderaciones y métodos de normalización, buscando una forma consistente de transformar las métricas disponibles en una valoración del rendimiento.</p>
+  <p>El sistema busca valorar la performance de un jugador en cada partida de forma <strong>transparente y reproducible</strong>. En lugar de intentar modelar aspectos que los datos disponibles no contienen, se concentra en medir lo observable y en interpretarlo dentro del contexto propio de cada campeón, porque los campeones no tienen las mismas posibilidades de producir rendimiento en cada dimensión.</p>
 
-  <p>En la mayoría de los casos, los distintos modelos producían resultados similares a las valoraciones observadas de Riot. Sin embargo, también aparecían excepciones puntuales que resultaban difíciles de justificar o que generaban resultados controvertidos. Al analizar múltiples partidas, surgió además un patrón más estable: a medida que se acumulaban observaciones, las posiciones relativas de los jugadores tendían a conservar cierta consistencia al analizarlos desde diferentes perspectivas.</p>
+<h3>Score Global</h3>
 
-  <p>El desarrollo permitió identificar dos límites fundamentales: <strong>la capacidad del modelador para representar correctamente el rendimiento y la ausencia de datos relevantes en la información disponible del cliente</strong>. Esto marcó una diferencia importante entre lo que el sistema podía calcular y lo que realmente podía demostrar.</p>
+  <p>Cada partida se evalúa en <strong>cinco dimensiones</strong> —KPM, DPM, CCPM, Tank Share y KDA— cada una normalizada de <strong>0 a 10</strong>. Gold SPM se muestra solo como contexto (valor por minuto y porcentaje del equipo) y no suma al total.</p>
 
-  <p>La conclusión fue simplificar el problema. En lugar de intentar construir una fórmula capaz de resolver aspectos que requieren información que los datos disponibles no contienen, el sistema se concentra en <strong>medir de forma transparente y reproducible aquello que puede observarse</strong>.</p>
+  <p>El <strong>Score Global</strong> (0-50) es la suma ponderada de esas cinco puntuaciones. El peso de cada métrica parte de una base global y se ajusta con el patrón histórico del campeón: un Draven valora más el daño y las kills, un Zilean más el KDA y el CC, sin que ninguna métrica quede anulada.</p>
 
-  <p>El modelo actual resume el rendimiento de cada partida a partir de <strong>seis dimensiones observables</strong>: KPM, DPM, CCPM, Tank Share, KDA y Gold SPM. Estas dimensiones permiten representar distintas formas de contribución del jugador y reducir la dependencia de una única métrica.</p>
+<h3>P95R — Consistencia del jugador</h3>
 
-  <p>Cada dimensión se transforma en una puntuación común de <strong>0 a 10</strong> y las seis puntuaciones se integran en un Score Global de la partida. Este resultado permite describir el rendimiento observable de un jugador, pero no elimina una limitación fundamental: los campeones no tienen las mismas posibilidades de producir rendimiento en cada dimensión.</p>
+  <p>El <strong>percentil 95 (P95)</strong> de un campeón es el nivel de rendimiento que solo el 5% de sus observaciones históricas supera. El <strong>P95R</strong> expresa el Score Global de una partida en relación con ese techo histórico: dice qué tan cerca estuvo el jugador del mejor caso posible <em>de ese campeón</em>.</p>
 
-  <p>Por esta razón, el sistema construye también una <strong>referencia histórica para cada campeón</strong>. Esta referencia permite interpretar el resultado de una partida dentro del contexto estadístico propio del campeón utilizado, en lugar de comparar directamente valores que pueden tener comportamientos naturales diferentes.</p>
+  <p>Como el P95R compara contra un techo propio y estable, es una referencia fija entre partidas. Por eso su promedio es la medida correcta para <strong>rankear la consistencia de un jugador</strong> a lo largo del split: quien acostumbra a acercarse al techo de sus campeones queda arriba, sin importar si esos campeones son carries o supports.</p>
 
-  <p>El primer intento para realizar esta comparación fue el <strong>Meta Ratio</strong>, que relacionaba el Score de una partida con el rendimiento histórico de su campeón. Sin embargo, se detectó que esta relación podía estar sesgada por las diferencias de escala entre campeones.</p>
+<h3>Match Impact (MI) — Impacto intra-partida</h3>
 
-  <p>La solución fue utilizar una referencia basada en la propia distribución histórica de cada campeón: el <strong>percentil 95 (P95)</strong>. Un percentil expresa la posición relativa de un valor dentro de una distribución: de forma intuitiva, los percentiles bajos representan resultados poco destacados y los percentiles altos resultados cada vez más excepcionales. El P95 identifica un nivel de rendimiento que se encuentra por encima de aproximadamente el 95% de las observaciones históricas del campeón.</p>
+  <p>El <strong>MI</strong> responde una pregunta distinta: <em>¿quién decidió esta partida?</em> Compara al jugador únicamente con los otros nueve participantes, usando un ranking 1-10 por métrica.</p>
 
-  <p>A partir de esta referencia se construyó el <strong>P95R</strong>, cuyo objetivo es expresar el rendimiento de una partida en relación con ese nivel excepcional histórico, manteniendo el contexto propio de cada campeón.</p>
+  <p>Solo cuentan las métricas que el campeón puede impactar históricamente (según su P95 frente a la distribución global). Si el jugador supera su propio P95 en otra métrica y queda entre los cinco mejores de la partida, esa métrica también entra como <em>métrica extra</em>. Cada métrica contribuye con <code>(11 - rank)</code> ponderado por el peso del campeón.</p>
 
-  <p>De forma complementaria, el <strong>Match Impact (MI)</strong> mide el rendimiento relativo de un jugador dentro de la misma partida. Se calcula a partir del ranking del jugador en cada una de las cinco dimensiones observables (KPM, DPM, KDA, CCPM y Tank) comparado con los otros nueve participantes. Para evitar que los campeones con menor capacidad de daño, kills o control queden siempre relegados (por ejemplo, soportes y enchanters), el MI se ajusta con el techo histórico del campeón: 50% del valor proviene del rank intra-partido y 50% de qué tan cerca estuvo el score total del jugador del percentil 95 histórico de ese campeón. Así un support que juega cerca del techo de su campeón puede obtener un MI alto aunque sus métricas absolutas estén por debajo de las de un carry.</p>
+  <p>Finalmente, un <strong>factor de diversidad</strong> limita el techo de campeones con pocas métricas activas, para que un support con solo KDA alto no monopolice el top sin acompañar con nada más.</p>
+
+  <p>El MI es volátil por naturaleza —depende de esa partida concreta— y por eso se usa para identificar <strong>quién dominó un encuentro</strong>, no para rankear jugadores.</p>
+
+<h3>Resumen</h3>
+
+  <p><strong>MI</strong> mide el impacto de un jugador <em>dentro de una partida</em>: es relativo a los nueve rivales y compañeros, contextual y partida a partida. <strong>P95R</strong> mide el rendimiento de un jugador <em>contra el techo histórico de su campeón</em>: es estable, comparable entre campeones, y su promedio define el ranking del split.</p>
 
 </div>
 

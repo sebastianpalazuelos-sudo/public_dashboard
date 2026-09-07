@@ -350,12 +350,11 @@ table td {
 .impact-stat{color:#fbbf24;font-weight:700;text-align:center;}
 /* Cinco columnas fijas: las métricas RAW entran siempre en una sola línea. */
 .match-context-stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:0;}
-.score-metrics-grid{grid-template-columns:repeat(6,minmax(0,1fr));}
+.score-metrics-grid{grid-template-columns:repeat(5,minmax(0,1fr));}
+.match-context-shares{grid-template-columns:repeat(5,minmax(0,1fr));}
 .score-metric-card{min-width:0;justify-content:space-between;}
 .score-metric-card strong{font-size:24px;}
-/* Los tres shares conservan el ancho de columna y quedan centrados en la fila. */
-.match-context-shares .context-stat-card:first-child{grid-column:2;}
-.context-stat-card{display:flex;flex-direction:column;gap:4px;padding:10px 12px;background:rgba(17,24,39,.9);border:1px solid rgba(75,85,99,.85);border-radius:10px;}
+.context-stat-card{display:flex;flex-direction:column;gap:4px;justify-content:center;align-items:center;padding:10px 12px;background:rgba(17,24,39,.9);border:1px solid rgba(75,85,99,.85);border-radius:10px;}
 .context-stat-card strong{color:#f9fafb;font-size:21px;}
 .context-stat-card span:last-child{color:#9ca3af;font-size:12px;}
 .context-stat-label{color:#93c5fd;font-size:11px;font-weight:bold;letter-spacing:.04em;text-transform:uppercase;}
