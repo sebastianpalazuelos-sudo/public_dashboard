@@ -210,33 +210,39 @@
 
 <h3>Filosofía</h3>
 
-  <p>El sistema busca valorar la performance de un jugador en cada partida de forma <strong>transparente y reproducible</strong>. En lugar de intentar modelar aspectos que los datos disponibles no contienen, se concentra en medir lo observable y en interpretarlo dentro del contexto propio de cada campeón, porque los campeones no tienen las mismas posibilidades de producir rendimiento en cada dimensión.</p>
+  <p>El objetivo del sistema es valorar la performance de un jugador en cada partida de forma <strong>transparente y reproducible</strong>. En lugar de intentar modelar aspectos que los datos disponibles no contienen, el sistema se concentra en medir lo observable y en interpretarlo dentro del contexto propio de cada campeón.</p>
 
-<h3>Score Global</h3>
+  <p>La idea central es simple: <strong>no todos los campeones pueden producir lo mismo</strong>. Un carry puede hacer daño y kills; un enchanter hace curación y control que los datos no capturan. Compararlos directamente produce resultados injustos. Por eso cada campeón tiene su propio contexto estadístico.</p>
 
-  <p>Cada partida se evalúa en <strong>cinco dimensiones</strong> —KPM, DPM, CCPM, Tank Share y KDA— cada una normalizada de <strong>0 a 10</strong>. Gold SPM se muestra solo como contexto (valor por minuto y porcentaje del equipo) y no suma al total.</p>
+<h3>Cómo funciona</h3>
 
-  <p>El <strong>Score Global</strong> (0-50) es la suma ponderada de esas cinco puntuaciones. El peso de cada métrica parte de una base global y se ajusta con el patrón histórico del campeón: un Draven valora más el daño y las kills, un Zilean más el KDA y el CC, sin que ninguna métrica quede anulada.</p>
+  <p>Cada partida se resume en <strong>cinco dimensiones observables</strong>: KPM, DPM, CCPM, Tank Share y KDA. Cada una se transforma en una puntuación de <strong>0 a 10</strong>. Gold se muestra como contexto, no como parte del score principal.</p>
+
+  <p>Las cinco puntuaciones se combinan en un <strong>Score Global ponderado</strong>. El peso de cada métrica depende del patrón histórico del campeón: un Draven se juzga más por daño y kills, un Zilean más por KDA y CC. Así el score es justo entre campeones distintos.</p>
 
 <h3>P95R — Consistencia del jugador</h3>
 
-  <p>El <strong>percentil 95 (P95)</strong> de un campeón es el nivel de rendimiento que solo el 5% de sus observaciones históricas supera. El <strong>P95R</strong> expresa el Score Global de una partida en relación con ese techo histórico: dice qué tan cerca estuvo el jugador del mejor caso posible <em>de ese campeón</em>.</p>
+  <p>El <strong>percentil 95</strong> de un campeón es el nivel que solo el 5% de sus partidas históricas supera. El <strong>P95R</strong> expresa qué tan cerca estuvo el jugador de ese techo.</p>
 
-  <p>Como el P95R compara contra un techo propio y estable, es una referencia fija entre partidas. Por eso su promedio es la medida correcta para <strong>rankear la consistencia de un jugador</strong> a lo largo del split: quien acostumbra a acercarse al techo de sus campeones queda arriba, sin importar si esos campeones son carries o supports.</p>
+  <p>Como el P95R compara contra una referencia fija y propia del campeón, es una medida estable entre partidas. Por eso su promedio se usa para <strong>rankear la consistencia de un jugador</strong>: quien regularmente se acerca al techo de sus campeones queda arriba, sin importar si son carries o supports.</p>
 
 <h3>Match Impact (MI) — Impacto intra-partida</h3>
 
-  <p>El <strong>MI</strong> responde una pregunta distinta: <em>¿quién decidió esta partida?</em> Compara al jugador únicamente con los otros nueve participantes, usando un ranking 1-10 por métrica.</p>
+  <p>El <strong>MI</strong> responde a una pregunta distinta: <em>¿quién decidió esta partida?</em> Compara al jugador contra los otros nueve participantes usando rankings por métrica.</p>
 
-  <p>Solo cuentan las métricas que el campeón puede impactar históricamente (según su P95 frente a la distribución global). Si el jugador supera su propio P95 en otra métrica y queda entre los cinco mejores de la partida, esa métrica también entra como <em>métrica extra</em>. Cada métrica contribuye con <code>(11 - rank)</code> ponderado por el peso del campeón.</p>
+  <p>Solo cuentan las métricas que el campeón históricamente puede impactar. Si el jugador supera su propio techo histórico en una métrica adicional, entra como bonus. Cuanta menos diversidad tenga, más difícil es llegar al máximo.</p>
 
-  <p>Finalmente, un <strong>factor de diversidad</strong> limita el techo de campeones con pocas métricas activas, para que un support con solo KDA alto no monopolice el top sin acompañar con nada más.</p>
+  <p>El MI es volátil por naturaleza: depende de esa partida concreta. Sirve para identificar <strong>quién dominó un encuentro</strong>, no para rankear jugadores.</p>
 
-  <p>El MI es volátil por naturaleza —depende de esa partida concreta— y por eso se usa para identificar <strong>quién dominó un encuentro</strong>, no para rankear jugadores.</p>
+<h3>Evolución del sistema</h3>
+
+  <p>El modelo inicial usaba ponderaciones fijas, pero era injusto entre campeones con roles distintos. Luego se probó comparar el score contra la media histórica del campeón, pero la escala no se mantenía. La solución fue usar el <strong>percentil 95</strong> como techo de referencia: una medida robusta que no se distorsiona por outliers.</p>
+
+  <p>El MI original promediaba el rank en todas las métricas igual; se refinó para contar solo las que cada campeón puede impactar, con un ajuste de diversidad para que no baste con dominar una sola métrica.</p>
 
 <h3>Resumen</h3>
 
-  <p><strong>MI</strong> mide el impacto de un jugador <em>dentro de una partida</em>: es relativo a los nueve rivales y compañeros, contextual y partida a partida. <strong>P95R</strong> mide el rendimiento de un jugador <em>contra el techo histórico de su campeón</em>: es estable, comparable entre campeones, y su promedio define el ranking del split.</p>
+  <p><strong>MI</strong> mide el impacto de un jugador <em>dentro de una partida</em>: es contextual y cambia partida a partida. <strong>P95R</strong> mide el rendimiento <em>contra el techo histórico del campeón</em>: es estable y comparable. Uno detecta quién decidió un encuentro; el otro detecta quién es consistente.</p>
 
 </div>
 

@@ -13,6 +13,19 @@ let matchExplorerSort = { key: "match_impact", direction: "desc" };
 
 let activeViewName = "home";
 
+// Campeones cuya contribución principal (curación, utilidad, escudos)
+// no es observable directamente. Se muestran al final de su equipo en Match
+// Explorer con un indicador especial.
+const UTILITY_SUPPORT_CHAMPIONS = [
+    "Yuumi", "Sona", "Lulu", "Renata Glasc", "Milio", "Janna",
+    "Ivern", "Soraka", "Nami", "Taric",
+    "Seraphine", "Lux", "Braum"
+];
+
+function isUtilitySupport(championName){
+    return UTILITY_SUPPORT_CHAMPIONS.includes(championName);
+}
+
 // P95R (Meta Ratio normalizado): MR = score / META(p50), escalado por el máximo
 // estadístico del campeón (p95 / p50). Debe reflejar el mismo cálculo del motor.
 function getChampionMetaP95(championName){
@@ -2364,6 +2377,12 @@ function sortMatchPlayers(players){
     const multiplier = direction === "asc" ? 1 : -1;
 
     return [...players].sort((a, b) => {
+        const aUtility = isUtilitySupport(a.champion) ? 1 : 0;
+        const bUtility = isUtilitySupport(b.champion) ? 1 : 0;
+        if(aUtility !== bUtility){
+            return aUtility - bUtility;
+        }
+
         const left = getMatchSortValue(a, key);
         const right = getMatchSortValue(b, key);
         if(typeof left === "string"){
@@ -2514,7 +2533,7 @@ function renderMatchExplorer(matchId){
                 onkeydown="if(event.key === 'Enter' || event.key === ' '){event.preventDefault();toggleMatchContext('${rowId}');}">
             <td><span class="match-team-badge ${team.className}" title="${escapeHtml(team.title)}" aria-label="${escapeHtml(team.title)}"></span></td>
             <td title="${escapeHtml(formatPlayerName(player.name))}">${escapeHtml(formatPlayerName(player.name))}</td>
-            <td><span class="match-champion-cell"><span>${formatChampionName(player)}</span></span></td>
+            <td><span class="match-champion-cell"><span>${formatChampionName(player)}${isUtilitySupport(player.champion) ? ' <span class="utility-support-asterisk" title="Campeón con influencia principal no detectable por el sistema">*</span>' : ''}</span></span></td>
             <td class="impact-stat">${formatMatchScore(player.match_impact)}</td>
             <td>${formatMatchScore(getScoreMetric(player, "kpm"))}</td>
             <td>${formatMatchScore(getScoreMetric(player, "dpm"))}</td>
