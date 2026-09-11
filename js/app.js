@@ -1445,6 +1445,26 @@ function renderPlayerProfile(playerName){
                     </div>
                 </div>
 
+                ${(officialRankingRow?.resolved || 0) >= 50 ? `
+                <div class="summary-card">
+                    <div class="summary-label">
+                        Win Rate
+                    </div>
+                    <div class="summary-value">
+                        ${formatHomeMetric((officialRankingRow?.win_rate || 0) * 100, 1)}%
+                    </div>
+                </div>
+                ` : `
+                <div class="summary-card no-wr" title="Menos de 50 partidas con ganador asignado y al menos un amigo más. Actual: ${officialRankingRow?.wins || 0}/${officialRankingRow?.resolved || 0} - ${formatHomeMetric((officialRankingRow?.win_rate || 0) * 100, 1)}%">
+                    <div class="summary-label">
+                        Win Rate
+                    </div>
+                    <div class="summary-value">
+                        *
+                    </div>
+                </div>
+                `}
+
                 <div class="summary-card">
                     <div class="summary-label">
                         Avg Score
@@ -1822,6 +1842,9 @@ function renderPlayerChampionHighlights(elementId, highlights){
                     <div>
                         <div class="home-player-name">
                             ${escapeHtml(formatPlayerName(player.player || "-"))}
+                            ${(player.resolved || 0) >= 50
+                                ? `<span class="home-player-win-rate">${formatHomeMetric((player.win_rate || 0) * 100, 1)}% WR</span>`
+                                : `<span class="home-player-win-rate no-wr" title="Menos de 50 partidas con ganador asignado y al menos un amigo más. Actual: ${player.wins || 0}/${player.resolved || 0} - ${formatHomeMetric((player.win_rate || 0) * 100, 1)}%">*</span>`}
                         </div>
                         <div class="home-player-card-label">
                             Best observed champion results
@@ -1869,6 +1892,7 @@ function getSplitSortValue(row, key){
     if(key === "p95r"){ return Number(row.avg_meta_ratio) || 0; }
     if(key === "mi"){ return Number(row.global_avg_match_impact) || 0; }
     if(key === "games"){ return Number(row.games) || 0; }
+    if(key === "win_rate"){ return Number(row.win_rate) || 0; }
     return Number(row[key]) || 0;
 }
 
@@ -1927,6 +1951,7 @@ function renderGlobalRanking(elementId, ranking){
           <th>#</th>
           <th>Jugador</th>
           ${splitRankHeader("Games", "games")}
+          ${splitRankHeader("WR", "win_rate")}
           ${splitRankHeader("P95R", "p95r", "ratio-stat")}
           ${splitRankHeader("MI", "mi", "impact-stat")}
           <th>KPM</th>
@@ -1949,6 +1974,7 @@ function renderGlobalRanking(elementId, ranking){
           ${escapeHtml(formatPlayerName(r.name))}
         </td>
         <td>${r.games}</td>
+        <td>${(r.resolved || 0) >= 50 ? formatHomeMetric((r.win_rate || 0) * 100, 1) + "%" : `<span title="Menos de 50 partidas con ganador asignado y al menos un amigo más. Actual: ${r.wins || 0}/${r.resolved || 0} - ${formatHomeMetric((r.win_rate || 0) * 100, 1)}%">*</span>`}</td>
         <td class="ratio-stat">${formatHomeMetric(r.avg_meta_ratio, 3)}</td>
         <td class="impact-stat">${formatHomeMetric(r.global_avg_match_impact || 0, 2)}</td>
         <td>${formatHomeMetric(getScoreMetric(r, "kpm"))}</td>
