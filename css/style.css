@@ -350,6 +350,11 @@ table td {
 .impact-stat{color:#fbbf24;font-weight:700;text-align:center;}
 .utility-support-asterisk{color:#9ca3af;font-weight:700;cursor:help;}
 .match-champion-cell .utility-support-asterisk{margin-left:3px;}
+.split-sort-header{cursor:pointer;}
+.split-sort-header:hover{background:rgba(148,163,184,.12);}
+.split-sort-header.active-sort{color:#93c5fd;}
+.match-win-badge{margin-left:6px;padding:1px 6px;border-radius:4px;background:#22c55e;color:#064e3b;font-size:11px;font-weight:700;text-transform:uppercase;}
+.match-win-heading{margin-left:10px;padding:2px 8px;border-radius:4px;background:#22c55e;color:#064e3b;font-size:12px;font-weight:700;text-transform:uppercase;}
 /* Cinco columnas fijas: las métricas RAW entran siempre en una sola línea. */
 .match-context-stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:0;}
 .score-metrics-grid{grid-template-columns:repeat(5,minmax(0,1fr));}

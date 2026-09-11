@@ -10,6 +10,9 @@ const views = {
 
 let dashboardData = null;
 let matchExplorerSort = { key: "match_impact", direction: "desc" };
+let splitRankingSort = { key: "p95r", direction: "desc" };
+let currentSplitRanking = null;
+let currentSplitRankingId = null;
 
 let activeViewName = "home";
 
@@ -19,7 +22,7 @@ let activeViewName = "home";
 const UTILITY_SUPPORT_CHAMPIONS = [
     "Yuumi", "Sona", "Lulu", "Renata Glasc", "Milio", "Janna",
     "Ivern", "Soraka", "Nami", "Taric",
-    "Seraphine", "Lux", "Braum"
+    "Seraphine", "Braum"
 ];
 
 function isUtilitySupport(championName){
@@ -390,31 +393,22 @@ function calculateSynergy(){
     const playerStats = {};
     selectedPlayers.forEach(playerName => {
         try {
-            // Apply bottom 15% trim like the backend does
             const playerScores = sharedMatches.map(m => m[playerName].score);
-            playerScores.sort((a, b) => b - a); // Sort descending
-            const trimCount = Math.floor(playerScores.length * 0.15);
-            const trimmedScores = playerScores.slice(0, -trimCount || playerScores.length);
-            
-            const avgScore = trimmedScores.reduce((sum, score) => sum + score, 0) / trimmedScores.length;
-            
-            // For meta ratio normalized, we need to calculate it the same way
+            const avgScore = playerScores.reduce((sum, score) => sum + score, 0) / playerScores.length;
+
             const playerMetaRatios = sharedMatches.map(m => normalizeMetaRatio(
                 m[playerName].score,
                 m[playerName].champion_meta,
                 m[playerName].champion_meta_p95 || getChampionMetaP95(m[playerName].champion)
             ));
-            playerMetaRatios.sort((a, b) => b - a); // Sort descending
-            const trimCountMeta = Math.floor(playerMetaRatios.length * 0.15);
-            const trimmedMetaRatios = playerMetaRatios.slice(0, -trimCountMeta || playerMetaRatios.length);
-            const avgMetaRatio = trimmedMetaRatios.reduce((sum, ratio) => sum + ratio, 0) / trimmedMetaRatios.length;
-            
+            const avgMetaRatio = playerMetaRatios.reduce((sum, ratio) => sum + ratio, 0) / playerMetaRatios.length;
+
             playerStats[playerName] = { avgScore, avgMetaRatio };
 
             // Debug logs
             const ranking = dashboardData?.current_split?.global_ranking || [];
             const playerData = ranking.find(r => r.name === playerName);
-            console.log(`${playerName}: Avg with team (trimmed)=${avgScore.toFixed(2)}, Global avg=${playerData?.global_avg?.toFixed(2)}, Diff=${(avgScore - playerData?.global_avg).toFixed(2)}`);
+            console.log(`${playerName}: Avg with team=${avgScore.toFixed(2)}, Global avg=${playerData?.global_avg?.toFixed(2)}, Diff=${(avgScore - playerData?.global_avg).toFixed(2)}`);
         } catch (error) {
             console.error(`Error calculating stats for ${playerName}:`, error);
         }
@@ -1390,34 +1384,22 @@ function renderPlayerProfile(playerName){
             }
         );
 
-    // Calcular Avg Score: ordenar por score → eliminar 30% → promedio simple
-    const sortedByScore = [...champions].sort((a, b) => b.global_avg - a.global_avg);
-    const trimCountScore = Math.floor(sortedByScore.length * 0.3);
-    const scoredChampions = sortedByScore.slice(trimCountScore);
-    
-    const avgScore = scoredChampions.length > 0
-        ? scoredChampions.reduce((sum, c) => sum + c.global_avg, 0) / scoredChampions.length
+    // Calcular Avg Score y Avg P95R con promedio simple de todos los campeones.
+    const avgScore = champions.length > 0
+        ? champions.reduce((sum, c) => sum + c.global_avg, 0) / champions.length
         : 0;
 
-    // Calcular Avg Meta Ratio: ordenar por meta_ratio → eliminar 30% → promedio simple
     const metaRatiosWithChampions = champions.map(champion => {
-        const meta = dashboardData?.champion_engine?.champion_meta?.[champion.champion]?.score?.p50 || 0;
         const ratio = normalizeMetaRatio(
             champion.global_avg,
-            meta,
-            getChampionMetaP95(champion.champion)
+            champion.champion_meta,
+            champion.champion_meta_p95 || getChampionMetaP95(champion.champion)
         );
         return { ratio, champion };
     });
-    
-    const sortedByMetaRatio = [...metaRatiosWithChampions].sort((a, b) => b.ratio - a.ratio);
-    const trimCountMeta = Math.floor(sortedByMetaRatio.length * 0.3);
-    const scoredMetaRatios = trimCountMeta > 0
-        ? sortedByMetaRatio.slice(0, -trimCountMeta)
-        : sortedByMetaRatio;
-    
-    const avgMetaRatio = scoredMetaRatios.length > 0
-        ? scoredMetaRatios.reduce((sum, x) => sum + x.ratio, 0) / scoredMetaRatios.length
+
+    const avgMetaRatio = metaRatiosWithChampions.length > 0
+        ? metaRatiosWithChampions.reduce((sum, x) => sum + x.ratio, 0) / metaRatiosWithChampions.length
         : 0;
 
     const officialRankingRow = isChampionReference
@@ -1426,11 +1408,15 @@ function renderPlayerProfile(playerName){
             row => row.name === playerName
         );
 
-    // The player summary must use the same official score shown on Home and
-    // in the split ranking. Champion History remains a per-champion view.
+    // The player summary uses the official split values when available,
+    // falling back to the per-champion simple mean for Champion Reference.
     const allMatchAvg = isChampionReference
         ? formatHomeMetric(avgScore)
         : formatHomeMetric(officialRankingRow?.global_avg ?? avgScore);
+
+    const avgP95R = isChampionReference
+        ? avgMetaRatio
+        : (officialRankingRow?.avg_meta_ratio ?? avgMetaRatio);
 
     document.getElementById(
         "players-player-results"
@@ -1473,7 +1459,7 @@ function renderPlayerProfile(playerName){
                         Avg P95R
                     </div>
                     <div class="summary-value">
-                        ${formatHomeMetric(avgMetaRatio, 3)}
+                        ${formatHomeMetric(avgP95R, 3)}
                     </div>
                 </div>
             </div>
@@ -1526,8 +1512,8 @@ function renderPlayerChampionTable(
             }
 
             if(activeSortKey === "games"){
-                const gamesA = Number(a.global_games) || 0;
-                const gamesB = Number(b.global_games) || 0;
+                const gamesA = Number(a.global_games ?? a.games ?? 0);
+                const gamesB = Number(b.global_games ?? b.games ?? 0);
 
                 return activeSortDirection === "asc"
                     ? gamesA - gamesB
@@ -1879,7 +1865,49 @@ function renderPlayerChampionHighlights(elementId, highlights){
     }).join("");
 }
 
+function getSplitSortValue(row, key){
+    if(key === "p95r"){ return Number(row.avg_meta_ratio) || 0; }
+    if(key === "mi"){ return Number(row.global_avg_match_impact) || 0; }
+    if(key === "games"){ return Number(row.games) || 0; }
+    return Number(row[key]) || 0;
+}
+
+function sortSplitRanking(key){
+    if(splitRankingSort.key === key){
+        splitRankingSort.direction = splitRankingSort.direction === "desc" ? "asc" : "desc";
+    } else {
+        splitRankingSort.key = key;
+        splitRankingSort.direction = "desc";
+    }
+    if(currentSplitRanking && currentSplitRankingId){
+        renderGlobalRanking(currentSplitRankingId, currentSplitRanking);
+    }
+}
+
+function splitRankHeader(label, key, extraClass=""){
+    const active = splitRankingSort.key === key;
+    const arrow = active
+        ? (splitRankingSort.direction === "desc" ? " ▼" : " ▲")
+        : " ↕";
+    const cls = [
+        "split-sort-header",
+        active ? "active-sort" : "",
+        extraClass
+    ].filter(Boolean).join(" ");
+    return `<th class="${cls}" data-split-sort="${key}">${label}${arrow}</th>`;
+}
+
+function attachSplitRankingSorting(){
+    document.querySelectorAll("[data-split-sort]").forEach(th => {
+        th.addEventListener("click", () => {
+            sortSplitRanking(th.dataset.splitSort);
+        });
+    });
+}
+
 function renderGlobalRanking(elementId, ranking){
+  currentSplitRanking = ranking;
+  currentSplitRankingId = elementId;
   const el = document.getElementById(elementId);
 
   if(!ranking || ranking.length === 0){
@@ -1887,7 +1915,10 @@ function renderGlobalRanking(elementId, ranking){
     return;
   }
 
-  ranking = ranking.slice().sort((a, b) => Number(b.avg_meta_ratio || 0) - Number(a.avg_meta_ratio || 0));
+  const multiplier = splitRankingSort.direction === "asc" ? 1 : -1;
+  ranking = ranking.slice().sort((a, b) => (
+      getSplitSortValue(a, splitRankingSort.key) - getSplitSortValue(b, splitRankingSort.key)
+  ) * multiplier);
 
   let html = `
     <table>
@@ -1895,8 +1926,9 @@ function renderGlobalRanking(elementId, ranking){
         <tr>
           <th>#</th>
           <th>Jugador</th>
-          <th>Games</th>
-          <th class="ratio-stat">P95R</th>
+          ${splitRankHeader("Games", "games")}
+          ${splitRankHeader("P95R", "p95r", "ratio-stat")}
+          ${splitRankHeader("MI", "mi", "impact-stat")}
           <th>KPM</th>
           <th>DPM</th>
           <th>KDA</th>
@@ -1918,6 +1950,7 @@ function renderGlobalRanking(elementId, ranking){
         </td>
         <td>${r.games}</td>
         <td class="ratio-stat">${formatHomeMetric(r.avg_meta_ratio, 3)}</td>
+        <td class="impact-stat">${formatHomeMetric(r.global_avg_match_impact || 0, 2)}</td>
         <td>${formatHomeMetric(getScoreMetric(r, "kpm"))}</td>
         <td>${formatHomeMetric(getScoreMetric(r, "dpm"))}</td>
         <td>${formatHomeMetric(getScoreMetric(r, "kda"))}</td>
@@ -1933,6 +1966,7 @@ function renderGlobalRanking(elementId, ranking){
   `;
 
   el.innerHTML = html;
+  attachSplitRankingSorting();
 }
 
 function formatSplitDate(dateValue){
@@ -2475,11 +2509,13 @@ function renderMatchExplorer(matchId){
     const durationHeader = duration
         ? `<span class="match-duration" title="Duración de la partida">${duration}</span>`
         : "";
+    const winningTeam = match.winning_team ?? null;
 
     let html = `
     <div class="match-heading ${match.is_remake ? "match-heading-remake" : ""}">
         <h3>${escapeHtml(match.match_id)}</h3>
         ${remakeHeader}
+        ${winningTeam ? `<span class="match-win-heading" title="Ganador: ${getTeamLabel(winningTeam).title}">WIN ${getTeamLabel(winningTeam).title}</span>` : ""}
         ${durationHeader}
     </div>
     ${remakeNotice}
@@ -2521,7 +2557,9 @@ function renderMatchExplorer(matchId){
 
     orderedTeams.forEach(([teamId, players]) => {
         const team = getTeamLabel(teamId);
-        html += `<tr class="match-team-divider ${team.className}"><td colspan="9"><span class="match-team-badge ${team.className}" title="${escapeHtml(team.title)}"></span></td></tr>`;
+        const isWinningTeam = teamId === winningTeam;
+        const winLabel = isWinningTeam ? `<span class="match-win-badge">WIN</span>` : "";
+        html += `<tr class="match-team-divider ${team.className}"><td colspan="9"><span class="match-team-badge ${team.className}" title="${escapeHtml(team.title)}"></span>${winLabel}</td></tr>`;
 
         // IMPORTANT: sort a copy for this team only. Never sort the full match.
         const sortedTeamPlayers = sortMatchPlayers(players);
