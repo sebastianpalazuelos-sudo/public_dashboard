@@ -1652,6 +1652,76 @@ table td {
     font-size:10px;
 }
 
+.players-section-title{
+    margin:18px 0 10px;
+    font-size:16px;
+    font-weight:700;
+    color:#e5e7eb;
+    border-left:4px solid #3b82f6;
+    padding-left:10px;
+}
+#players-profile-view.hidden{
+    display:none;
+}
+#players-profile-view{
+    animation: profileFadeIn 0.25s ease-out;
+}
+@keyframes profileFadeIn{
+    from{ opacity:0; transform: translateY(12px); }
+    to{ opacity:1; transform: translateY(0); }
+}
+.players-profile-header{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    margin-bottom:22px;
+    padding:14px 16px;
+    background: rgba(17,24,39,.92);
+    border:1px solid rgba(75,85,99,.85);
+    border-radius:12px;
+}
+.players-back-button{
+    padding:10px 18px;
+    border:1px solid #4b5563;
+    border-radius:10px;
+    background:#1f2937;
+    color:#f9fafb;
+    font-size:14px;
+    font-weight:700;
+    cursor:pointer;
+    transition: background .15s;
+}
+.players-back-button:hover{
+    background:#374151;
+}
+#players-profile-title{
+    margin:0;
+    font-size:20px;
+    font-weight:700;
+    color:#e5e7eb;
+}
+.players-ranking-row{
+    cursor:pointer;
+}
+.players-ranking-row:hover{
+    background:rgba(59,130,246,.12);
+}
+.match-back-button{
+    margin-bottom:12px;
+    padding:10px 18px;
+    border:1px solid #4b5563;
+    border-radius:10px;
+    background:#1f2937;
+    color:#f9fafb;
+    font-size:14px;
+    font-weight:700;
+    cursor:pointer;
+    transition: background .15s;
+}
+.match-back-button:hover{
+    background:#374151;
+}
+
 /* =========================================
    METHODOLOGY
    ========================================= */
