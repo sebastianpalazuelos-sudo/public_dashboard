@@ -1845,9 +1845,12 @@ function renderPlayerChampionHighlights(elementId, highlights){
                     <div>
                         <div class="home-player-name">
                             ${escapeHtml(formatPlayerName(player.player || "-"))}
-                            ${(player.resolved || 0) >= 50
-                                ? `<span class="home-player-win-rate">${formatHomeMetric((player.win_rate || 0) * 100, 1)}% WR</span>`
-                                : `<span class="home-player-win-rate no-wr" title="Menos de 50 partidas con ganador asignado y al menos un amigo más. Actual: ${player.wins || 0}/${player.resolved || 0} - ${formatHomeMetric((player.win_rate || 0) * 100, 1)}%">*</span>`}
+                            ${(() => {
+                                const s = getPlayerWinRateStats(player.player);
+                                return (s.resolved || 0) >= 50
+                                    ? `<span class="home-player-win-rate">${formatHomeMetric(s.ewr, 1)}% EWR</span>`
+                                    : `<span class="home-player-win-rate no-wr" title="Menos de 50 partidas con ganador asignado y al menos un amigo más. Actual: ${(s.NW || 0) + (s.SurrW || 0)}/${s.resolved || 0} - ${formatHomeMetric(s.ewr, 1)}%">*</span>`;
+                            })()}
                         </div>
                         <div class="home-player-card-label">
                             Best observed champion results
@@ -1895,7 +1898,7 @@ function getSplitSortValue(row, key){
     if(key === "p95r"){ return Number(row.avg_meta_ratio) || 0; }
     if(key === "mi"){ return Number(row.global_avg_match_impact) || 0; }
     if(key === "games"){ return Number(row.games) || 0; }
-    if(key === "win_rate"){ return Number(row.win_rate) || 0; }
+    if(key === "ewr"){ return Number(getPlayerWinRateStats(row.name).ewr) || 0; }
     return Number(row[key]) || 0;
 }
 
@@ -1954,7 +1957,7 @@ function renderGlobalRanking(elementId, ranking){
           <th>#</th>
           <th>Jugador</th>
           ${splitRankHeader("Games", "games")}
-          ${splitRankHeader("WR", "win_rate")}
+          ${splitRankHeader("EWR", "ewr")}
           ${splitRankHeader("P95R", "p95r", "ratio-stat")}
           ${splitRankHeader("MI", "mi", "impact-stat")}
           <th>KPM</th>
@@ -1974,10 +1977,13 @@ function renderGlobalRanking(elementId, ranking){
       <tr class="${rankClass}">
         <td>${i + 1}</td>
         <td>
-          ${escapeHtml(formatPlayerName(r.name))}
+          ${escapeHtml(formatPlayerName(r.name))}${renderPentaBadge(r.total_pentakills)}
         </td>
         <td>${r.games}</td>
-        <td>${(r.resolved || 0) >= 50 ? formatHomeMetric((r.win_rate || 0) * 100, 1) + "%" : `<span title="Menos de 50 partidas con ganador asignado y al menos un amigo más. Actual: ${r.wins || 0}/${r.resolved || 0} - ${formatHomeMetric((r.win_rate || 0) * 100, 1)}%">*</span>`}</td>
+        <td>${(() => {
+            const s = getPlayerWinRateStats(r.name);
+            return (s.resolved || 0) >= 50 ? formatHomeMetric(s.ewr, 1) + "%" : `<span title="Menos de 50 partidas con ganador asignado y al menos un amigo más. Actual: ${(s.NW || 0) + (s.SurrW || 0)}/${s.resolved || 0} - ${formatHomeMetric(s.ewr, 1)}%">*</span>`;
+        })()}</td>
         <td class="ratio-stat">${formatHomeMetric(r.avg_meta_ratio, 3)}</td>
         <td class="impact-stat">${formatHomeMetric(r.global_avg_match_impact || 0, 2)}</td>
         <td>${formatHomeMetric(getScoreMetric(r, "kpm"))}</td>
@@ -2404,6 +2410,14 @@ function formatMatchPlayerName(playerName){
     return formatPlayerName(playerName);
 }
 
+function renderPentaBadge(count, inline=false){
+    const n = Number(count) || 0;
+    if(n <= 0) return "";
+    const cls = inline ? "penta-badge penta-badge-inline" : "penta-badge";
+    const countHtml = n > 1 ? `<span class="penta-count">${n}</span>` : "";
+    return `<span class="${cls}" title="Pentakill${n > 1 ? 's' : ''}"><span class="penta-star">★</span>${countHtml}</span>`;
+}
+
 function getMatchSortValue(player, key){
     if(key === "teamId"){ return Number(player.teamId) || 999; }
     if(key === "name" || key === "champion"){
@@ -2599,7 +2613,7 @@ function renderMatchExplorer(matchId){
                 onclick="toggleMatchContext('${rowId}')"
                 onkeydown="if(event.key === 'Enter' || event.key === ' '){event.preventDefault();toggleMatchContext('${rowId}');}">
             <td><span class="match-team-badge ${team.className}" title="${escapeHtml(team.title)}" aria-label="${escapeHtml(team.title)}"></span></td>
-            <td title="${escapeHtml(formatPlayerName(player.name))}">${escapeHtml(formatPlayerName(player.name))}</td>
+            <td title="${escapeHtml(formatPlayerName(player.name))}">${escapeHtml(formatPlayerName(player.name))}${renderPentaBadge(player.penta_kills, true)}</td>
             <td><span class="match-champion-cell"><span>${formatChampionName(player)}${isUtilitySupport(player.champion) ? ' <span class="utility-support-asterisk" title="Campeón con influencia principal no detectable por el sistema">*</span>' : ''}</span></span></td>
             <td class="impact-stat">${formatMatchScore(player.match_impact)}</td>
             <td>${formatMatchScore(getScoreMetric(player, "kpm"))}</td>
@@ -2657,8 +2671,22 @@ function computeWinRateStats(){
         let category;
         if(!match.ended_in_surrender){
             category = match.winning_team === friendTeam ? "NW" : "NL";
+        } else if(match.winning_team === friendTeam){
+            // Si ganaron pero el LCU dice que perdimos, es Surrender Win por MI/estructuras.
+            // Si el LCU tambien dice que ganamos, se rindio el enemigo: Natural Win.
+            if(match.actual_winning_team != null && match.actual_winning_team !== friendTeam){
+                category = "SurrW";
+            } else {
+                category = "NW";
+            }
         } else {
-            category = match.winning_team === friendTeam ? "SurrW" : "SurrL";
+            // Si perdimos y el LCU tambien dice que perdimos, es Surrender Lose.
+            // Si el LCU dice que ganamos, es NL (error o caso raro).
+            if(match.actual_winning_team != null && match.actual_winning_team !== friendTeam){
+                category = "SurrL";
+            } else {
+                category = "NL";
+            }
         }
         for(const p of friendPlayers){
             const name = canonicalPlayerName(p.identity || p.name);
@@ -2722,8 +2750,8 @@ function renderPlayersRanking(){
                     ${header("NW", "NW", "Victoria natural, destruimos el nexo contrario o el equipo oponente se rindió", "winrate-win")}
                     ${header("NL", "NL", "Derrota natural, el equipo contrario destruyó nuestro nexo", "winrate-loss")}
                     ${header("nwr", "NWR", "Natural Win Rate = NW / (NW + NL)", "ratio-stat")}
-                    ${header("SurrW", "SurrW", "Surrender Win, nos rendimos ganando (Calculado por impacto con 22% margen de error)", "winrate-win")}
-                    ${header("SurrL", "SurrL", "Surrender Lose, nos rendimos perdiendo (Calculado por impacto con 22% margen de error)", "winrate-loss")}
+                    ${header("SurrW", "SurrW", "Surrender Win, nos rendimos ganando (Calculado por impacto y daño a objetivos)", "winrate-win")}
+                    ${header("SurrL", "SurrL", "Surrender Lose, nos rendimos perdiendo (Calculado por impacto y daño a objetivos)", "winrate-loss")}
                     ${header("total", "Total", "Partidas resueltas con al menos un amigo más")}
                     ${header("ewr", "EWR", "Estimated Win Rate, porcentaje ajustado contemplando margen de error", "impact-stat")}
                     ${header("p95r", "P95R", "Meta Ratio normalizado respecto al percentil 95 del campeón", "impact-stat")}
@@ -2739,7 +2767,7 @@ function renderPlayersRanking(){
         const title = qualified ? "" : `title="Mínimo 50 partidas con al menos un amigo más. Actual: ${r.resolved}"`;
         html += `
             <tr class="players-ranking-row${qualified ? "" : " no-wr"}" data-player="${escapeHtml(r.name)}" ${title}>
-                <td>${escapeHtml(formatPlayerName(r.name))}</td>
+                <td>${escapeHtml(formatPlayerName(r.name))}${renderPentaBadge(r.total_pentakills)}</td>
                 <td class="winrate-win">${r.NW}</td>
                 <td class="winrate-loss">${r.NL}</td>
                 <td class="ratio-stat">${nwrText}</td>

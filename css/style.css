@@ -1619,6 +1619,39 @@ table td {
     color:#06b6d4;
 }
 
+.penta-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:2px;
+    margin-left:6px;
+    padding:1px 5px;
+    background:linear-gradient(135deg,#7f1d1d,#991b1b);
+    border:1px solid #fbbf24;
+    border-radius:10px;
+    color:#fbbf24;
+    font-size:11px;
+    font-weight:700;
+    line-height:1;
+    vertical-align:middle;
+    box-shadow:0 0 6px rgba(251,191,36,0.35);
+}
+.penta-badge .penta-star{
+    color:#fbbf24;
+    font-size:12px;
+}
+.penta-badge .penta-count{
+    color:#fff;
+    font-size:10px;
+    min-width:10px;
+    text-align:center;
+}
+.penta-badge-inline{
+    padding:0 4px;
+    border-radius:8px;
+    margin-left:4px;
+    font-size:10px;
+}
+
 /* =========================================
    METHODOLOGY
    ========================================= */
