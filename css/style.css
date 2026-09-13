@@ -71,6 +71,18 @@ header p{
     gap:16px;
 }
 
+.player-profile-card .summary-cards{
+    display:flex;
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    gap:12px;
+}
+
+.player-profile-card .summary-card{
+    flex:1 0 130px;
+    min-width:130px;
+}
+
 .summary-card{
     background:rgba(17,24,39,0.92);
     border:1px solid rgba(75,85,99,0.85);
@@ -1723,3 +1735,24 @@ table td {
 #selected-split-ranking table{table-layout:auto;}
 #selected-split-ranking th,
 #selected-split-ranking td{padding-left:12px;padding-right:12px;}
+
+
+/* WIN RATE TAB */
+.winrate-table{width:100%;min-width:700px;border-collapse:collapse;margin-top:16px;table-layout:auto;}
+.winrate-table th,.winrate-table td{padding:10px 12px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.08);}
+.winrate-table th{background:rgba(255,255,255,0.06);font-weight:700;color:#93c5fd;}
+.winrate-table td:first-child,.winrate-table th:first-child{text-align:left;}
+.winrate-table td:first-child{color:#f9fafb;}
+.winrate-table tbody tr:hover{background:rgba(255,255,255,0.04);}
+.winrate-table th.sortable{cursor:pointer;}
+.winrate-table th.sortable:hover{background:rgba(255,255,255,0.1);}
+.winrate-table th.sort-asc::after{content:" ▲";}
+.winrate-table th.sort-desc::after{content:" ▼";}
+.players-ranking-row{cursor:pointer;}
+#players-player-select{margin-top:24px;}
+.winrate-table th.winrate-win{color:#22c55e;}
+.winrate-table th.winrate-loss{color:#ef4444;}
+.winrate-table tr.unqualified td{color:#9ca3af;}
+.winrate-table .unqualified-asterisk{color:#fbbf24;font-weight:700;margin-left:4px;}
+.winrate-table th.ratio-stat,.winrate-table td.ratio-stat{color:#34d399;}
+.winrate-table th.impact-stat,.winrate-table td.impact-stat{color:#fbbf24;}

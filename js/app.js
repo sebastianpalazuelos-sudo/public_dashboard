@@ -11,6 +11,7 @@ const views = {
 let dashboardData = null;
 let matchExplorerSort = { key: "match_impact", direction: "desc" };
 let splitRankingSort = { key: "p95r", direction: "desc" };
+let winRateSort = { key: "ewr", direction: "desc" };
 let currentSplitRanking = null;
 let currentSplitRankingId = null;
 
@@ -163,6 +164,10 @@ function showView(viewName){
     document
         .querySelector(`.tab-button[data-view="${viewName}"]`)
         .classList.add("active");
+
+    if(viewName === "players"){
+        renderPlayersRanking();
+    }
 
     activeViewName = viewName;
 }
@@ -1445,41 +1450,39 @@ function renderPlayerProfile(playerName){
                     </div>
                 </div>
 
-                ${(officialRankingRow?.resolved || 0) >= 50 ? `
                 <div class="summary-card">
                     <div class="summary-label">
-                        Win Rate
+                        NWR
                     </div>
                     <div class="summary-value">
-                        ${formatHomeMetric((officialRankingRow?.win_rate || 0) * 100, 1)}%
-                    </div>
-                </div>
-                ` : `
-                <div class="summary-card no-wr" title="Menos de 50 partidas con ganador asignado y al menos un amigo más. Actual: ${officialRankingRow?.wins || 0}/${officialRankingRow?.resolved || 0} - ${formatHomeMetric((officialRankingRow?.win_rate || 0) * 100, 1)}%">
-                    <div class="summary-label">
-                        Win Rate
-                    </div>
-                    <div class="summary-value">
-                        *
-                    </div>
-                </div>
-                `}
-
-                <div class="summary-card">
-                    <div class="summary-label">
-                        Avg Score
-                    </div>
-                    <div class="summary-value">
-                        ${allMatchAvg}
+                        ${formatHomeMetric(getPlayerWinRateStats(playerName).nwr, 1)}%
                     </div>
                 </div>
 
                 <div class="summary-card">
                     <div class="summary-label">
-                        Avg P95R
+                        EWR
                     </div>
                     <div class="summary-value">
-                        ${formatHomeMetric(avgP95R, 3)}
+                        ${formatHomeMetric(getPlayerWinRateStats(playerName).ewr, 1)}%
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="summary-label">
+                        P95R
+                    </div>
+                    <div class="summary-value">
+                        ${formatHomeMetric(getPlayerWinRateStats(playerName).p95r, 3)}
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="summary-label">
+                        Avg MI
+                    </div>
+                    <div class="summary-value">
+                        ${formatHomeMetric(getPlayerWinRateStats(playerName).mi, 2)}
                     </div>
                 </div>
             </div>
@@ -1856,8 +1859,8 @@ function renderPlayerChampionHighlights(elementId, highlights){
                         <strong>${formatHomeMetric(player.avg_meta_ratio || 0, 3)}</strong>
                     </div>
                     <div class="home-player-global-avg home-score-avg">
-                        <span>AVG SCORE</span>
-                        <strong>${formatHomeMetric(player.global_avg)}</strong>
+                        <span>AVG MI</span>
+                        <strong>${formatHomeMetric(getCurrentSplitRanking(player.player).global_avg_match_impact || 0, 2)}</strong>
                     </div>
                 </div>
 
@@ -2614,5 +2617,165 @@ function renderMatchExplorer(matchId){
     attachMatchExplorerSorting(match.match_id);
 }
 
+
+function getPlayerIdentityMap(){
+    const map = {};
+    if(!dashboardData?.player_identities) return map;
+    for(const [canonical, aliases] of Object.entries(dashboardData.player_identities)){
+        map[canonical] = canonical;
+        for(const alias of aliases){
+            map[alias] = canonical;
+        }
+    }
+    return map;
+}
+
+function canonicalPlayerName(name){
+    return getPlayerIdentityMap()[name] || name;
+}
+
+function getCurrentSplitRanking(name){
+    return (dashboardData?.current_split?.global_ranking || []).find(r => r.name === name) || {};
+}
+
+function computeWinRateStats(){
+    const stats = {};
+    const matches = dashboardData?.match_explorer || [];
+    for(const match of matches){
+        if(match.is_remake || match.winning_team == null) continue;
+        const friendPlayers = (match.players || []).filter(p => p.is_friend);
+        if(friendPlayers.length < 2) continue;
+        const friendTeam = friendPlayers[0]?.teamId;
+        const hasFriendPartner = friendPlayers.length >= 2;
+        for(const p of friendPlayers){
+            const name = canonicalPlayerName(p.identity || p.name);
+            if(!stats[name]){
+                stats[name] = { NW:0, NL:0, SurrW:0, SurrL:0, resolved:0 };
+            }
+            if(hasFriendPartner) stats[name].resolved++;
+        }
+        let category;
+        if(!match.ended_in_surrender){
+            category = match.winning_team === friendTeam ? "NW" : "NL";
+        } else {
+            category = match.winning_team === friendTeam ? "SurrW" : "SurrL";
+        }
+        for(const p of friendPlayers){
+            const name = canonicalPlayerName(p.identity || p.name);
+            stats[name][category]++;
+        }
+    }
+    for(const s of Object.values(stats)){
+        s.total = s.NW + s.NL + s.SurrW + s.SurrL;
+        s.nwr = s.NW + s.NL > 0 ? (s.NW / (s.NW + s.NL)) * 100 : 0;
+        const surrError = 0.22;
+        s.ewr = s.total > 0
+            ? ((s.NW + s.SurrW * (1 - surrError) + s.SurrL * surrError) / s.total) * 100
+            : 0;
+    }
+    return stats;
+}
+
+function getPlayerWinRateStats(playerName){
+    const s = computeWinRateStats()[playerName] || { NW:0, NL:0, SurrW:0, SurrL:0, total:0, resolved:0, nwr:0, ewr:0 };
+    const row = getCurrentSplitRanking(playerName);
+    s.p95r = row.avg_meta_ratio ?? 0;
+    s.mi = row.global_avg_match_impact ?? 0;
+    return s;
+}
+
+function sortWinRateRows(rows){
+    const qualified = rows.filter(r => r.resolved >= 50);
+    const unqualified = rows.filter(r => r.resolved < 50);
+    const dir = winRateSort.direction === "asc" ? 1 : -1;
+    qualified.sort((a, b) => (a[winRateSort.key] - b[winRateSort.key]) * dir);
+    return [...qualified, ...unqualified];
+}
+
+function renderPlayersRanking(){
+    const container = document.getElementById("players-ranking");
+    if(!container || !dashboardData) return;
+    const stats = computeWinRateStats();
+    const ranking = (dashboardData.current_split?.global_ranking || []);
+    let rows = ranking.map(r => {
+        const s = stats[r.name] || { NW:0, NL:0, SurrW:0, SurrL:0, total:0, resolved:0, nwr:0, ewr:0 };
+        return {
+            ...r,
+            ...s,
+            p95r: r.avg_meta_ratio ?? 0,
+            mi: r.global_avg_match_impact ?? 0
+        };
+    });
+    rows = sortWinRateRows(rows);
+
+    const header = (key, label, title, cls = "") => {
+        const isSort = winRateSort.key === key;
+        const arrow = isSort ? (winRateSort.direction === "asc" ? " ▲" : " ▼") : "";
+        return `<th class="sortable ${cls}${isSort ? " sorted" : ""}" data-sort="${key}" title="${title}">${label}${arrow}</th>`;
+    };
+
+    let html = `
+        <table class="winrate-table">
+            <thead>
+                <tr>
+                    <th title="Perfil canónico del jugador">Profile</th>
+                    ${header("NW", "NW", "Victoria natural, destruimos el nexo contrario o el equipo oponente se rindió", "winrate-win")}
+                    ${header("NL", "NL", "Derrota natural, el equipo contrario destruyó nuestro nexo", "winrate-loss")}
+                    ${header("nwr", "NWR", "Natural Win Rate = NW / (NW + NL)", "ratio-stat")}
+                    ${header("SurrW", "SurrW", "Surrender Win, nos rendimos ganando (Calculado por impacto con 22% margen de error)", "winrate-win")}
+                    ${header("SurrL", "SurrL", "Surrender Lose, nos rendimos perdiendo (Calculado por impacto con 22% margen de error)", "winrate-loss")}
+                    ${header("total", "Total", "Partidas resueltas con al menos un amigo más")}
+                    ${header("ewr", "EWR", "Estimated Win Rate, porcentaje ajustado contemplando margen de error", "impact-stat")}
+                    ${header("p95r", "P95R", "Meta Ratio normalizado respecto al percentil 95 del campeón", "impact-stat")}
+                    ${header("mi", "MI", "Match Impact promedio del jugador", "impact-stat")}
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    for(const r of rows){
+        const qualified = r.resolved >= 50;
+        const nwrText = qualified ? ((r.NW + r.NL) > 0 ? formatHomeMetric(r.nwr, 1) + "%" : "0.00%") : "*";
+        const ewrText = qualified ? formatHomeMetric(r.ewr, 1) + "%" : "*";
+        const title = qualified ? "" : `title="Mínimo 50 partidas con al menos un amigo más. Actual: ${r.resolved}"`;
+        html += `
+            <tr class="players-ranking-row${qualified ? "" : " no-wr"}" data-player="${escapeHtml(r.name)}" ${title}>
+                <td>${escapeHtml(formatPlayerName(r.name))}</td>
+                <td class="winrate-win">${r.NW}</td>
+                <td class="winrate-loss">${r.NL}</td>
+                <td class="ratio-stat">${nwrText}</td>
+                <td class="winrate-win">${r.SurrW}</td>
+                <td class="winrate-loss">${r.SurrL}</td>
+                <td>${r.total}</td>
+                <td class="impact-stat">${ewrText}</td>
+                <td class="impact-stat">${formatHomeMetric(r.p95r, 3)}</td>
+                <td class="impact-stat">${formatHomeMetric(r.mi, 2)}</td>
+            </tr>
+        `;
+    }
+    html += `</tbody></table>`;
+    container.innerHTML = html;
+    container.querySelectorAll(".players-ranking-row").forEach(row => {
+        row.addEventListener("click", () => {
+            const select = document.getElementById("players-player-select");
+            if(select){
+                select.value = row.dataset.player;
+                renderPlayerProfile(row.dataset.player);
+            }
+        });
+    });
+    container.querySelectorAll("th.sortable").forEach(th => {
+        th.addEventListener("click", () => {
+            const key = th.dataset.sort;
+            if(!key) return;
+            if(winRateSort.key === key){
+                winRateSort.direction = winRateSort.direction === "asc" ? "desc" : "asc";
+            }else{
+                winRateSort.key = key;
+                winRateSort.direction = "desc";
+            }
+            renderPlayersRanking();
+        });
+    });
+}
 
 loadDashboard();
