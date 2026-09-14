@@ -2783,13 +2783,13 @@ function renderPlayersRanking(){
                         <th title="Perfil canónico del jugador">Profile</th>
                         ${header("NW", "NW", "Victoria natural, destruimos el nexo contrario o el equipo oponente se rindió", "winrate-win")}
                         ${header("NL", "NL", "Derrota natural, el equipo contrario destruyó nuestro nexo", "winrate-loss")}
-                        ${header("nwr", "NWR", "Natural Win Rate = NW / (NW + NL)", "ratio-stat")}
+                        ${header("nwr", "NWR", "Natural Win Rate = NW / (NW + NL)", "nwr-stat")}
                         ${header("SurrW", "SurrW", "Surrender Win, nos rendimos ganando (Calculado por impacto y daño a objetivos)", "winrate-win")}
                         ${header("SurrL", "SurrL", "Surrender Lose, nos rendimos perdiendo (Calculado por impacto y daño a objetivos)", "winrate-loss")}
                         ${header("total", "Total", "Partidas resueltas con al menos un amigo más")}
-                        ${header("ewr", "EWR", "Estimated Win Rate, porcentaje ajustado contemplando margen de error", "impact-stat")}
-                        ${header("p95r", "P95R", "Meta Ratio normalizado respecto al percentil 95 del campeón", "impact-stat")}
-                        ${header("mi", "MI", "Match Impact promedio del jugador", "impact-stat")}
+                        ${header("ewr", "EWR", "Estimated Win Rate, porcentaje ajustado contemplando margen de error", "ewr-stat")}
+                        ${header("p95r", "P95R", "Meta Ratio normalizado respecto al percentil 95 del campeón", "p95r-stat")}
+                        ${header("mi", "MI", "Match Impact promedio del jugador", "mi-stat")}
                     </tr>
                 </thead>
                 <tbody>
@@ -2804,13 +2804,13 @@ function renderPlayersRanking(){
                     <td>${escapeHtml(formatPlayerName(r.name))}${renderPentaBadge(r.total_pentakills)}</td>
                     <td class="winrate-win">${r.NW}</td>
                     <td class="winrate-loss">${r.NL}</td>
-                    <td class="ratio-stat">${nwrText}</td>
+                    <td class="nwr-stat">${nwrText}</td>
                     <td class="winrate-win">${r.SurrW}</td>
                     <td class="winrate-loss">${r.SurrL}</td>
                     <td>${r.total}</td>
-                    <td class="impact-stat">${ewrText}</td>
-                    <td class="impact-stat">${formatHomeMetric(r.p95r, 3)}</td>
-                    <td class="impact-stat">${formatHomeMetric(r.mi, 2)}</td>
+                    <td class="ewr-stat">${ewrText}</td>
+                    <td class="p95r-stat">${formatHomeMetric(r.p95r, 3)}</td>
+                    <td class="mi-stat">${formatHomeMetric(r.mi, 2)}</td>
                 </tr>
             `;
         }

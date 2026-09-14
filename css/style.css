@@ -360,6 +360,10 @@ table td {
 .match-context-component.score-component strong{color:#22c55e;}
 .ratio-stat{color:#34d399;font-weight:700;text-align:center;}
 .impact-stat{color:#fbbf24;font-weight:700;text-align:center;}
+.nwr-stat{color:#6ee7b7;font-weight:700;text-align:center;}
+.ewr-stat{color:#10b981;font-weight:700;text-align:center;}
+.p95r-stat{color:#2563eb;font-weight:700;text-align:center;}
+.mi-stat{color:#fbbf24;font-weight:700;text-align:center;}
 .utility-support-asterisk{color:#9ca3af;font-weight:700;cursor:help;}
 .match-champion-cell .utility-support-asterisk{margin-left:3px;}
 .split-sort-header{cursor:pointer;}
