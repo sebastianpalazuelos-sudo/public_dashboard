@@ -6,6 +6,7 @@ const views = {
     matches: document.getElementById("view-matches"),
     methodology: document.getElementById("view-methodology"),
     splits: document.getElementById("view-splits"),
+    changelog: document.getElementById("view-changelog"),
 };
 
 let dashboardData = null;
@@ -169,7 +170,23 @@ function showView(viewName){
         resetProfileNav();
     }
 
+    if(viewName === "changelog"){
+        loadChangelog();
+    }
+
     activeViewName = viewName;
+}
+
+async function loadChangelog(){
+    const el = document.getElementById("changelog-content");
+    if(!el) return;
+    try{
+        const res = await fetch("CHANGELOG.md");
+        const text = await res.text();
+        el.textContent = text;
+    }catch(e){
+        el.textContent = "No se pudo cargar el changelog.";
+    }
 }
 
 async function loadDashboard(){

@@ -1768,6 +1768,33 @@ table td {
 
 
 /* =========================================
+   CHANGELOG
+   ========================================= */
+#view-changelog section{
+    max-width:1000px;
+    margin:0 auto;
+    padding:24px;
+    background:rgba(17,24,39,.9);
+    border:1px solid rgba(75,85,99,.85);
+    border-radius:12px;
+}
+#view-changelog h2{
+    margin:0 0 16px 0;
+    color:#f8fafc;
+    font-size:22px;
+    font-weight:700;
+}
+.changelog-pre{
+    white-space:pre-wrap;
+    word-wrap:break-word;
+    color:#cbd5e1;
+    line-height:1.7;
+    font-family:Consolas,Monaco,"Courier New",monospace;
+    font-size:14px;
+    margin:0;
+}
+
+/* =========================================
    CHAMPION EXPLORER — G4 SCORE MODEL v2.2
    ========================================= */
 .champion-ranking-table-g4{
