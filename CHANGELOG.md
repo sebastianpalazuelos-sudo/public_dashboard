@@ -101,3 +101,9 @@ Se corrige la selección de métricas:
 - Se agrega la **implicación DPM → KPM**: si el daño por minuto es una métrica activa del campeón, obligatoriamente entra también KPM. Esto impide que un campeón con DPM elevado pero KPM bajo (como Morgana) obtenga un MI inflado. Morgana bajó de MI **9.0** a **7.5**.
 - Gangplank pasa arriba de Ashe en MI porque no se le suma TANK y sus ranks de KPM/DPM son mejores.
 - Se solucionó un bug derivado del ajuste de selección: en la partida **1623995299**, el Ornn de Einherjar había quedado último porque no se le contaban correctamente sus métricas propias. Con el fix, trepó al tercer puesto como correspondía.
+
+### 1623995400 — Determinación del ganador en surrenders
+
+Antes, cuando una partida terminaba en surrender, no siempre quedaba claro cuál equipo había ganado realmente. El EWR aplicaba un descuento empírico superior al 20% sobre `SurrW` y `SurrL` para reflejar esa incertidumbre.
+
+Se agregó el cálculo de **daño a estructuras** (torretas e inhibidores) como tie-breaker: si un equipo se rinde pero su daño a estructuras supera al enemigo por al menos 50%, se le considera ganador. Con esto el resultado corregido es confiable, y `SurrW` / `SurrL` se tratan como victoria y derrota reales. El EWR ya no aplica margen de error.

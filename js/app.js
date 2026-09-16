@@ -2739,9 +2739,8 @@ function computeWinRateStats({fullFriend=false}={}){
     for(const s of Object.values(stats)){
         s.total = s.NW + s.NL + s.SurrW + s.SurrL;
         s.nwr = s.NW + s.NL > 0 ? (s.NW / (s.NW + s.NL)) * 100 : 0;
-        const surrError = 0.22;
         s.ewr = s.total > 0
-            ? ((s.NW + s.SurrW * (1 - surrError) + s.SurrL * surrError) / s.total) * 100
+            ? ((s.NW + s.SurrW) / s.total) * 100
             : 0;
     }
     return stats;
@@ -2802,7 +2801,7 @@ function renderPlayersRanking(){
                         ${header("SurrW", "SurrW", "Surrender Win, nos rendimos ganando (Calculado por impacto y daño a objetivos)", "winrate-win")}
                         ${header("SurrL", "SurrL", "Surrender Lose, nos rendimos perdiendo (Calculado por impacto y daño a objetivos)", "winrate-loss")}
                         ${header("total", "Total", "Partidas resueltas con al menos un amigo más")}
-                        ${header("ewr", "EWR", "Estimated Win Rate, porcentaje ajustado contemplando margen de error", "ewr-stat")}
+                        ${header("ewr", "EWR", "Estimated Win Rate, porcentaje ajustado por daño a estructuras en surrenders", "ewr-stat")}
                         ${header("p95r", "P95R", "Meta Ratio normalizado respecto al percentil 95 del campeón", "p95r-stat")}
                         ${header("mi", "MI", "Match Impact promedio del jugador", "mi-stat")}
                     </tr>
