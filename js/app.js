@@ -2153,11 +2153,8 @@ function renderSelectedSplit(splitId){
                 <span>—</span>
                 ${formatSplitDate(split.end)}
             </div>
-            <div id="selected-split-ranking"></div>
         </article>
     `;
-
-    renderGlobalRanking("selected-split-ranking", split.ranking);
 }
 
 function loadMatchExplorerSelect(){
@@ -2793,6 +2790,7 @@ function renderPlayersRanking(){
 
     const tableHTML = (rows, title, minResolved=50, tableKey="all") => {
         let h = `
+            <div class="ranking-table-block">
             <h3 class="players-section-title">${title}</h3>
             <table class="winrate-table">
                 <thead>
@@ -2831,11 +2829,11 @@ function renderPlayersRanking(){
                 </tr>
             `;
         }
-        h += `</tbody></table>`;
+        h += `</tbody></table></div>`;
         return h;
     };
 
-    container.innerHTML = tableHTML(allRows, "All-Matches Ranking", 50, "all") + tableHTML(fullRows, "Full-Friend Team", 30, "full");
+    container.innerHTML = tableHTML(allRows, "All-Matches Ranking", 50, "all") + tableHTML(fullRows, "Full-Friends Team Ranking", 30, "full");
 
     container.querySelectorAll(".players-ranking-row").forEach(row => {
         row.addEventListener("click", () => {

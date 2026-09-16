@@ -222,6 +222,9 @@ td:not(:nth-child(2)){
     color:#93c5fd;
     border-bottom:3px solid #93c5fd;
 }
+.tab-button.tab-right{
+    margin-left:auto;
+}
 .app-view{
     display:none;
 }
@@ -1872,6 +1875,8 @@ table td {
 
 
 /* WIN RATE TAB */
+.ranking-table-block{margin-bottom:32px;padding-bottom:16px;border-bottom:1px solid rgba(55,65,81,0.6);}
+.ranking-table-block:last-child{border-bottom:none;margin-bottom:0;}
 .winrate-table{width:100%;min-width:700px;border-collapse:collapse;margin-top:16px;table-layout:auto;}
 .winrate-table th,.winrate-table td{padding:10px 12px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.08);}
 .winrate-table th{background:rgba(255,255,255,0.06);font-weight:700;color:#93c5fd;}
