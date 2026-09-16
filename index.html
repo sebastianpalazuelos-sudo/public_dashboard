@@ -224,13 +224,13 @@
 
   <p>Cada partida se resume en <strong>cinco dimensiones observables</strong>: KPM, DPM, CCPM, Tank% y KDA. Cada una se transforma en una puntuación de <strong>0 a 10</strong>. Gold se muestra como contexto, no como parte del score principal.</p>
 
-  <p>El <strong>GLOBAL TOTAL</strong> es la suma de esas cinco puntuaciones. Se mide lo mismo para todos los campeones, pero <strong>no es comparable entre campeones distintos</strong>: cada uno tiene valores naturales distintos en cada métrica. Por ejemplo, Sivir no aporta CC, así que su CCPM suele ser bajo, mientras que un tank suma más en Tank%.</p>
+  <p>El <strong>GLOBAL TOTAL</strong> es el <strong>promedio</strong> de las puntuaciones de las métricas que el campeón puede impactar en esa partida. Se mide lo mismo para todos los campeones, pero solo entran las métricas relevantes: las que forman parte del <em>kit natural</em> del campeón más las que el jugador alcanzó de forma extraordinaria. Así un support con 2 métricas y un carry con 5 compiten en la misma escala 0-10.</p>
 
 <h3>P95R — Consistencia del jugador</h3>
 
-  <p>El <strong>percentil 95 (P95)</strong> de un campeón es el score que solo el 5% de sus mejores partidas históricas supera. El <strong>P95R</strong> compara el GLOBAL TOTAL de la partida contra ese techo.</p>
+  <p>El <strong>percentil 95 (P95)</strong> de un campeón es el score promedio que solo el 5% de sus mejores partidas históricas supera. El <strong>P95R</strong> compara el GLOBAL TOTAL de cada partida contra ese techo propio del campeón.</p>
 
-  <p>Si el jugador hizo más que el P95, su P95R es mayor a 1. Si hizo menos, es menor a 1. Como el P95R compara contra una referencia propia del campeón, es una medida estable y comparable. Su promedio se usa para <strong>rankear la consistencia de un jugador</strong>.</p>
+  <p>Si el jugador hizo más que el P95, su P95R es mayor a 1. Si hizo menos, es menor a 1. El P95R promedio de un jugador se calcula <strong>partida por partida</strong>, no promediando por campeón: si jugó 10 partidas con Mundo y 1 con Orianna, esas 11 partidas pesan igual. Por eso es una medida estable y comparable para <strong>rankear la consistencia de un jugador</strong>.</p>
 
 <h3>Match Impact (MI) — Impacto intra-partida</h3>
 
@@ -244,11 +244,11 @@
 
 <h3>Evolución del sistema</h3>
 
-  <p>El modelo inicial usaba ponderaciones fijas, pero era injusto entre campeones con roles distintos. Luego se probó pesar por campeón, pero los resultados eran difíciles de interpretar. La versión actual simplifica la lógica: cada métrica se incluye o no, y todas las incluidas pesan lo mismo. El P95R ajusta por campeón y el MI mide el impacto en la partida.</p>
+  <p>El modelo inicial usaba ponderaciones fijas, pero era injusto entre campeones con roles distintos. Luego se probó pesar por campeón, pero los resultados eran difíciles de interpretar. La versión v7 simplificó la lógica: cada métrica se incluye o no, y todas las incluidas pesan lo mismo. En la versión v8 el GLOBAL TOTAL pasó a ser el promedio de esas métricas, y el P95R se calcula partida por partida. Así el score del perfil y la consistencia del jugador quedaron en una escala 0-10 comparable entre todos los campeones.</p>
 
 <h3>Resumen</h3>
 
-  <p><strong>GLOBAL TOTAL</strong> mide el rendimiento absoluto del jugador en cinco métricas. <strong>MI</strong> mide su impacto <em>dentro de una partida</em>: es contextual y cambia partida a partida. <strong>P95R</strong> mide el rendimiento <em>contra el techo histórico del campeón</em>: es estable y comparable. El primero describe qué pasó; el segundo, qué tan cerca del máximo estuvo.</p>
+  <p><strong>GLOBAL TOTAL</strong> mide el rendimiento del jugador <em>en las métricas que realmente puede impactar</em>: es el promedio de esas puntuaciones. <strong>MI</strong> mide su impacto <em>dentro de una partida</em>, también como promedio, pero usando ranks contra los otros nueve. <strong>P95R</strong> mide el rendimiento <em>contra el techo histórico del campeón</em>, partida a partida: es estable y comparable. El primero describe qué pasó; el tercero, qué tan cerca del máximo estuvo.</p>
 
 </div>
 
