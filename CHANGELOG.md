@@ -102,6 +102,30 @@ Se corrige la selección de métricas:
 - Gangplank pasa arriba de Ashe en MI porque no se le suma TANK y sus ranks de KPM/DPM son mejores.
 - Se solucionó un bug derivado del ajuste de selección: en la partida **1623995299**, el Ornn de Einherjar había quedado último porque no se le contaban correctamente sus métricas propias. Con el fix, trepó al tercer puesto como correspondía.
 
+### 20260916 — Válvula de tank% global
+
+Se refuerza la regla de `tank_share` extra para campeones que no son tanques por kit:
+
+- Antes, un campeón no tanque podía sumar `tank_share` al MI si solo superaba su propio P90 histórico.
+- Ahora, además de superar su P90, debe superar el **umbral global P60** de `tank_share` (≈0.223).
+- Esto evita que un support o carry con 12–15% histórico pero 20–22% en una partida sin tanques reciba puntos de TANK.
+
+### 20260916 — MI con mínimo para 2 métricas
+
+Se ajusta el cálculo del **MI** cuando un campeón entra con solo **2 métricas activas**:
+
+- En lugar de promediar `(11 - rank)` de ambas métricas, se toma el **mínimo**.
+- Esto evita que un support con KDA #1 pero CCPM #4 alcance un MI alto por una sola métrica.
+- Con 3 o más métricas se mantiene el promedio.
+
+### 20260916 — Contribución del MI con techo por score
+
+Se refuerza el cálculo del **MI** para evitar que un rank alto con puntaje absoluto bajo infle el resultado:
+
+- La contribución de cada métrica pasa a ser `min(11 - rank, score)` en lugar de `11 - rank`.
+- Si un jugador es #1 en CCPM pero su `ccpm_score` es 5.7, aporta 5.7 al MI, no 10.
+- Esto resuelve casos como el de Leona en la partida **1624554944**: `score` 5.72, CCPM #1, y un MI que quedaba inflado por el rank relativo.
+
 ### 1623995400 — Determinación del ganador en surrenders
 
 Antes, cuando una partida terminaba en surrender, no siempre quedaba claro cuál equipo había ganado realmente. El EWR aplicaba un descuento empírico superior al 20% sobre `SurrW` y `SurrL` para reflejar esa incertidumbre.
