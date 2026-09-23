@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>ARAM Engine Dashboard</title>
-<link rel="stylesheet" href="css/style.css?v=splits-current-v3.0">
+<link rel="stylesheet" href="css/style.css?v=kda-universal-v5.0">
 </head>
 <body>
 <header>
@@ -214,41 +214,43 @@
 
 <div class="methodology-section">
 
-<h3>Filosofía</h3>
+<h3>Qué mide el sistema</h3>
 
-  <p>El objetivo del sistema es valorar la performance de un jugador en cada partida de forma <strong>transparente y reproducible</strong>. En lugar de intentar modelar aspectos que los datos disponibles no contienen, el sistema se concentra en medir lo observable y en interpretarlo dentro del contexto propio de cada campeón.</p>
+  <p>Cada partida se resume en <strong>cinco dimensiones observables</strong>: KPM, DPM, KDA, CCPM y Tank%. Cada una se transforma en un score de <strong>0 a 10</strong> usando referencias globales fijas. Gold se muestra como contexto, no entra al Score.</p>
+  <p>De esas métricas salen cuatro números:</p>
+  <ul>
+    <li><strong>Score</strong>: rendimiento del jugador en las métricas que realmente activó para ese campeón.</li>
+    <li><strong>MI</strong>: impacto dentro de la partida, basado en el rank contra los otros nueve.</li>
+    <li><strong>P95R</strong>: consistencia del jugador comparada contra el techo histórico del campeón.</li>
+    <li><strong>EWR</strong>: win rate corregido por impacto general y daño a estructuras en surrenders.</li>
+  </ul>
 
-  <p>La idea central es simple: <strong>no todos los campeones pueden producir lo mismo</strong>. Un carry puede hacer daño y kills; un enchanter hace curación y control que los datos no capturan. Compararlos directamente produce resultados injustos. Por eso cada campeón tiene su propio contexto estadístico.</p>
+<h3>Cómo se eligen las métricas activas</h3>
 
-<h3>Cómo funciona</h3>
+  <p>Los <strong>no enchanters</strong> arrancan con <strong>KDA + 2 métricas naturales</strong> entre KPM, DPM, CCPM y Tank%. La elección se hace por <code>central del campeón / central global</code>.</p>
+  <p>Los <strong>enchanters puros</strong> (Yuumi, Sona, Lulu, Janna, Soraka, Nami, Milio, Seraphine, Renata Glasc, Ivern, Bard) usan KDA como única signature.</p>
+  <p>Una métrica no-signature puede entrar como <strong>extra</strong> si supera el 90% de los valores históricos del campeón en esa métrica, y mejora el impacto del campeón en esa partida. Nunca entran más de <strong>3 métricas</strong>: si hay 4 o 5 candidatas, se quedan las 3 mejores.</p>
 
-  <p>Cada partida se resume en <strong>cinco dimensiones observables</strong>: KPM, DPM, CCPM, Tank% y KDA. Cada una se transforma en una puntuación de <strong>0 a 10</strong>. Gold se muestra como contexto, no como parte del score principal.</p>
+<h3>Qué pasa con las métricas que quedan afuera</h3>
 
-  <p>El <strong>GLOBAL TOTAL</strong> es la suma de esas cinco puntuaciones. Se mide lo mismo para todos los campeones, pero <strong>no es comparable entre campeones distintos</strong>: cada uno tiene valores naturales distintos en cada métrica. Por ejemplo, Sivir no aporta CC, así que su CCPM suele ser bajo, mientras que un tank suma más en Tank%.</p>
+  <p>Como máximo se usan 3 métricas; el resto se evalúa en conjunto. Si las métricas que quedaron afuera estuvieron por debajo de lo esperado, bajan la nota; si estuvieron por arriba, no la suben: nunca bonifica, solo penaliza. Este ajuste afecta tanto al <strong>Score</strong> como al <strong>MI</strong>.</p>
 
-<h3>P95R — Consistencia del jugador</h3>
+<h3>Match Impact</h3>
 
-  <p>El <strong>percentil 95 (P95)</strong> de un campeón es el score que solo el 5% de sus mejores partidas históricas supera. El <strong>P95R</strong> compara el GLOBAL TOTAL de la partida contra ese techo.</p>
+  <p>El MI es el promedio de <code>11 - rank</code> en las métricas activas, ajustado por cantidad: 1 métrica = 0.88, 2 = 0.91, 3 = 1.0. Los supports de utilidad con 1 o 2 métricas reciben un ajuste adicional de 0.95. Después se aplica el multiplicador de excluidas.</p>
 
-  <p>Si el jugador hizo más que el P95, su P95R es mayor a 1. Si hizo menos, es menor a 1. Como el P95R compara contra una referencia propia del campeón, es una medida estable y comparable. Su promedio se usa para <strong>rankear la consistencia de un jugador</strong>.</p>
+<h3>Influencia medible insuficiente</h3>
 
-<h3>Match Impact (MI) — Impacto intra-partida</h3>
+  <p>Si un campeón queda con menos de 2 métricas activas (típico de enchanters con un solo KDA), la partida se marca con <span class="insufficient-metrics-asterisk">*</span>. Esa partida <strong>sigue contando para P95R y win rate</strong>, pero <strong>no entra en los promedios de Score y MI del perfil</strong>, porque la muestra observable no es representativa.</p>
 
-  <p>El <strong>MI</strong> responde a una pregunta distinta: <em>¿quién decidió esta partida?</em> Compara al jugador contra los otros nueve participantes usando el <strong>rank</strong> en cada métrica.</p>
+<h3>P95R y EWR</h3>
 
-  <p>El MI es el promedio de <strong>(11 - rank)</strong> en las métricas seleccionadas para ese campeón en esa partida. Una métrica se selecciona si es parte del <em>kit natural</em> del campeón o si el jugador tuvo un <em>rendimiento extraordinario</em> (superó su P90 o P95 histórico). Cada métrica seleccionada pesa 1.0.</p>
-
-  <p>Para evitar que supports con pocas métricas alcancen valores inflados, se aplica un <strong>diversity factor</strong>. <strong>Tank%</strong> tiene un umbral más alto (P60) porque tanquear es propio de los tanques. Además, existe una <strong>implicación DPM → KPM</strong>: si el daño por minuto entra en el MI, el daño en asesinatos también debe entrar.</p>
-
-  <p>El MI es volátil por naturaleza: depende de esa partida concreta. Sirve para identificar <strong>quién dominó un encuentro</strong>, no para rankear jugadores.</p>
-
-<h3>Evolución del sistema</h3>
-
-  <p>El modelo inicial usaba ponderaciones fijas, pero era injusto entre campeones con roles distintos. Luego se probó pesar por campeón, pero los resultados eran difíciles de interpretar. La versión actual simplifica la lógica: cada métrica se incluye o no, y todas las incluidas pesan lo mismo. El P95R ajusta por campeón y el MI mide el impacto en la partida.</p>
+  <p>El <strong>P95</strong> de un campeón es el score promedio que solo el 5% de sus mejores partidas supera. El <strong>P95R</strong> es <code>Score de la partida / P95 del campeón</code>, promediado partida por partida. Es comparable entre campeones distintos.</p>
+  <p>El <strong>EWR</strong> es el win rate corregido por impacto general y daño a estructuras en surrenders.</p>
 
 <h3>Resumen</h3>
 
-  <p><strong>GLOBAL TOTAL</strong> mide el rendimiento absoluto del jugador en cinco métricas. <strong>MI</strong> mide su impacto <em>dentro de una partida</em>: es contextual y cambia partida a partida. <strong>P95R</strong> mide el rendimiento <em>contra el techo histórico del campeón</em>: es estable y comparable. El primero describe qué pasó; el segundo, qué tan cerca del máximo estuvo.</p>
+  <p><strong>Score</strong> mide el rendimiento en lo que el campeón pudo impactar. <strong>MI</strong> mide quién decidió la partida. <strong>P95R</strong> mide consistencia contra el techo histórico. <strong>EWR</strong> mide el porcentaje de victorias corregido por impacto general y daño a estructuras en surrenders.</p>
 
 </div>
 
@@ -269,6 +271,6 @@
 
 </main>
 
-<script src="js/app.js?v=methodology-update-v1"></script>
+<script src="js/app.js?v=kda-universal-v5.0"></script>
 </body>
 </html>

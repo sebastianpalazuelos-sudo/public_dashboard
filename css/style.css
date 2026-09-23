@@ -365,10 +365,13 @@ table td {
 .impact-stat{color:#fbbf24;font-weight:700;text-align:center;}
 .nwr-stat{color:#6ee7b7;font-weight:700;text-align:center;}
 .ewr-stat{color:#10b981;font-weight:700;text-align:center;}
+.pwr-stat{color:#c026d3;font-weight:700;text-align:center;}
 .p95r-stat{color:#2563eb;font-weight:700;text-align:center;}
 .mi-stat{color:#fbbf24;font-weight:700;text-align:center;}
 .utility-support-asterisk{color:#9ca3af;font-weight:700;cursor:help;}
 .match-champion-cell .utility-support-asterisk{margin-left:3px;}
+.insufficient-metrics-asterisk{color:#ef4444;font-weight:700;cursor:help;}
+.match-champion-cell .insufficient-metrics-asterisk{margin-left:3px;}
 .split-sort-header{cursor:pointer;}
 .split-sort-header:hover{background:rgba(148,163,184,.12);}
 .split-sort-header.active-sort{color:#93c5fd;}
@@ -380,6 +383,8 @@ table td {
 .match-context-shares{grid-template-columns:repeat(5,minmax(0,1fr));}
 .score-metric-card{min-width:0;justify-content:space-between;}
 .score-metric-card strong{font-size:24px;}
+.score-metric-active{border-color:rgba(34,197,94,.7);background:rgba(34,197,94,.14);box-shadow:0 0 0 1px rgba(34,197,94,.35);}
+.score-metric-active .context-stat-label{color:#86efac;}
 .context-stat-card{display:flex;flex-direction:column;gap:4px;justify-content:center;align-items:center;padding:10px 12px;background:rgba(17,24,39,.9);border:1px solid rgba(75,85,99,.85);border-radius:10px;}
 .context-stat-card strong{color:#f9fafb;font-size:21px;}
 .context-stat-card span:last-child{color:#9ca3af;font-size:12px;}

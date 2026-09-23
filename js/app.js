@@ -11,8 +11,8 @@ const views = {
 
 let dashboardData = null;
 let matchExplorerSort = { key: "match_impact", direction: "desc" };
-let splitRankingSort = { key: "p95r", direction: "desc" };
-let winRateSort = { key: "p95r", direction: "desc" };
+let splitRankingSort = { key: "global_avg_match_impact", direction: "desc" };
+let winRateSort = { key: "global_avg_match_impact", direction: "desc" };
 let profileNavStack = [{ view: "ranking" }];
 let matchFromNav = false;
 let currentSplitRanking = null;
@@ -25,8 +25,7 @@ let activeViewName = "home";
 // Explorer con un indicador especial.
 const UTILITY_SUPPORT_CHAMPIONS = [
     "Yuumi", "Sona", "Lulu", "Renata Glasc", "Milio", "Janna",
-    "Ivern", "Soraka", "Nami", "Taric",
-    "Seraphine", "Braum"
+    "Ivern", "Soraka", "Nami", "Seraphine"
 ];
 
 function isUtilitySupport(championName){
@@ -1897,8 +1896,12 @@ function renderPlayerChampionHighlights(elementId, highlights){
                         <strong>${formatHomeMetric(player.avg_meta_ratio || 0, 3)}</strong>
                     </div>
                     <div class="home-player-global-avg home-score-avg">
-                        <span>AVG MI</span>
-                        <strong>${formatHomeMetric(getCurrentSplitRanking(player.player).global_avg_match_impact || 0, 2)}</strong>
+                        <span>MI</span>
+                        <strong>${formatHomeMetric(getCurrentSplitRanking(player.player).global_avg_match_impact ?? 0, 2)}</strong>
+                    </div>
+                    <div class="home-player-global-avg home-profile-score-avg">
+                        <span>Score</span>
+                        <strong>${formatHomeMetric(player.global_avg ?? 0, 2)}</strong>
                     </div>
                 </div>
 
@@ -1931,9 +1934,9 @@ function renderPlayerChampionHighlights(elementId, highlights){
 
 function getSplitSortValue(row, key){
     if(key === "p95r"){ return Number(row.avg_meta_ratio) || 0; }
-    if(key === "mi"){ return Number(row.global_avg_match_impact) || 0; }
     if(key === "games"){ return Number(row.games) || 0; }
-    if(key === "ewr"){ return Number(getPlayerWinRateStats(row.name).ewr) || 0; }
+    if(key === "ewr"){ return Number(row.ewr) || 0; }
+    if(key === "global_avg_match_impact"){ return Number(row.global_avg_match_impact) || 0; }
     return Number(row[key]) || 0;
 }
 
@@ -1993,8 +1996,8 @@ function renderGlobalRanking(elementId, ranking){
           <th>Jugador</th>
           ${splitRankHeader("Games", "games")}
           ${splitRankHeader("EWR", "ewr")}
+          ${splitRankHeader("MI", "global_avg_match_impact", "mi-stat")}
           ${splitRankHeader("P95R", "p95r", "ratio-stat")}
-          ${splitRankHeader("MI", "mi", "impact-stat")}
           <th>KPM</th>
           <th>DPM</th>
           <th>KDA</th>
@@ -2015,12 +2018,9 @@ function renderGlobalRanking(elementId, ranking){
           ${escapeHtml(formatPlayerName(r.name))}${renderPentaBadge(r.total_pentakills)}
         </td>
         <td>${r.games}</td>
-        <td>${(() => {
-            const s = getPlayerWinRateStats(r.name);
-            return (s.resolved || 0) >= 50 ? formatHomeMetric(s.ewr, 1) + "%" : `<span title="Menos de 50 partidas con ganador asignado y al menos un amigo más. Actual: ${(s.NW || 0) + (s.SurrW || 0)}/${s.resolved || 0} - ${formatHomeMetric(s.ewr, 1)}%">*</span>`;
-        })()}</td>
+        <td>${formatHomeMetric(r.ewr || 0, 1)}%</td>
+        <td class="mi-stat"><strong>${formatHomeMetric(r.global_avg_match_impact ?? 0, 2)}</strong></td>
         <td class="ratio-stat">${formatHomeMetric(r.avg_meta_ratio, 3)}</td>
-        <td class="impact-stat">${formatHomeMetric(r.global_avg_match_impact || 0, 2)}</td>
         <td>${formatHomeMetric(getScoreMetric(r, "kpm"))}</td>
         <td>${formatHomeMetric(getScoreMetric(r, "dpm"))}</td>
         <td>${formatHomeMetric(getScoreMetric(r, "kda"))}</td>
@@ -2286,25 +2286,30 @@ function renderMetricRank(rank){
 
 function renderMetricBreakdown(player, matchPlayers){
     const context = player.context || {};
+    const metricKeyMap = { kpm: "kpm", dpm: "dpm", kda: "kda", ccpm: "ccpm", tank_share: "tank" };
+    const activeMetrics = new Set(
+        (Array.isArray(player.active_metrics) ? player.active_metrics : [])
+            .map(m => metricKeyMap[m] || m)
+    );
     const metrics = [
         { label: "KPM", key: "kpm", digits: 3 },
-        { label: "DPM", key: "dpm", digits: 0 },
+        { label: "DPM", key: "dpm", digits: 1 },
         { label: "KDA", key: "kda", digits: 2 },
         { label: "CCPM", key: "ccpm", digits: 3 },
         { label: "Tank %", key: "tank", percent: true }
     ];
 
     return metrics.map(metric => {
-        const raw = getRawMatchMetric(player, metric.key);
-        const value = metric.percent
-            ? formatMatchPercent(raw)
-            : formatMatchRate(raw, metric.digits);
+        const score = getScoreMetric(player, metric.key);
+        const scoreValue = formatMatchScore(score);
         const rank = getMatchMetricRank(matchPlayers, player, metric.key);
+        const isActive = activeMetrics.has(metric.key);
+        const activeClass = isActive ? " score-metric-active" : "";
 
         return `
-            <div class="context-stat-card score-metric-card">
+            <div class="context-stat-card score-metric-card${activeClass}">
                 <span class="context-stat-label">${metric.label}</span>
-                <strong>${value}</strong>
+                <strong class="score-metric-value">${scoreValue}</strong>
                 ${renderMetricRank(rank)}
             </div>
         `;
@@ -2479,15 +2484,25 @@ function getMatchSortValue(player, key){
     return Number(player[key]) || 0;
 }
 
+function getMatchTier(player){
+    if(player.insufficient_metrics){
+        return 2;
+    }
+    if(isUtilitySupport(player.champion)){
+        return 1;
+    }
+    return 0;
+}
+
 function sortMatchPlayers(players){
     const { key, direction } = matchExplorerSort;
     const multiplier = direction === "asc" ? 1 : -1;
 
     return [...players].sort((a, b) => {
-        const aUtility = isUtilitySupport(a.champion) ? 1 : 0;
-        const bUtility = isUtilitySupport(b.champion) ? 1 : 0;
-        if(aUtility !== bUtility){
-            return aUtility - bUtility;
+        const aTier = getMatchTier(a);
+        const bTier = getMatchTier(b);
+        if(aTier !== bTier){
+            return aTier - bTier;
         }
 
         const left = getMatchSortValue(a, key);
@@ -2648,13 +2663,17 @@ function renderMatchExplorer(matchId){
                 onkeydown="if(event.key === 'Enter' || event.key === ' '){event.preventDefault();toggleMatchContext('${rowId}');}">
             <td><span class="match-team-badge ${team.className}" title="${escapeHtml(team.title)}" aria-label="${escapeHtml(team.title)}"></span></td>
             <td title="${escapeHtml(formatPlayerName(player.name))}">${escapeHtml(formatPlayerName(player.name))}${renderPentaBadge(player.penta_kills, true)}</td>
-            <td><span class="match-champion-cell"><span>${formatChampionName(player)}${isUtilitySupport(player.champion) ? ' <span class="utility-support-asterisk" title="Campeón con influencia principal no detectable por el sistema">*</span>' : ''}</span></span></td>
+            <td><span class="match-champion-cell"><span>${formatChampionName(player)}${
+                player.insufficient_metrics
+                    ? ' <span class="insufficient-metrics-asterisk" title="Influencia medible insuficiente">*</span>'
+                    : (isUtilitySupport(player.champion) ? ' <span class="utility-support-asterisk" title="Campeón con influencia principal no detectable por el sistema">*</span>' : '')
+            }</span></span></td>
             <td class="impact-stat">${formatMatchScore(player.match_impact)}</td>
-            <td>${formatMatchScore(getScoreMetric(player, "kpm"))}</td>
-            <td>${formatMatchScore(getScoreMetric(player, "dpm"))}</td>
-            <td>${formatMatchScore(getScoreMetric(player, "kda"))}</td>
-            <td>${formatMatchScore(getScoreMetric(player, "ccpm"))}</td>
-            <td>${formatMatchScore(getScoreMetric(player, "tank"))}</td>
+            <td>${formatMatchRate(getRawMatchMetric(player, "kpm"), 3)}</td>
+            <td>${formatMatchRate(getRawMatchMetric(player, "dpm"), 1)}</td>
+            <td>${formatMatchRate(getRawMatchMetric(player, "kda"), 2)}</td>
+            <td>${formatMatchRate(getRawMatchMetric(player, "ccpm"), 3)}</td>
+            <td>${formatMatchPercent(getRawMatchMetric(player, "tank"))}</td>
             </tr>
             <tr id="${rowId}" class="match-context-row" hidden><td colspan="9">${renderPlayerContext(player, match.is_remake, matchPlayers)}</td></tr>`;
         });
@@ -2739,9 +2758,8 @@ function computeWinRateStats({fullFriend=false}={}){
     for(const s of Object.values(stats)){
         s.total = s.NW + s.NL + s.SurrW + s.SurrL;
         s.nwr = s.NW + s.NL > 0 ? (s.NW / (s.NW + s.NL)) * 100 : 0;
-        const surrError = 0.22;
         s.ewr = s.total > 0
-            ? ((s.NW + s.SurrW * (1 - surrError) + s.SurrL * surrError) / s.total) * 100
+            ? ((s.NW + s.SurrW) / s.total) * 100
             : 0;
     }
     return stats;
@@ -2751,7 +2769,7 @@ function getPlayerWinRateStats(playerName, fullFriend=false){
     const s = computeWinRateStats({fullFriend})[playerName] || { NW:0, NL:0, SurrW:0, SurrL:0, total:0, resolved:0, nwr:0, ewr:0 };
     const row = getCurrentSplitRanking(playerName, fullFriend);
     s.p95r = row.avg_meta_ratio ?? 0;
-    s.mi = row.global_avg_match_impact ?? 0;
+    s.pwr = row.pwr ?? row.avg_meta_ratio ?? 0;
     return s;
 }
 
@@ -2802,9 +2820,9 @@ function renderPlayersRanking(){
                         ${header("SurrW", "SurrW", "Surrender Win, nos rendimos ganando (Calculado por impacto y daño a objetivos)", "winrate-win")}
                         ${header("SurrL", "SurrL", "Surrender Lose, nos rendimos perdiendo (Calculado por impacto y daño a objetivos)", "winrate-loss")}
                         ${header("total", "Total", "Partidas resueltas con al menos un amigo más")}
-                        ${header("ewr", "EWR", "Estimated Win Rate, porcentaje ajustado contemplando margen de error", "ewr-stat")}
+                        ${header("ewr", "EWR", "Estimated Win Rate, porcentaje ajustado por daño a estructuras en surrenders", "ewr-stat")}
                         ${header("p95r", "P95R", "Meta Ratio normalizado respecto al percentil 95 del campeón", "p95r-stat")}
-                        ${header("mi", "MI", "Match Impact promedio del jugador", "mi-stat")}
+                        ${header("global_avg_match_impact", "MI", "Match Impact promedio del jugador", "mi-stat")}
                     </tr>
                 </thead>
                 <tbody>
@@ -2825,7 +2843,7 @@ function renderPlayersRanking(){
                     <td>${r.total}</td>
                     <td class="ewr-stat">${ewrText}</td>
                     <td class="p95r-stat">${formatHomeMetric(r.p95r, 3)}</td>
-                    <td class="mi-stat">${formatHomeMetric(r.mi, 2)}</td>
+                    <td class="mi-stat"><strong>${formatHomeMetric(r.global_avg_match_impact ?? 0, 2)}</strong></td>
                 </tr>
             `;
         }
