@@ -227,13 +227,12 @@
 
 <h3>Cómo se eligen las métricas activas</h3>
 
-  <p>Los <strong>no enchanters</strong> arrancan con <strong>KDA + 2 métricas naturales</strong> entre KPM, DPM, CCPM y Tank%. La elección se hace por <code>central del campeón / central global</code>.</p>
-  <p>Los <strong>enchanters puros</strong> (Yuumi, Sona, Lulu, Janna, Soraka, Nami, Milio, Seraphine, Renata Glasc, Ivern, Bard) usan KDA como única signature.</p>
-  <p>Una métrica no-signature puede entrar como <strong>extra</strong> si supera el 90% de los valores históricos del campeón en esa métrica, y mejora el impacto del campeón en esa partida. Nunca entran más de <strong>3 métricas</strong>: si hay 4 o 5 candidatas, se quedan las 3 mejores.</p>
+  <p>Los <strong>no enchanters</strong> compiten entre <strong>KPM, DPM, KDA, CCPM y Tank%</strong>. Se activan las <strong>3 mejores por rank</strong> de esa partida. KDA entra solo si estuvo entre las 3; si otra métrica lo supera, queda afuera. La elección previa por <code>central del campeón / central global</code> sigue definiendo las 2 métricas más naturales, pero la selección final es por rank.</p>
+  <p>Los <strong>enchanters puros</strong> (Yuumi, Sona, Lulu, Janna, Soraka, Nami, Milio, Seraphine, Renata Glasc, Ivern, Bard) usan KDA como única signature, pero pueden sumar extras si superan el 90% de sus valores históricos. Nunca entran más de <strong>3 métricas</strong>.</p>
 
 <h3>Qué pasa con las métricas que quedan afuera</h3>
 
-  <p>Como máximo se usan 3 métricas; el resto se evalúa en conjunto. Si las métricas que quedaron afuera estuvieron por debajo de lo esperado, bajan la nota; si estuvieron por arriba, no la suben: nunca bonifica, solo penaliza. Este ajuste afecta tanto al <strong>Score</strong> como al <strong>MI</strong>.</p>
+  <p>Como máximo se usan 3 métricas; el resto se evalúa en conjunto. Si las métricas que quedaron afuera estuvieron por debajo de lo esperado, bajan la nota; si estuvieron por arriba, no la suben: nunca bonifica, solo penaliza. <strong>KDA pesa el doble</strong> en ese promedio, porque es la métrica con más correlación con ganar. Este ajuste afecta tanto al <strong>Score</strong> como al <strong>MI</strong>.</p>
 
 <h3>Match Impact</h3>
 

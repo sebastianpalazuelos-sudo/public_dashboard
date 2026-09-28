@@ -180,14 +180,24 @@ Se cierra la selección para evitar que una cuarta métrica diluya o dispare el 
 
 ---
 
-## Sistema actual (v9.3)
+## v9.4 — KDA compite y peso doble en el multiplicador
+
+KDA deja de ser obligatorio para los no enchanters. Compite con las otras métricas; entra solo si está entre las 3 mejores por rank. Además, cuando KDA queda excluida, pesa el doble en el multiplicador.
+
+- **Métricas activas**: se activan las 3 mejores por rank de las 5 candidatas. KDA entra solo si supera a las demás.
+- **Multiplicador de excluidas**: `scale` sube de `0.20` a `0.50`. KDA tiene peso `2.0`; el resto `1.0`.
+- **Partida de referencia**: `1625771117` — Dr. Mundo con KDA excluida baja de Score **4.09** a **3.89** porque el multiplicador castiga su KDA con doble peso.
+
+---
+
+## Sistema actual (v9.4)
 
 El motor puntúa partidas ARAM con las siguientes reglas:
 
 1. **Score** — promedio de los scores (0–10) de las métricas activas, multiplicado por el factor de métricas excluidas (nunca > 1.0). Gold es contexto.
 2. **MI** — promedio de `11 - rank` en las métricas activas, ajustado por `diversity_factor` (`1=0.88, 2=0.91, 3=1.0`) y por `0.95` adicional para enchanters con ≤2 métricas. Luego el mismo factor de excluidas.
-3. **Métricas activas** — no enchanter: KDA + 2 naturales. Extras si superan P90 del campeón y mejoran MI. Máximo 3. Enchanters puros: KDA sola.
-4. **Métricas excluidas** — multiplicador con al menos 2 afuera. `ratio = observado / central`, truncado `[0.5, 2.0]`; `1 + 0.20 * (promedio - 1)`, tope 1.0, piso 0.5.
+3. **Métricas activas** — no enchanter: las 3 mejores por rank entre KPM, DPM, KDA, CCPM y Tank%. Enchanters puros: KDA sola, más extras que superen el P90 del campeón. Máximo 3.
+4. **Métricas excluidas** — multiplicador con al menos 2 afuera. `ratio = observado / central`, truncado `[0.5, 2.0]`; promedio ponderado donde KDA pesa el doble; `1 + 0.50 * (promedio - 1)`, tope 1.0, piso 0.5.
 5. **P95R** — `Score / P95 histórico del campeón`, promediado partida por partida.
 6. **EWR** — win rate corregido por impacto general y daño a estructuras en surrenders.
 7. **Métricas insuficientes** — `< 2 métricas activas` → `*` y se excluyen de los promedios de Score/MI del perfil, pero siguen en P95R y win rate.
