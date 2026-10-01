@@ -190,14 +190,36 @@ KDA deja de ser obligatorio para los no enchanters. Compite con las otras métri
 
 ---
 
-## Sistema actual (v9.4)
+## v9.5 — Perfiles de campeón y multiplicador natural
+
+La activación se atiene al perfil natural del campeón y el multiplicador deja de castigar métricas ajenas.
+
+- **3 métricas signature** para no enchanters: las 3 más naturales según `central_del_campeón / central_global`.
+- **Tank% solo si es tanquillo**: `tank_share` no puede ser signature si el central del campeón está por debajo del umbral global.
+- **Extras por P90**: cualquier métrica no signature entra solo si supera el **P90 del campeón** en esa partida (con el umbral adicional de tank).
+- **Multiplicador de excluidas limitado**: solo considera `kda` y métricas que sean `signatures` del campeón. Métricas ajenas (CCPM para Lucian, tank para un carry) no penalizan.
+- **Partida de referencia**: `1627452421` — Lucian pasa de Score **6.87** a **8.15** porque CCPM y tank, métricas ajenas a su perfil, dejan de castigarlo.
+
+---
+
+## v9.6 — P95R sobre la suma total de métricas
+
+El P95R pasa a medir la suma de todo lo que el campeón hizo en la partida, comparado contra sí mismo.
+
+- **P95R** = `(kpm + dpm + kda + ccpm + tank) / P95 de esa suma para ese campeón`.
+- El P95 de cada campeón se calcula sobre el histórico de la **suma de sus cinco scores**, no sobre el Score activo.
+- Así un support con KDA perfecto pero sin daño ni tank no obtiene P95R 1.0; debe acercarse a la suma total que ese mismo campeón puede alcanzar en sus mejores partidas.
+
+---
+
+## Sistema actual (v9.6)
 
 El motor puntúa partidas ARAM con las siguientes reglas:
 
 1. **Score** — promedio de los scores (0–10) de las métricas activas, multiplicado por el factor de métricas excluidas (nunca > 1.0). Gold es contexto.
 2. **MI** — promedio de `11 - rank` en las métricas activas, ajustado por `diversity_factor` (`1=0.88, 2=0.91, 3=1.0`) y por `0.95` adicional para enchanters con ≤2 métricas. Luego el mismo factor de excluidas.
-3. **Métricas activas** — no enchanter: las 3 mejores por rank entre KPM, DPM, KDA, CCPM y Tank%. Enchanters puros: KDA sola, más extras que superen el P90 del campeón. Máximo 3.
-4. **Métricas excluidas** — multiplicador con al menos 2 afuera. `ratio = observado / central`, truncado `[0.5, 2.0]`; promedio ponderado donde KDA pesa el doble; `1 + 0.50 * (promedio - 1)`, tope 1.0, piso 0.5.
-5. **P95R** — `Score / P95 histórico del campeón`, promediado partida por partida.
+3. **Métricas activas** — no enchanter: 3 métricas **signature** (las más naturales del campeón) más extras que superen el **P90 del campeón**. Tank% solo puede ser signature si el campeón es naturalmente tanquillo. Máximo 3.
+4. **Métricas excluidas** — multiplicador con al menos 2 afuera, pero solo considera `kda` y métricas que sean `signature` del campeón. Métricas ajenas al perfil no penalizan.
+5. **P95R** — suma de los cinco scores (`kpm + dpm + kda + ccpm + tank`) de la partida, dividida por el P95 de esa suma para **ese mismo campeón**. Promediado partida por partida.
 6. **EWR** — win rate corregido por impacto general y daño a estructuras en surrenders.
 7. **Métricas insuficientes** — `< 2 métricas activas` → `*` y se excluyen de los promedios de Score/MI del perfil, pero siguen en P95R y win rate.
