@@ -32,29 +32,6 @@ function isUtilitySupport(championName){
     return UTILITY_SUPPORT_CHAMPIONS.includes(championName);
 }
 
-// P95R (Meta Ratio normalizado): MR = score / META(p50), escalado por el máximo
-// estadístico del campeón (p95 / p50). Debe reflejar el mismo cálculo del motor.
-function getChampionMetaP95(championName){
-    return Number(
-        dashboardData?.champion_engine?.champion_meta?.[championName]?.score?.p95
-    ) || 0;
-}
-
-function normalizeMetaRatio(score, meta, metaP95){
-    const metaValue = Number(meta) || 0;
-
-    if(metaValue <= 0){
-        return 0;
-    }
-
-    const metaRatio = (Number(score) || 0) / metaValue;
-    const metaRatioMaxStatistical = (Number(metaP95) || 0) / metaValue;
-
-    return metaRatioMaxStatistical > 0
-        ? metaRatio / metaRatioMaxStatistical
-        : metaRatio;
-}
-
 function resetPlayersView(){
     showPlayersRanking();
 }
@@ -337,6 +314,10 @@ function updatePlayerStats(playerName, playerType){
                     <span class="stat-value score-value">${formatHomeMetric(playerData.global_avg)}</span>
                 </div>
                 <div class="synergy-player-stat">
+                    <span class="stat-label mi-label">MI:</span>
+                    <span class="stat-value mi-value">${formatHomeMetric(playerData.global_avg_match_impact || 0)}</span>
+                </div>
+                <div class="synergy-player-stat">
                     <span class="stat-label meta-label">P95R:</span>
                     <span class="stat-value meta-value">${formatHomeMetric(playerData.avg_meta_ratio || 0, 3)}</span>
                 </div>
@@ -347,150 +328,233 @@ function updatePlayerStats(playerName, playerType){
     }
 }
 
+// Por debajo de esta cantidad de partidas juntos, las diferencias son ruido.
+const SYNERGY_RELIABLE_MATCHES = 15;
+
+// P95R de una partida según v9.6: suma de los cinco scores dividida por el P95
+// de esa suma para ese campeón. El motor ya lo deja precalculado en `p95r`;
+// el cálculo manual es el fallback para datos viejos.
+function matchP95R(row){
+    const stored = Number(row.p95r);
+    if(Number.isFinite(stored) && stored > 0){
+        return stored;
+    }
+
+    const p95Total = Number(row.champion_meta_p95_total) || 0;
+    if(p95Total <= 0){
+        return null;
+    }
+
+    const total = ["kpm_score", "dpm_score", "kda_score", "ccpm_score", "tank_score"]
+        .reduce((sum, key) => sum + (Number(row[key]) || 0), 0);
+
+    return total / p95Total;
+}
+
+// P95R v9.6 de un par jugador-campeón. El motor lo deja en `avg_p95r`; el
+// fallback reconstruye el promedio de la suma de los cinco scores sobre el P95
+// de esa suma, que es constante por campeón.
+function championAvgP95R(row){
+    const stored = Number(row?.avg_p95r);
+    if(Number.isFinite(stored) && stored > 0){
+        return stored;
+    }
+
+    const p95Total = Number(row?.champion_meta_p95_total)
+        || Number(dashboardData?.champion_engine?.champion_meta?.[row?.champion]?.total?.p95)
+        || 0;
+    if(p95Total <= 0){
+        return 0;
+    }
+
+    const total = Number(row.global_avg_total_score) || ["kpm", "dpm", "kda", "ccpm", "tank"]
+        .reduce((sum, metric) => sum + (Number(row[`global_avg_${metric}_score`]) || 0), 0);
+
+    return total / p95Total;
+}
+
+function synergyAverage(values){
+    const usable = values.filter(v => Number.isFinite(v));
+    if(usable.length === 0){
+        return null;
+    }
+    return usable.reduce((sum, v) => sum + v, 0) / usable.length;
+}
+
+// Score y MI ignoran las partidas con métricas insuficientes, igual que el motor
+// al construir `scored_games`. P95R las incluye, igual que `p95r_games`.
+function synergyProfile(rows){
+    const scored = rows.filter(r => !r.insufficient_metrics);
+
+    return {
+        score: synergyAverage(scored.map(r => Number(r.score))),
+        mi: synergyAverage(scored.map(r => Number(r.match_impact))),
+        p95r: synergyAverage(rows.map(matchP95R)),
+        scoredGames: scored.length,
+        games: rows.length,
+    };
+}
+
+function renderSynergyStat(label, labelClass, valueClass, value, baseline, digits){
+    if(!Number.isFinite(value)){
+        return `
+            <div class="synergy-stat">
+                <div class="synergy-stat-label ${labelClass}">${label}</div>
+                <div class="synergy-stat-value ${valueClass}">—</div>
+            </div>
+        `;
+    }
+
+    let diffHtml = `<span class="synergy-diff diff-none">no baseline</span>`;
+    if(Number.isFinite(baseline)){
+        const diff = value - baseline;
+        const diffClass = diff > 0 ? "diff-positive" : (diff < 0 ? "diff-negative" : "diff-none");
+        const sign = diff > 0 ? "+" : "";
+        diffHtml = `<span class="synergy-diff ${diffClass}">${sign}${formatHomeMetric(diff, digits)}</span>`;
+    }
+
+    return `
+        <div class="synergy-stat">
+            <div class="synergy-stat-label ${labelClass}">${label}</div>
+            <div class="synergy-stat-value ${valueClass}">
+                ${formatHomeMetric(value, digits)}
+                ${diffHtml}
+            </div>
+        </div>
+    `;
+}
+
 function calculateSynergy(){
-    console.log("Calculando sinergia...");
-    const playerA = document.getElementById("synergy-player-a").value;
-    const playerB = document.getElementById("synergy-player-b").value;
-    const playerC = document.getElementById("synergy-player-c").value;
-    const playerD = document.getElementById("synergy-player-d").value;
-    const playerE = document.getElementById("synergy-player-e").value;
+    const selectIds = ["a", "b", "c", "d", "e"];
     const resultsDiv = document.getElementById("synergy-results");
 
-    console.log("Player A:", playerA, "Player B:", playerB, "Player C:", playerC, "Player D:", playerD, "Player E:", playerE);
+    const selectedPlayers = selectIds
+        .map(id => document.getElementById(`synergy-player-${id}`)?.value)
+        .filter(Boolean);
 
     // Verificar que al menos 2 jugadores estén seleccionados
-    const selectedPlayers = [playerA, playerB, playerC, playerD, playerE].filter(p => p);
     if(selectedPlayers.length < 2){
         resultsDiv.innerHTML = `<p class="synergy-empty">Select at least 2 players to analyze synergy</p>`;
         return;
     }
 
     // Verificar que no haya duplicados
-    const uniquePlayers = [...new Set(selectedPlayers)];
-    if(uniquePlayers.length !== selectedPlayers.length){
+    if(new Set(selectedPlayers).size !== selectedPlayers.length){
         resultsDiv.innerHTML = `<p class="synergy-empty">Select different players</p>`;
         return;
     }
 
-    // Find matches where all selected players played together on the same team
+    // Cada partida cae en uno de dos grupos: "together" (todos los seleccionados
+    // en el mismo equipo) o "apart" (el jugador jugó, pero sin el grupo completo).
+    // El baseline sale de "apart": comparar contra el promedio general no sirve
+    // porque las partidas juntos están dentro de ese promedio.
     const matches = dashboardData.match_explorer || [];
-    console.log("Total matches:", matches.length);
-    const sharedMatches = [];
+    const together = [];
+    const apartRows = {};
+    selectedPlayers.forEach(name => { apartRows[name] = []; });
 
     matches.forEach(match => {
         const players = match.players || [];
-        const playerData = {};
-
-        selectedPlayers.forEach(playerName => {
-            playerData[playerName] = players.find(p => (p.identity || p.name) === playerName);
+        const rows = {};
+        selectedPlayers.forEach(name => {
+            rows[name] = players.find(p => (p.identity || p.name) === name) || null;
         });
 
-        // Verificar que todos los jugadores seleccionados estén en la partida
-        const allPresent = selectedPlayers.every(playerName => playerData[playerName]);
-        if(!allPresent) return;
+        const present = selectedPlayers.filter(name => rows[name]);
+        const teamIds = present.map(name => rows[name].teamId);
+        const allTogether =
+            present.length === selectedPlayers.length &&
+            teamIds.every(teamId => teamId === teamIds[0]);
 
-        // Verificar que todos estén en el mismo equipo
-        const teamIds = selectedPlayers.map(playerName => playerData[playerName].teamId);
-        const sameTeam = teamIds.every(teamId => teamId === teamIds[0]);
-
-        if(sameTeam){
-            sharedMatches.push({
+        if(allTogether){
+            together.push({
                 match_id: match.match_id,
-                ...playerData
+                is_remake: Boolean(match.is_remake),
+                winning_team: match.winning_team,
+                teamId: teamIds[0],
+                rows,
             });
+            return;
         }
+
+        present.forEach(name => apartRows[name].push(rows[name]));
     });
 
-    console.log("Shared matches:", sharedMatches.length);
-
-    if(sharedMatches.length === 0){
+    if(together.length === 0){
         resultsDiv.innerHTML = `<p class="synergy-empty">No matches found where all selected players played together</p>`;
         return;
     }
 
-    if(sharedMatches.length < 3){
-        resultsDiv.innerHTML = `<p class="synergy-empty">Only ${sharedMatches.length} match(es) together (minimum 3 for reliable data)</p>`;
-        return;
-    }
+    // Win / loss del grupo. Como todos están en el mismo equipo comparten
+    // resultado. Los remakes y las partidas sin ganador asignado no cuentan.
+    const resolved = together.filter(m =>
+        !m.is_remake && m.winning_team !== null && m.winning_team !== undefined
+    );
+    const wins = resolved.filter(m => m.teamId === m.winning_team).length;
+    const losses = resolved.length - wins;
 
-    console.log("Calculating averages for selected players...");
+    const playerClasses = ["player-a", "player-b", "player-c", "player-d", "player-e"];
 
-    // Calculate averages for each selected player
-    const playerStats = {};
-    selectedPlayers.forEach(playerName => {
-        try {
-            const playerScores = sharedMatches.map(m => m[playerName].score);
-            const avgScore = playerScores.reduce((sum, score) => sum + score, 0) / playerScores.length;
+    const columnsHtml = selectedPlayers.map((playerName, index) => {
+        const playerClass = playerClasses[index] || "player-a";
+        const stats = synergyProfile(together.map(m => m.rows[playerName]));
+        const baseline = synergyProfile(apartRows[playerName]);
 
-            const playerMetaRatios = sharedMatches.map(m => normalizeMetaRatio(
-                m[playerName].score,
-                m[playerName].champion_meta,
-                m[playerName].champion_meta_p95 || getChampionMetaP95(m[playerName].champion)
-            ));
-            const avgMetaRatio = playerMetaRatios.reduce((sum, ratio) => sum + ratio, 0) / playerMetaRatios.length;
-
-            playerStats[playerName] = { avgScore, avgMetaRatio };
-
-            // Debug logs
-            const ranking = dashboardData?.current_split?.global_ranking || [];
-            const playerData = ranking.find(r => r.name === playerName);
-            console.log(`${playerName}: Avg with team=${avgScore.toFixed(2)}, Global avg=${playerData?.global_avg?.toFixed(2)}, Diff=${(avgScore - playerData?.global_avg).toFixed(2)}`);
-        } catch (error) {
-            console.error(`Error calculating stats for ${playerName}:`, error);
-        }
-    });
-
-    // Build results HTML
-    let columnsHtml = '';
-    selectedPlayers.forEach((playerName, index) => {
-        const playerClasses = ['player-a', 'player-b', 'player-c', 'player-d', 'player-e'];
-        const playerClass = playerClasses[index] || 'player-a';
-        const stats = playerStats[playerName];
-
-        // Get player's individual averages from ranking
-        const ranking = dashboardData?.current_split?.global_ranking || [];
-        const playerData = ranking.find(r => r.name === playerName);
-        const baseAvg = playerData?.global_avg || 0;
-        const baseMeta = playerData?.avg_meta_ratio || 0;
-
-        const scoreDiff = stats.avgScore - baseAvg;
-        const metaDiff = stats.avgMetaRatio - baseMeta;
-
-        columnsHtml += `
+        return `
             <div class="synergy-stats-col ${playerClass}">
                 <h4>${escapeHtml(formatPlayerName(playerName))}</h4>
-                <div class="synergy-stat">
-                    <div class="synergy-stat-label score-label">Score</div>
-                    <div class="synergy-stat-value score-value">
-                        ${formatHomeMetric(stats.avgScore)}
-                        <span class="synergy-diff ${scoreDiff > 0 ? "diff-positive" : "diff-negative"}">
-                            ${scoreDiff > 0 ? `+${formatHomeMetric(scoreDiff)}` : formatHomeMetric(scoreDiff)}
-                        </span>
-                    </div>
-                </div>
-                <div class="synergy-stat">
-                    <div class="synergy-stat-label meta-label">P95R</div>
-                    <div class="synergy-stat-value meta-value">
-                        ${formatHomeMetric(stats.avgMetaRatio, 3)}
-                        <span class="synergy-diff ${metaDiff > 0 ? "diff-positive" : "diff-negative"}">
-                            ${metaDiff > 0 ? `+${formatHomeMetric(metaDiff, 3)}` : formatHomeMetric(metaDiff, 3)}
-                        </span>
-                    </div>
-                </div>
+                <div class="synergy-col-meta">vs ${baseline.games} apart</div>
+                ${renderSynergyStat("Score", "score-label", "score-value", stats.score, baseline.score, 2)}
+                ${renderSynergyStat("MI", "mi-label", "mi-value", stats.mi, baseline.mi, 2)}
+                ${renderSynergyStat("P95R", "meta-label", "meta-value", stats.p95r, baseline.p95r, 3)}
             </div>
         `;
-    });
+    }).join("");
+
+    const warningHtml = together.length < SYNERGY_RELIABLE_MATCHES
+        ? `<p class="synergy-warning">Only ${together.length} matches together — differences at this sample size are mostly noise.</p>`
+        : "";
+
+    const recordHtml = resolved.length > 0
+        ? `
+            <div class="synergy-summary-item">
+                <span class="synergy-summary-value">
+                    <span class="record-win">${wins}</span><span class="record-sep">-</span><span class="record-loss">${losses}</span>
+                </span>
+                <span class="synergy-summary-label">record</span>
+            </div>
+            <div class="synergy-summary-item">
+                <span class="synergy-summary-value">${formatHomeMetric(100 * wins / resolved.length, 1)}%</span>
+                <span class="synergy-summary-label">win rate</span>
+            </div>
+        `
+        : `
+            <div class="synergy-summary-item">
+                <span class="synergy-summary-value">—</span>
+                <span class="synergy-summary-label">no resolved matches</span>
+            </div>
+        `;
 
     resultsDiv.innerHTML = `
         <div class="synergy-results-card">
             <div class="synergy-players">
                 ${selectedPlayers.map((p, i) => {
-                    const playerClasses = ['synergy-player-a', 'synergy-player-b', 'synergy-player-c', 'synergy-player-d', 'synergy-player-e'];
-                    const playerClass = playerClasses[i] || 'synergy-player-a';
-                    return `<span class="${playerClass}">${escapeHtml(formatPlayerName(p))}</span>`;
+                    const nameClass = `synergy-${playerClasses[i] || "player-a"}`;
+                    return `<span class="${nameClass}">${escapeHtml(formatPlayerName(p))}</span>`;
                 }).join(' <span>+</span> ')}
             </div>
-            <h3>${sharedMatches.length} matches together</h3>
+            <div class="synergy-summary">
+                <div class="synergy-summary-item">
+                    <span class="synergy-summary-value">${together.length}</span>
+                    <span class="synergy-summary-label">matches together</span>
+                </div>
+                ${recordHtml}
+            </div>
+            ${warningHtml}
+            <p class="synergy-baseline-note">
+                Differences are measured against each player's average in matches
+                <strong>without this group</strong>, not against their overall average.
+            </p>
             <div class="synergy-stats">
                 ${columnsHtml}
             </div>
@@ -1417,19 +1481,7 @@ function renderPlayerProfile(playerName, context="all"){
 
     const champions =
         Object.values(playerProfile).sort(
-            (a, b) => {
-                const ratioA = normalizeMetaRatio(
-                    a.global_avg,
-                    a.champion_meta,
-                    a.champion_meta_p95 || getChampionMetaP95(a.champion)
-                );
-                const ratioB = normalizeMetaRatio(
-                    b.global_avg,
-                    b.champion_meta,
-                    b.champion_meta_p95 || getChampionMetaP95(b.champion)
-                );
-                return ratioB - ratioA;
-            }
+            (a, b) => championAvgP95R(b) - championAvgP95R(a)
         );
 
     // Calcular Avg Score y Avg P95R con promedio simple de todos los campeones.
@@ -1437,14 +1489,10 @@ function renderPlayerProfile(playerName, context="all"){
         ? champions.reduce((sum, c) => sum + c.global_avg, 0) / champions.length
         : 0;
 
-    const metaRatiosWithChampions = champions.map(champion => {
-        const ratio = normalizeMetaRatio(
-            champion.global_avg,
-            champion.champion_meta,
-            champion.champion_meta_p95 || getChampionMetaP95(champion.champion)
-        );
-        return { ratio, champion };
-    });
+    const metaRatiosWithChampions = champions.map(champion => ({
+        ratio: championAvgP95R(champion),
+        champion,
+    }));
 
     const avgMetaRatio = metaRatiosWithChampions.length > 0
         ? metaRatiosWithChampions.reduce((sum, x) => sum + x.ratio, 0) / metaRatiosWithChampions.length
@@ -1564,17 +1612,8 @@ function renderPlayerChampionTable(
             }
 
             if(activeSortKey === "ratio"){
-                const ratioA = normalizeMetaRatio(
-                    a.global_avg,
-                    a.champion_meta,
-                    a.champion_meta_p95 || getChampionMetaP95(a.champion)
-                );
-
-                const ratioB = normalizeMetaRatio(
-                    b.global_avg,
-                    b.champion_meta,
-                    b.champion_meta_p95 || getChampionMetaP95(b.champion)
-                );
+                const ratioA = championAvgP95R(a);
+                const ratioB = championAvgP95R(b);
 
                 return activeSortDirection === "asc"
                     ? ratioA - ratioB
@@ -1666,7 +1705,7 @@ function renderPlayerChampionTable(
                 <td>${formatHomeMetric(getScoreMetric(champion, "ccpm"))}</td>
                 <td>${formatHomeMetric(getScoreMetric(champion, "tank"))}</td>
                 <td class="meta-stat">${formatHomeMetric(champion.champion_meta || 0)}</td>
-                <td class="ratio-stat">${formatHomeMetric(normalizeMetaRatio(champion.global_avg, champion.champion_meta, champion.champion_meta_p95 || getChampionMetaP95(champion.champion)), 3)}</td>
+                <td class="ratio-stat">${formatHomeMetric(championAvgP95R(champion), 3)}</td>
             </tr>
             <tr id="${matchesRowId}" class="profile-matches-row" hidden>
                 <td colspan="11">${buildProfileMatchesPanel(champion)}</td>
@@ -1814,6 +1853,7 @@ function renderPlayerChampionHighlights(elementId, highlights){
             const ratioA = Number(a.avg_meta_ratio) || 0;
             const ratioB = Number(b.avg_meta_ratio) || 0;
 
+
             if(ratioA !== ratioB){
                 return ratioB - ratioA;
             }
@@ -1854,7 +1894,7 @@ function renderPlayerChampionHighlights(elementId, highlights){
                             </span>
                         </td>
                         <td>${formatHomeMetric(champion.games, 0)}</td>
-                        <td class="ratio-stat">${formatHomeMetric(champion.meta_ratio_normalized ?? champion.meta_ratio ?? 0, 3)}</td>
+                        <td class="ratio-stat">${formatHomeMetric(championAvgP95R(champion), 3)}</td>
                         <td class="score-stat">${formatHomeMetric(champion.score_avg)}</td>
                         <td class="meta-stat">${formatHomeMetric(champion.champion_meta || 0)}</td>
                         <td>${formatHomeMetric(getScoreMetric(displayChampion, "kpm"))}</td>
@@ -2459,11 +2499,7 @@ function getMatchSortValue(player, key){
         return String(player[key] || "").toLocaleLowerCase("es");
     }
     if(key === "ratio"){
-        return normalizeMetaRatio(
-            player.score,
-            player.champion_meta,
-            player.champion_meta_p95 || getChampionMetaP95(player.champion)
-        );
+        return matchP95R(player) ?? 0;
     }
     if(key === "match_impact"){
         return Number(player.match_impact) || 0;
@@ -2628,7 +2664,7 @@ function renderMatchExplorer(matchId){
     const matchPlayers = (match.players || []).map(player => ({
         ...player,
         match_impact: Number(player.match_impact) || 0,
-        p95r: normalizeMetaRatio(player.score, player.champion_meta, player.champion_meta_p95 || getChampionMetaP95(player.champion))
+        p95r: matchP95R(player) ?? 0
     }));
 
     const teamGroups = new Map();

@@ -212,6 +212,31 @@ El P95R pasa a medir la suma de todo lo que el campeón hizo en la partida, comp
 
 ---
 
+## v9.6.1 — P95R consistente en todo el dashboard
+
+El motor pasó a v9.6, pero el frontend seguía calculando el P95R con la fórmula de v9.5 (`score / P95 del score`) en tres lugares. Las reglas de scoring no cambian; lo que se corrige es que el dashboard muestre lo que el motor calcula.
+
+- **Match Explorer** y **Sinergias** usan el campo `p95r` que el motor ya persiste por partida.
+- Las **tablas de campeón por jugador** y **Champion Reference** usan el nuevo campo `avg_p95r`, expuesto desde el motor. Como el P95 de la suma es constante por campeón, el promedio de los P95R por partida equivale a `global_avg_total_score / total.p95`; el campo se calcula en el motor para no perder precisión por redondeo.
+- Se verificó la consistencia: el `avg_p95r` por campeón ponderado por partidas reproduce el `avg_meta_ratio` del ranking.
+- **Sinergias** además agrega **MI** promedio y el **record W-L** del grupo, y mide las diferencias contra el promedio de cada jugador **sin ese grupo**, no contra su promedio general (que incluye las partidas juntos y aplastaba la señal).
+
+---
+
+## v9.6.2 — Calibración de los umbrales internos
+
+Se midieron por primera vez con estadística formal los parámetros que el veredicto de v9 dejaba como "pendientes de validación". Ningún valor del motor cambia: lo que cambia es que ahora están medidos.
+
+- Nuevo `tools/calibrate.py`. Recalcula Score y MI con parámetros variables y los evalúa con dos criterios independientes: concordancia intra-partida con el resultado real (523 partidas naturales, sin surrenders para evitar circularidad) y confiabilidad split-half. Cada diferencia pasa por un bootstrap pareado. El harness reproduce el motor exactamente: 7220 filas, diferencia máxima 0.0000.
+- **Validez predictiva medida**: el Score promedio del equipo identifica al ganador en el **73.42%** de las partidas y el MI en el **72.08%**. El veredicto anterior reportaba 57%/58% porque comparaba niveles absolutos en lugar de los dos equipos de la misma partida.
+- **Validado**: el límite de **3 métricas signature y 3 activas**. Bajar a 2 degrada la concordancia en `-2.77pp [-5.26, -0.19]`, el único efecto significativo de todo el barrido.
+- **Sin evidencia para moverse**: el P60 de `tank_share` (nada se separa del ruido entre P40 y P80), el P90 de las extras, el `diversity_factor` y el castigo a utility supports.
+- **Código muerto eliminado**: `METRIC_P25_THRESHOLD` y `METRIC_GLOBAL_P95` se calculaban en cinco lugares y no se leían en ninguno; las asignaciones en `engine.py` nunca llegaban a `score.py`. También salen `_build_champion_weights`, `_build_match_weights` y el `_calculate_match_impact` duplicado, todos sin llamadores. El `P25` de la reseña original nunca fue un parámetro vivo.
+- **Hallazgo**: el **multiplicador de métricas excluidas es inerte**. Se activa en 63 de 7220 filas (0.9%) con un castigo medio del 0.09%, y tanto `excluded_scale` como el peso doble de KDA son indistinguibles de apagarlo (IC `[0.00, 0.00]`).
+- **Límite reconocido**: con 722 partidas el bootstrap tiene un semiancho de 1.2 a 2.5 puntos porcentuales. Todos estos parámetros producen efectos menores, así que seguir afinándolos no tiene sustento. Harían falta del orden de 2500 partidas.
+
+---
+
 ## Sistema actual (v9.6)
 
 El motor puntúa partidas ARAM con las siguientes reglas:

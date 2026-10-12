@@ -1519,6 +1519,9 @@ table td {
 .synergy-player-stat .meta-value{
     color:#059669;
 }
+.synergy-player-stat .mi-value{
+    color:#fbbf24;
+}
 #synergy-results{
     text-align:center;
 }
@@ -1537,6 +1540,66 @@ table td {
 .synergy-results-card h3{
     margin:0 0 16px 0;
     color:#f8fafc;
+}
+.synergy-summary{
+    display:flex;
+    justify-content:center;
+    gap:28px;
+    flex-wrap:wrap;
+    margin:16px 0 4px 0;
+}
+.synergy-summary-item{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:2px;
+}
+.synergy-summary-value{
+    font-size:22px;
+    font-weight:800;
+    color:#f8fafc;
+}
+.synergy-summary-label{
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    color:#94a3b8;
+}
+.record-win{
+    color:#22c55e;
+}
+.record-loss{
+    color:#ef4444;
+}
+.record-sep{
+    color:#6b7280;
+    margin:0 4px;
+}
+.synergy-warning{
+    margin:10px auto 0 auto;
+    max-width:620px;
+    font-size:12px;
+    font-weight:600;
+    color:#fbbf24;
+}
+.synergy-baseline-note{
+    margin:10px auto 18px auto;
+    max-width:620px;
+    font-size:12px;
+    line-height:1.5;
+    color:#94a3b8;
+}
+.synergy-baseline-note strong{
+    color:#cbd5e1;
+}
+.synergy-col-meta{
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    color:#6b7280;
+    margin-bottom:10px;
 }
 .synergy-stats{
     display:grid;
@@ -1590,11 +1653,21 @@ table td {
 .synergy-stat-label.meta-label{
     color:#059669;
 }
+.synergy-stat-label.mi-label{
+    color:#fbbf24;
+}
+.synergy-stat-value.mi-value{
+    color:#fbbf24;
+}
 .synergy-stat-value .diff-positive{
     color:#ec4899;
 }
 .synergy-stat-value .diff-negative{
     color:#ef4444;
+}
+.synergy-stat-value .diff-none{
+    color:#6b7280;
+    font-weight:600;
 }
 .synergy-diff{
     margin-left:8px;
