@@ -1515,6 +1515,17 @@ function renderPlayerProfile(playerName, context="all"){
         ? avgMetaRatio
         : (officialRankingRow?.avg_meta_ratio ?? avgMetaRatio);
 
+    const profileWinStats = isChampionReference ? null : getPlayerWinRateStats(playerName, fullFriend);
+    const absentWinStats = fullFriend && !isChampionReference
+        ? computeFullFriendAbsentWinRates([playerName])[playerName]
+        : null;
+    const secondaryStatLabel = fullFriend ? "WR SIN" : "Avg Score";
+    const secondaryStatValue = fullFriend
+        ? (absentWinStats?.games
+            ? `${formatHomeMetric(absentWinStats.pct, 1)}%`
+            : "—")
+        : allMatchAvg;
+
     document.getElementById(
         "players-player-results"
     ).innerHTML = `
@@ -1544,19 +1555,19 @@ function renderPlayerProfile(playerName, context="all"){
 
                 <div class="summary-card">
                     <div class="summary-label">
-                        NWR
+                        ${secondaryStatLabel}
                     </div>
                     <div class="summary-value">
-                        ${formatHomeMetric(getPlayerWinRateStats(playerName, fullFriend).nwr, 1)}%
+                        ${secondaryStatValue}
                     </div>
                 </div>
 
                 <div class="summary-card">
                     <div class="summary-label">
-                        EWR
+                        WR
                     </div>
                     <div class="summary-value">
-                        ${formatHomeMetric(getPlayerWinRateStats(playerName, fullFriend).ewr, 1)}%
+                        ${formatHomeMetric(profileWinStats?.ewr, 1)}%
                     </div>
                 </div>
 
@@ -2948,7 +2959,7 @@ function renderPlayersRanking(){
             const absent = full ? absentStats[r.name] : null;
             const absentText = !absent || !absent.games
                 ? '<span title="Sin partidas Full-Friends en ausencia del perfil">—</span>'
-                : `${formatHomeMetric(absent.pct, 1)}% <span style="color:#a9b8ca">(${absent.wins}/${absent.games})</span>`;
+                : `${formatHomeMetric(absent.pct, 1)}%`;
             h += `
                 <tr class="players-ranking-row" data-player="${escapeHtml(r.name)}" data-table="${tableKey}">
                     <td>${escapeHtml(formatPlayerName(r.name))}${renderPentaBadge(r.total_pentakills)}</td>
