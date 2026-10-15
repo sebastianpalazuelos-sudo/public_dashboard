@@ -171,6 +171,7 @@ async function loadDashboard(){
     if(!response.ok) throw new Error("No se pudo cargar dashboard_data.json");
     const data=await response.json();
     dashboardData = data;
+    championEwrCache = null;
     renderPlayerChampionHighlights(
         "home-player-champion-highlights",
         data.player_champion_highlights
@@ -1233,7 +1234,8 @@ function getGoldPerMinute(item, durationSeconds = 0){
 
 function buildChampionRankingTable(
     championProfile,
-    selectedProfileName = null
+    selectedProfileName = null,
+    championName = null
 ){
     let html = `
         <h3>Champion Ranking</h3>
@@ -1298,6 +1300,7 @@ function buildChampionRankingTable(
                     <td class="champion-player-cell">
                         <div class="champion-ranking-player-name">
                             ${escapeHtml(displayName)}
+                            ${!isReference ? championEwrLabel(profile.name, championName || profile.champion) : ""}
 
                             ${isSelected ? `
                                 <span class="selected-player-badge">SELECTED PROFILE</span>
@@ -1415,7 +1418,7 @@ function renderChampionProfile(championName){
     `;
 
     const tableContainer = document.getElementById("champions-player-table");
-    tableContainer.innerHTML = buildChampionRankingTable(championProfile);
+    tableContainer.innerHTML = buildChampionRankingTable(championProfile, null, championName);
     attachChampionRankingInteractions(tableContainer);
 }
 
@@ -1683,7 +1686,7 @@ function renderPlayerChampionTable(
         html += `
             <tr class="champion-row" data-champion-index="${index}">
                 <td>${index + 1}</td>
-                <td>${escapeHtml(champion.champion)}</td>
+                <td>${escapeHtml(champion.champion)} ${playerName !== "Champion Reference" ? championEwrLabel(playerName, champion.champion, fullFriend) : ""}</td>
                 <td>
                     <div class="profile-games-cell">
                         <span>${champion.global_games ?? champion.games ?? 0}</span>
@@ -1809,7 +1812,8 @@ function renderPlayerChampionDetail(champion, playerName, fullFriend=false){
         <div class="player-champion-comparison-table">
             ${buildChampionRankingTable(
                 championProfile,
-                playerName
+                playerName,
+                championName
             )}
         </div>
     `;
@@ -1891,6 +1895,7 @@ function renderPlayerChampionHighlights(elementId, highlights){
                         <td class="home-champion-name">
                             <span class="home-champion-name-line">
                                 <span>${escapeHtml(champion.champion || "-")}</span>
+                                ${championEwrLabel(player.player, champion.champion)}
                             </span>
                         </td>
                         <td>${formatHomeMetric(champion.games, 0)}</td>
@@ -2749,6 +2754,20 @@ function getCurrentSplitRanking(name, fullFriend=false){
     return ranking.find(r => r.name === name) || {};
 }
 
+const FULL_FRIEND_START_MS = Date.parse("2026-10-15T00:00:00-03:00");
+const FULL_FRIEND_EXCLUDED = new Set(["Einherjar#LAS", "Esquilax 2001#LAS"]);
+
+function isEligibleFullFriendMatch(match){
+    if(Number(match.timestamp || 0) < FULL_FRIEND_START_MS) return false;
+    const friends = (match.players || []).filter(p => p.is_friend);
+    if(friends.length !== 5) return false;
+    if(friends.some(p => FULL_FRIEND_EXCLUDED.has(p.name) || FULL_FRIEND_EXCLUDED.has(p.identity)
+        || ["Einherjar", "Esquilax 2001"].includes(canonicalPlayerName(p.identity || p.name)))) return false;
+    const teams = new Set(friends.map(p => p.teamId));
+    const identities = new Set(friends.map(p => canonicalPlayerName(p.identity || p.name)));
+    return teams.size === 1 && !teams.has(null) && identities.size === 5;
+}
+
 function computeWinRateStats({fullFriend=false}={}){
     const stats = {};
     const matches = dashboardData?.match_explorer || [];
@@ -2756,7 +2775,7 @@ function computeWinRateStats({fullFriend=false}={}){
         if(match.is_remake || match.winning_team == null) continue;
         const friendPlayers = (match.players || []).filter(p => p.is_friend);
         if(friendPlayers.length < 2) continue;
-        if(fullFriend && friendPlayers.length !== 5) continue;
+        if(fullFriend && !isEligibleFullFriendMatch(match)) continue;
         const friendTeam = friendPlayers[0]?.teamId;
         const hasFriendPartner = friendPlayers.length >= 2;
         for(const p of friendPlayers){
@@ -2801,11 +2820,67 @@ function computeWinRateStats({fullFriend=false}={}){
     return stats;
 }
 
+// Team win rate in matches played without each eligible friend.
+// Uses the same Full-Friends match predicate and effective winning_team as WR.
+function computeFullFriendAbsentWinRates(playerNames){
+    const result = Object.fromEntries(playerNames.map(name => [name, {wins:0, games:0, pct:null}]));
+    for(const match of (dashboardData?.match_explorer || [])){
+        if(match.is_remake || match.winning_team == null || !isEligibleFullFriendMatch(match)) continue;
+        const present = (match.players || []).filter(p => p.is_friend);
+        const identities = new Set(present.map(p => canonicalPlayerName(p.identity || p.name)));
+        const team = Number(present[0]?.teamId);
+        const won = Number(match.winning_team) === team;
+        for(const name of playerNames){
+            if(identities.has(canonicalPlayerName(name))) continue;
+            result[name].games++;
+            if(won) result[name].wins++;
+        }
+    }
+    for(const entry of Object.values(result)){
+        entry.pct = entry.games ? 100 * entry.wins / entry.games : null;
+    }
+    return result;
+}
+
+// Corrected champion win rate, shared by Home, Profiles and Champion Explorer.
+// Uses the effective winner persisted in match_explorer, never the raw Riot win flag.
+let championEwrCache = null;
+function getChampionEwr(playerName, championName, fullFriend=false){
+    if(!playerName || !championName || playerName === "Champion Reference" || playerName === "Champion Baseline") return null;
+    if(!championEwrCache) championEwrCache = new Map();
+    const identity = canonicalPlayerName(playerName);
+    const key = JSON.stringify([identity, championName, Boolean(fullFriend)]);
+    if(championEwrCache.has(key)) return championEwrCache.get(key);
+    let wins = 0, games = 0;
+    for(const match of (dashboardData?.match_explorer || [])){
+        if(match.is_remake || match.winning_team == null) continue;
+        if(fullFriend && !isEligibleFullFriendMatch(match)) continue;
+        const row = (match.players || []).find(p =>
+            p.is_friend && canonicalPlayerName(p.identity || p.name) === identity && p.champion === championName
+        );
+        if(!row) continue;
+        games++;
+        if(Number(row.teamId) === Number(match.winning_team)) wins++;
+    }
+    const result = {wins, games, pct: games ? 100 * wins / games : null};
+    championEwrCache.set(key, result);
+    return result;
+}
+function championEwrLabel(playerName, championName, fullFriend=false){
+    const result = getChampionEwr(playerName, championName, fullFriend);
+    if(!result) return "";
+    const pct = result.pct == null ? "—" : `${formatHomeMetric(result.pct, 1)}%`;
+    return `<span class="champion-ewr" title="Victorias corregidas / partidas con resultado válido"><span style="color:#39c9a0;font-weight:700">WR ${pct}</span> <span style="color:#a9b8ca">(${result.wins}/${result.games})</span></span>`;
+}
+
 function getPlayerWinRateStats(playerName, fullFriend=false){
     const s = computeWinRateStats({fullFriend})[playerName] || { NW:0, NL:0, SurrW:0, SurrL:0, total:0, resolved:0, nwr:0, ewr:0 };
     const row = getCurrentSplitRanking(playerName, fullFriend);
     s.p95r = row.avg_meta_ratio ?? 0;
     s.pwr = row.pwr ?? row.avg_meta_ratio ?? 0;
+    // The ranking stores average Match Impact under global_avg_match_impact.
+    // Without mapping it here, the profile summary formats undefined as 0.
+    s.mi = row.global_avg_match_impact ?? 0;
     return s;
 }
 
@@ -2829,12 +2904,18 @@ function renderPlayersRanking(){
         return {
             ...r,
             ...s,
+            W: s.NW + s.SurrW,
+            L: s.NL + s.SurrL,
+            wr: s.total ? (100 * (s.NW + s.SurrW) / s.total) : null,
             p95r: r.avg_meta_ratio ?? 0,
             mi: r.global_avg_match_impact ?? 0
         };
     });
     const allRows = sortWinRateRows(makeRows(allRanking, statsAll), 50);
-    const fullRows = sortWinRateRows(makeRows(fullFriendRanking, statsFull), 30);
+    const absentStats = computeFullFriendAbsentWinRates(fullFriendRanking.map(r => r.name));
+    const fullCandidates = makeRows(fullFriendRanking, statsFull);
+    for(const row of fullCandidates) row.wrSin = absentStats[row.name]?.pct ?? -1;
+    const fullRows = sortWinRateRows(fullCandidates, 0);
 
     const header = (key, label, title, cls = "") => {
         const isSort = winRateSort.key === key;
@@ -2843,41 +2924,38 @@ function renderPlayersRanking(){
     };
 
     const tableHTML = (rows, title, minResolved=50, tableKey="all") => {
+        const full = tableKey === "full";
         let h = `
             <div class="ranking-table-block">
             <h3 class="players-section-title">${title}</h3>
             <table class="winrate-table">
-                <thead>
-                    <tr>
-                        <th title="Perfil canónico del jugador">Profile</th>
-                        ${header("NW", "NW", "Victoria natural, destruimos el nexo contrario o el equipo oponente se rindió", "winrate-win")}
-                        ${header("NL", "NL", "Derrota natural, el equipo contrario destruyó nuestro nexo", "winrate-loss")}
-                        ${header("nwr", "NWR", "Natural Win Rate = NW / (NW + NL)", "nwr-stat")}
-                        ${header("SurrW", "SurrW", "Surrender Win, nos rendimos ganando (Calculado por impacto y daño a objetivos)", "winrate-win")}
-                        ${header("SurrL", "SurrL", "Surrender Lose, nos rendimos perdiendo (Calculado por impacto y daño a objetivos)", "winrate-loss")}
-                        ${header("total", "Total", "Partidas resueltas con al menos un amigo más")}
-                        ${header("ewr", "EWR", "Estimated Win Rate, porcentaje ajustado por daño a estructuras en surrenders", "ewr-stat")}
-                        ${header("p95r", "P95R", "Meta Ratio normalizado respecto al percentil 95 del campeón", "p95r-stat")}
-                        ${header("global_avg_match_impact", "MI", "Match Impact promedio del jugador", "mi-stat")}
-                    </tr>
-                </thead>
-                <tbody>
+                <thead><tr>
+                    <th title="Perfil canónico del jugador">Profile</th>
+                    ${header("W", "W", "Victorias corregidas", "winrate-win")}
+                    ${header("L", "L", "Derrotas corregidas", "winrate-loss")}
+                    ${header("wr", "WR", "Win Rate corregido: W / (W + L)", "ewr-stat")}
+                    ${full ? header("wrSin", "WR SIN", "Victorias / partidas Full-Friends en ausencia del perfil") : ""}
+                    ${header("p95r", "P95R", "Meta Ratio normalizado respecto al percentil 95 del campeón", "p95r-stat")}
+                    ${header("global_avg_match_impact", "MI", "Match Impact promedio del jugador", "mi-stat")}
+                </tr></thead><tbody>
         `;
         for(const r of rows){
-            const qualified = r.resolved >= minResolved;
-            const nwrText = qualified ? ((r.NW + r.NL) > 0 ? formatHomeMetric(r.nwr, 1) + "%" : "0.00%") : "*";
-            const ewrText = qualified ? formatHomeMetric(r.ewr, 1) + "%" : "*";
-            const title = qualified ? "" : `title="Mínimo ${minResolved} partidas con al menos un amigo más. Actual: ${r.resolved}"`;
+            if(r.isReference){
+                h += `<tr class="players-ranking-row" data-player="Champion Reference" data-table="all" title="Open opponent champion reference profiles">
+                    <td><strong>‹ Champion Reference ›</strong></td><td colspan="5">Opponent champion baselines · Browse champions →</td></tr>`;
+                continue;
+            }
+            const absent = full ? absentStats[r.name] : null;
+            const absentText = !absent || !absent.games
+                ? '<span title="Sin partidas Full-Friends en ausencia del perfil">—</span>'
+                : `${formatHomeMetric(absent.pct, 1)}% <span style="color:#a9b8ca">(${absent.wins}/${absent.games})</span>`;
             h += `
-                <tr class="players-ranking-row${qualified ? "" : " no-wr"}" data-player="${escapeHtml(r.name)}" data-table="${tableKey}" ${title}>
+                <tr class="players-ranking-row" data-player="${escapeHtml(r.name)}" data-table="${tableKey}">
                     <td>${escapeHtml(formatPlayerName(r.name))}${renderPentaBadge(r.total_pentakills)}</td>
-                    <td class="winrate-win">${r.NW}</td>
-                    <td class="winrate-loss">${r.NL}</td>
-                    <td class="nwr-stat">${nwrText}</td>
-                    <td class="winrate-win">${r.SurrW}</td>
-                    <td class="winrate-loss">${r.SurrL}</td>
-                    <td>${r.total}</td>
-                    <td class="ewr-stat">${ewrText}</td>
+                    <td class="winrate-win">${r.W}</td>
+                    <td class="winrate-loss">${r.L}</td>
+                    <td class="ewr-stat">${r.wr == null ? "—" : formatHomeMetric(r.wr, 1) + "%"}</td>
+                    ${full ? `<td class="ewr-stat">${absentText}</td>` : ""}
                     <td class="p95r-stat">${formatHomeMetric(r.p95r, 3)}</td>
                     <td class="mi-stat"><strong>${formatHomeMetric(r.global_avg_match_impact ?? 0, 2)}</strong></td>
                 </tr>
@@ -2887,7 +2965,9 @@ function renderPlayersRanking(){
         return h;
     };
 
-    container.innerHTML = tableHTML(allRows, "All-Matches Ranking", 50, "all") + tableHTML(fullRows, "Full-Friends Team Ranking", 30, "full");
+    const referenceRow = { name: "Champion Reference", isReference: true };
+    container.innerHTML = tableHTML([...allRows, referenceRow], "All-Matches Ranking", 50, "all")
+        + tableHTML(fullRows, "Full-Friends Team Ranking · since 15/10/2026", 0, "full");
 
     container.querySelectorAll(".players-ranking-row").forEach(row => {
         row.addEventListener("click", () => {
