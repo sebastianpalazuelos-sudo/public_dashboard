@@ -32,20 +32,6 @@ function isUtilitySupport(championName){
     return UTILITY_SUPPORT_CHAMPIONS.includes(championName);
 }
 
-const PARTIALLY_UNMEASURABLE_CHAMPIONS = ["Karma", "Zilean", "Taric"];
-function isPartiallyUnmeasurable(championName){
-    return PARTIALLY_UNMEASURABLE_CHAMPIONS.includes(championName);
-}
-function championMeasurementMarker(championName){
-    if(isUtilitySupport(championName)){
-        return ' <span class="utility-support-asterisk" title="Influencia principal no medible">*</span>';
-    }
-    if(isPartiallyUnmeasurable(championName)){
-        return ' <span title="Influencia relevante no medible">*</span>';
-    }
-    return '';
-}
-
 function resetPlayersView(){
     showPlayersRanking();
 }
@@ -399,12 +385,12 @@ function synergyAverage(values){
 // Score y MI ignoran las partidas con métricas insuficientes, igual que el motor
 // al construir `scored_games`. P95R las incluye, igual que `p95r_games`.
 function synergyProfile(rows){
-    const scored = rows.filter(r => !r.insufficient_metrics && !isUtilitySupport(r.champion));
+    const scored = rows.filter(r => !r.insufficient_metrics);
 
     return {
         score: synergyAverage(scored.map(r => Number(r.score))),
         mi: synergyAverage(scored.map(r => Number(r.match_impact))),
-        p95r: synergyAverage(rows.filter(r => !isUtilitySupport(r.champion)).map(matchP95R)),
+        p95r: synergyAverage(rows.map(matchP95R)),
         scoredGames: scored.length,
         games: rows.length,
     };
@@ -1339,12 +1325,12 @@ function buildChampionRankingTable(
                         </div>
                     </td>
 
-                    <td class="score-stat">${isUtilitySupport(championName) ? "*" : formatHomeMetric(profile.global_avg)}</td>
-                    <td>${isUtilitySupport(championName) ? "*" : formatHomeMetric(getScoreMetric(profile, "kpm"))}</td>
-                    <td>${isUtilitySupport(championName) ? "*" : formatHomeMetric(getScoreMetric(profile, "dpm"))}</td>
-                    <td>${isUtilitySupport(championName) ? "*" : formatHomeMetric(getScoreMetric(profile, "kda"))}</td>
-                    <td>${isUtilitySupport(championName) ? "*" : formatHomeMetric(getScoreMetric(profile, "ccpm"))}</td>
-                    <td>${isUtilitySupport(championName) ? "*" : formatHomeMetric(getScoreMetric(profile, "tank"))}</td>
+                    <td class="score-stat">${formatHomeMetric(profile.global_avg)}</td>
+                    <td>${formatHomeMetric(getScoreMetric(profile, "kpm"))}</td>
+                    <td>${formatHomeMetric(getScoreMetric(profile, "dpm"))}</td>
+                    <td>${formatHomeMetric(getScoreMetric(profile, "kda"))}</td>
+                    <td>${formatHomeMetric(getScoreMetric(profile, "ccpm"))}</td>
+                    <td>${formatHomeMetric(getScoreMetric(profile, "tank"))}</td>
                 </tr>
 
                 <tr id="${rowKey}-matches" class="profile-matches-row" hidden>
@@ -1502,12 +1488,11 @@ function renderPlayerProfile(playerName, context="all"){
         );
 
     // Calcular Avg Score y Avg P95R con promedio simple de todos los campeones.
-    const evaluableChampions = champions.filter(c => !isUtilitySupport(c.champion));
-    const avgScore = evaluableChampions.length > 0
-        ? evaluableChampions.reduce((sum, c) => sum + c.global_avg, 0) / evaluableChampions.length
+    const avgScore = champions.length > 0
+        ? champions.reduce((sum, c) => sum + c.global_avg, 0) / champions.length
         : 0;
 
-    const metaRatiosWithChampions = evaluableChampions.map(champion => ({
+    const metaRatiosWithChampions = champions.map(champion => ({
         ratio: championAvgP95R(champion),
         champion,
     }));
@@ -1716,7 +1701,7 @@ function renderPlayerChampionTable(
         html += `
             <tr class="champion-row" data-champion-index="${index}">
                 <td>${index + 1}</td>
-                <td>${escapeHtml(champion.champion)}${championMeasurementMarker(champion.champion)} ${playerName !== "Champion Reference" ? championEwrLabel(playerName, champion.champion, fullFriend) : ""}</td>
+                <td>${escapeHtml(champion.champion)} ${playerName !== "Champion Reference" ? championEwrLabel(playerName, champion.champion, fullFriend) : ""}</td>
                 <td>
                     <div class="profile-games-cell">
                         <span>${champion.global_games ?? champion.games ?? 0}</span>
@@ -1730,15 +1715,15 @@ function renderPlayerChampionTable(
                     </div>
                 </td>
                 <td>
-                    <strong>${isUtilitySupport(champion.champion) ? "*" : formatHomeMetric(champion.global_avg)}</strong>
+                    <strong>${formatHomeMetric(champion.global_avg)}</strong>
                 </td>
-                <td>${isUtilitySupport(champion.champion) ? "*" : formatHomeMetric(getScoreMetric(champion, "kpm"))}</td>
-                <td>${isUtilitySupport(champion.champion) ? "*" : formatHomeMetric(getScoreMetric(champion, "dpm"))}</td>
-                <td>${isUtilitySupport(champion.champion) ? "*" : formatHomeMetric(getScoreMetric(champion, "kda"))}</td>
-                <td>${isUtilitySupport(champion.champion) ? "*" : formatHomeMetric(getScoreMetric(champion, "ccpm"))}</td>
-                <td>${isUtilitySupport(champion.champion) ? "*" : formatHomeMetric(getScoreMetric(champion, "tank"))}</td>
+                <td>${formatHomeMetric(getScoreMetric(champion, "kpm"))}</td>
+                <td>${formatHomeMetric(getScoreMetric(champion, "dpm"))}</td>
+                <td>${formatHomeMetric(getScoreMetric(champion, "kda"))}</td>
+                <td>${formatHomeMetric(getScoreMetric(champion, "ccpm"))}</td>
+                <td>${formatHomeMetric(getScoreMetric(champion, "tank"))}</td>
                 <td class="meta-stat">${formatHomeMetric(champion.champion_meta || 0)}</td>
-                <td class="ratio-stat">${isUtilitySupport(champion.champion) ? "*" : formatHomeMetric(championAvgP95R(champion), 3)}</td>
+                <td class="ratio-stat">${formatHomeMetric(championAvgP95R(champion), 3)}</td>
             </tr>
             <tr id="${matchesRowId}" class="profile-matches-row" hidden>
                 <td colspan="11">${buildProfileMatchesPanel(champion)}</td>
@@ -2401,8 +2386,8 @@ function renderPlayerContext(player, isRemake = false, matchPlayers = []){
                     <strong>${escapeHtml(formatPlayerName(player.name))}</strong>
                     <span>${escapeHtml(player.champion)}</span>
                     <span class="match-context-meta" title="Meta histórico del campeón">Meta ${formatMatchScore(player.champion_meta || 0)}</span>
-                    <span class="match-context-score" title="Score global absoluto de la partida">Score ${isUtilitySupport(player.champion) ? "*" : formatMatchScore(player.score)}</span>
-                    <span class="match-context-impact" title="P95R: score relativo al potencial del campeón">P95R ${isUtilitySupport(player.champion) ? "*" : formatMatchRate(player.p95r, 3)}</span>
+                    <span class="match-context-score" title="Score global absoluto de la partida">Score ${formatMatchScore(player.score)}</span>
+                    <span class="match-context-impact" title="P95R: score relativo al potencial del campeón">P95R ${formatMatchRate(player.p95r, 3)}</span>
                 </div>
             </div>
 
@@ -2411,6 +2396,22 @@ function renderPlayerContext(player, isRemake = false, matchPlayers = []){
                 <h4>Score Metrics</h4>
                 <div class="match-context-stats score-metrics-grid">
                     ${renderMetricBreakdown(player, matchPlayers)}
+                </div>
+            </div>
+
+            <div class="match-context-group">
+                <h4>Apoyo a aliados</h4>
+                <div class="match-context-stats">
+                    <div class="context-stat-card" title="Curación realizada a compañeros. No participa en la nota.">
+                        <span class="context-stat-label">AllyH</span>
+                        <strong>${context.ally_h == null ? "—" : formatContextNumber(context.ally_h)}</strong>
+                        <small>Curación a aliados</small>
+                    </div>
+                    <div class="context-stat-card" title="Daño absorbido por escudos aplicados a compañeros. No participa en la nota.">
+                        <span class="context-stat-label">AllySh</span>
+                        <strong>${context.ally_sh == null ? "—" : formatContextNumber(context.ally_sh)}</strong>
+                        <small>Escudos a aliados</small>
+                    </div>
                 </div>
             </div>
 
@@ -2556,9 +2557,12 @@ function getMatchSortValue(player, key){
 }
 
 function getMatchTier(player){
-    // Primary unmeasurable always last, regardless of the sort column.
-    if(isUtilitySupport(player.champion)) return 2;
-    if(player.insufficient_metrics) return 1;
+    if(player.insufficient_metrics){
+        return 2;
+    }
+    if(isUtilitySupport(player.champion)){
+        return 1;
+    }
     return 0;
 }
 
@@ -2732,11 +2736,11 @@ function renderMatchExplorer(matchId){
             <td><span class="match-team-badge ${team.className}" title="${escapeHtml(team.title)}" aria-label="${escapeHtml(team.title)}"></span></td>
             <td title="${escapeHtml(formatPlayerName(player.name))}">${escapeHtml(formatPlayerName(player.name))}${renderPentaBadge(player.penta_kills, true)}</td>
             <td><span class="match-champion-cell"><span>${formatChampionName(player)}${
-                isUtilitySupport(player.champion) || isPartiallyUnmeasurable(player.champion)
-                    ? championMeasurementMarker(player.champion)
-                    : (player.insufficient_metrics ? ' <span class="insufficient-metrics-asterisk" title="Influencia medible insuficiente">*</span>' : '')
+                player.insufficient_metrics
+                    ? ' <span class="insufficient-metrics-asterisk" title="Influencia medible insuficiente">*</span>'
+                    : (isUtilitySupport(player.champion) ? ' <span class="utility-support-asterisk" title="Campeón con influencia principal no detectable por el sistema">*</span>' : '')
             }</span></span></td>
-            <td class="impact-stat">${isUtilitySupport(player.champion) ? "*" : formatMatchScore(player.match_impact)}</td>
+            <td class="impact-stat">${formatMatchScore(player.match_impact)}</td>
             <td>${formatMatchRate(getRawMatchMetric(player, "kpm"), 3)}</td>
             <td>${formatMatchRate(getRawMatchMetric(player, "dpm"), 1)}</td>
             <td>${formatMatchRate(getRawMatchMetric(player, "kda"), 2)}</td>
@@ -2986,8 +2990,8 @@ function renderPlayersRanking(){
                     <td class="winrate-loss">${r.L}</td>
                     <td class="ewr-stat">${r.wr == null ? "—" : formatHomeMetric(r.wr, 1) + "%"}</td>
                     ${full ? `<td class="ewr-stat">${absentText}</td>` : ""}
-                    <td class="p95r-stat">${r.p95r_games === 0 ? "—" : formatHomeMetric(r.p95r, 3)}</td>
-                    <td class="mi-stat"><strong>${r.scored_games === 0 ? "—" : formatHomeMetric(r.global_avg_match_impact ?? 0, 2)}</strong></td>
+                    <td class="p95r-stat">${formatHomeMetric(r.p95r, 3)}</td>
+                    <td class="mi-stat"><strong>${formatHomeMetric(r.global_avg_match_impact ?? 0, 2)}</strong></td>
                 </tr>
             `;
         }
