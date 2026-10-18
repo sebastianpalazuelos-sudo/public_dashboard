@@ -212,44 +212,72 @@
 
   <div class="methodology-content">
 
+
 <div class="methodology-section">
 
-<h3>Qué mide el sistema</h3>
+  <h3>Cómo funciona el sistema</h3>
 
-  <p>Cada partida se resume en <strong>cinco dimensiones observables</strong>: KPM, DPM, KDA, CCPM y Tank%. Cada una se transforma en un score de <strong>0 a 10</strong> usando referencias globales fijas. Gold se muestra como contexto, no entra al Score.</p>
-  <p>De esas métricas salen cuatro números:</p>
+  <p>AKE evalúa el rendimiento de cada jugador mediante cinco métricas:</p>
+
   <ul>
-    <li><strong>Score</strong>: rendimiento del jugador en las métricas que realmente activó para ese campeón.</li>
-    <li><strong>MI</strong>: impacto dentro de la partida, basado en el rank contra los otros nueve.</li>
-    <li><strong>P95R</strong>: suma de los cinco scores de la partida, comparada contra el techo histórico de la suma para ese mismo campeón.</li>
-    <li><strong>EWR</strong>: win rate corregido por impacto general y daño a estructuras en surrenders.</li>
+    <li><strong>KPM:</strong> asesinatos por minuto.</li>
+    <li><strong>DPM:</strong> daño a campeones por minuto.</li>
+    <li><strong>KDA:</strong> relación entre asesinatos, asistencias y muertes.</li>
+    <li><strong>CCPM:</strong> control de masas aplicado por minuto.</li>
+    <li><strong>Tank%:</strong> proporción del daño soportado por el equipo que absorbió el jugador.</li>
   </ul>
 
-<h3>Cómo se eligen las métricas activas</h3>
+  <p>Cada métrica se convierte en una puntuación de <strong>0 a 10</strong> utilizando referencias históricas generales.</p>
 
-  <p>Los <strong>no enchanters</strong> tienen <strong>3 métricas signature</strong>: las más naturales según <code>central del campeón / central global</code>. <strong>Tank%</strong> solo puede ser signature si el campeón es naturalmente tanquillo. Las métricas no signature compiten como <strong>extras</strong>, pero solo entran si superan el <strong>P90 del campeón</strong> en esa partida. Se activan las 3 mejores por rank entre signatures y extras. KDA no es obligatorio: entra solo si es signature o supera el P90.</p>
-  <p>Los <strong>enchanters puros</strong> (Yuumi, Sona, Lulu, Janna, Soraka, Nami, Milio, Seraphine, Renata Glasc, Ivern, Bard) usan KDA como única signature, pero pueden sumar extras si superan el 90% de sus valores históricos. Nunca entran más de <strong>3 métricas</strong>.</p>
+  <h3>Score — Rendimiento</h3>
 
-<h3>Qué pasa con las métricas que quedan afuera</h3>
+  <p>Mide qué tan bien rindió un jugador en las métricas más relevantes para su campeón.</p>
 
-  <p>Como máximo se usan 3 métricas; el resto se evalúa en conjunto, pero <strong>solo si son naturales del campeón o KDA</strong>. Métricas ajenas al perfil (ej. CCPM para Lucian o tank para un carry) no penalizan. Si las excluidas naturales estuvieron por debajo de lo esperado, bajan la nota; si estuvieron por arriba, no la suben: nunca bonifica, solo penaliza. <strong>KDA pesa el doble</strong> en ese promedio. Este ajuste afecta tanto al <strong>Score</strong> como al <strong>MI</strong>.</p>
+  <p>La puntuación de cada métrica se calcula comparando su rendimiento con referencias históricas de todos los campeones:</p>
 
-<h3>Match Impact</h3>
+  <ul>
+    <li><strong>P10:</strong> 1 punto.</li>
+    <li><strong>P50:</strong> 5 puntos.</li>
+    <li><strong>P95:</strong> 10 puntos.</li>
+  </ul>
 
-  <p>El MI es el promedio de <code>11 - rank</code> en las métricas activas, ajustado por cantidad: 1 métrica = 0.88, 2 = 0.91, 3 = 1.0. Los supports de utilidad con 1 o 2 métricas reciben un ajuste adicional de 0.95. Después se aplica el multiplicador de excluidas.</p>
+  <p>Entre estas referencias, la puntuación aumenta de forma lineal.</p>
 
-<h3>Influencia medible insuficiente</h3>
+  <p>Para cada campeón se seleccionan hasta <strong>tres métricas principales</strong>, según su rendimiento histórico habitual. Si un jugador destaca extraordinariamente en otra métrica, esta puede incorporarse cuando supera el <strong>90% de los registros históricos de ese campeón (P90)</strong>.</p>
 
-  <p>Si un campeón queda con menos de 2 métricas activas (típico de enchanters con un solo KDA), la partida se marca con <span class="insufficient-metrics-asterisk">*</span>. Esa partida <strong>sigue contando para P95R y win rate</strong>, pero <strong>no entra en los promedios de Score y MI del perfil</strong>, porque la muestra observable no es representativa.</p>
+  <p>El Score combina las métricas seleccionadas.</p>
 
-<h3>P95R y EWR</h3>
+  <h3>MI — Impacto en la partida</h3>
 
-  <p>Para cada campeón se calcula el <strong>P95</strong> de la <em>suma de sus cinco scores</em> históricos. El <strong>P95R</strong> de una partida es <code>(kpm + dpm + kda + ccpm + tank) / P95 de esa suma</code>, promediado partida por partida. Eso compara al jugador contra el propio techo del campeón, no contra otros campeones.</p>
-  <p>El <strong>EWR</strong> es el win rate corregido por impacto general y daño a estructuras en surrenders.</p>
+  <p>Mide cuánto destacó un jugador frente a los otros nueve participantes en las métricas relevantes para su campeón.</p>
 
-<h3>Resumen</h3>
+  <p>En cada métrica activa, el primer puesto recibe <strong>10 puntos</strong>, el segundo 9 y así sucesivamente hasta el décimo, que recibe 1.</p>
 
-  <p><strong>Score</strong> mide el rendimiento en lo que el campeón pudo impactar. <strong>MI</strong> mide quién decidió la partida. <strong>P95R</strong> compara la suma total del rendimiento contra el techo histórico del mismo campeón. <strong>EWR</strong> mide el porcentaje de victorias corregido por impacto general y daño a estructuras en surrenders.</p>
+  <p>El MI es el promedio de esas puntuaciones.</p>
+
+  <h3>P95R — Rendimiento respecto al campeón</h3>
+
+  <p>Compara el rendimiento total de una partida con el nivel alcanzado históricamente por ese mismo campeón.</p>
+
+  <p>Se suman las puntuaciones de las cinco métricas y se dividen por el <strong>percentil 95 histórico</strong> de esa suma para el campeón.</p>
+
+  <p>A diferencia del Score, el P95R considera las cinco métricas, no solamente las seleccionadas.</p>
+
+  <h3>EWR — Victorias corregidas</h3>
+
+  <p>Es el porcentaje de victorias ajustado para contemplar rendiciones que no reflejan el resultado real de la partida.</p>
+
+  <p>La corrección considera el impacto general de los equipos y el daño causado a estructuras.</p>
+
+  <h3>Campeones con influencia no medible</h3>
+
+  <p>Yuumi, Sona, Lulu, Janna, Soraka, Nami, Milio, Seraphine, Renata Glasc e Ivern dependen especialmente de la curación y los escudos otorgados a sus aliados.</p>
+
+  <p>Mientras AKE no disponga de suficientes datos de estas contribuciones, su rendimiento individual no se considera evaluable de manera representativa y se identifica con <span class="insufficient-metrics-asterisk">*</span>.</p>
+
+  <h3>Resumen</h3>
+
+  <p><strong>Score</strong> mide el rendimiento en las fortalezas del campeón; <strong>MI</strong>, cuánto destacó frente a los demás jugadores; <strong>P95R</strong>, qué tan cerca estuvo de los mejores registros históricos de su campeón; y <strong>EWR</strong>, el porcentaje de victorias corregido.</p>
 
 </div>
 
