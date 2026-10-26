@@ -1973,3 +1973,8 @@ table td {
 .winrate-table .unqualified-asterisk{color:#fbbf24;font-weight:700;margin-left:4px;}
 .winrate-table th.ratio-stat,.winrate-table td.ratio-stat{color:#34d399;}
 .winrate-table th.impact-stat,.winrate-table td.impact-stat{color:#fbbf24;}
+
+/* Six score categories including PROTPM; active category keeps existing green treatment. */
+.score-metrics-grid{grid-template-columns:repeat(6,minmax(0,1fr));}
+@media(max-width:1100px) and (min-width:761px){.score-metrics-grid{grid-template-columns:repeat(3,minmax(0,1fr));}}
+@media(max-width:760px){.score-metrics-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}

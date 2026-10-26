@@ -20,18 +20,6 @@ let currentSplitRankingId = null;
 
 let activeViewName = "home";
 
-// Campeones cuya contribución principal (curación, utilidad, escudos)
-// no es observable directamente. Se muestran al final de su equipo en Match
-// Explorer con un indicador especial.
-const UTILITY_SUPPORT_CHAMPIONS = [
-    "Yuumi", "Sona", "Lulu", "Renata Glasc", "Milio", "Janna",
-    "Ivern", "Soraka", "Nami", "Seraphine"
-];
-
-function isUtilitySupport(championName){
-    return UTILITY_SUPPORT_CHAMPIONS.includes(championName);
-}
-
 function resetPlayersView(){
     showPlayersRanking();
 }
@@ -1165,7 +1153,8 @@ function getScoreMetric(item, key){
         dpm: "global_avg_dpm_score",
         kda: "global_avg_kda_score",
         ccpm: "global_avg_ccpm_score",
-        tank: "global_avg_tank_score"
+        tank: "global_avg_tank_score",
+        protpm: "global_avg_protpm_score"
     };
     const canonicalKey = canonicalKeyByMetric[key];
     const canonicalValue = canonicalKey ? item?.[canonicalKey] : undefined;
@@ -1183,7 +1172,8 @@ function getScoreMetric(item, key){
             dpm: "global_avg_dpm_score",
             kda: "global_avg_kda_score",
             ccpm: "global_avg_ccpm_score",
-            tank: "global_avg_tank_score"
+            tank: "global_avg_tank_score",
+            protpm: "global_avg_protpm_score"
         };
         const aggregateValue = aggregateKeyByMetric[key] ? item?.[aggregateKeyByMetric[key]] : undefined;
         if(Number.isFinite(Number(aggregateValue))){
@@ -1194,7 +1184,8 @@ function getScoreMetric(item, key){
                 dpm: "GLOBAL_DPM PTS",
                 kda: "GLOBAL_KDA PTS",
                 ccpm: "GLOBAL_CCPM PTS",
-                tank: "GLOBAL_TANK PTS"
+                tank: "GLOBAL_TANK PTS",
+                protpm: "GLOBAL_PROTPM PTS"
             };
             const globalKey = globalKeyByMetric[key];
             const globalValue = globalKey ? item?.[globalKey] : undefined;
@@ -1211,7 +1202,8 @@ function getRawMatchMetric(player, key){
         dpm: player?.dpm,
         kda: player?.kda,
         ccpm: player?.ccpm,
-        tank: player?.tank_share
+        tank: player?.tank_share,
+        protpm: player?.protpm
     };
     const value = Number(values[key]);
     return Number.isFinite(value) ? value : 0;
@@ -2344,6 +2336,13 @@ function renderMetricRank(rank){
     return `<span class="context-stat-rank${rankClass}">#${position} de 10</span>`;
 }
 
+function getProtpmRank(players, player){
+    const measured = players.filter(p => p.protpm !== null && p.protpm !== undefined && Number.isFinite(Number(p.protpm)));
+    if(!measured.includes(player)) return {rank: 0, count: measured.length};
+    measured.sort((a,b) => Number(b.protpm) - Number(a.protpm));
+    return {rank: measured.indexOf(player) + 1, count: measured.length};
+}
+
 function renderMetricBreakdown(player, matchPlayers){
     const context = player.context || {};
     const metricKeyMap = { kpm: "kpm", dpm: "dpm", kda: "kda", ccpm: "ccpm", tank_share: "tank" };
@@ -2356,13 +2355,15 @@ function renderMetricBreakdown(player, matchPlayers){
         { label: "DPM", key: "dpm", digits: 1 },
         { label: "KDA", key: "kda", digits: 2 },
         { label: "CCPM", key: "ccpm", digits: 3 },
-        { label: "Tank %", key: "tank", percent: true }
+        { label: "Tank %", key: "tank", percent: true },
+        { label: "PROTPM", key: "protpm", digits: 2 }
     ];
 
     return metrics.map(metric => {
-        const score = getScoreMetric(player, metric.key);
-        const scoreValue = formatMatchScore(score);
-        const rank = getMatchMetricRank(matchPlayers, player, metric.key);
+        const protpmMissing = metric.key === "protpm" && (player.protpm === null || player.protpm === undefined || !Number.isFinite(Number(player.protpm)));
+        const score = protpmMissing ? null : getScoreMetric(player, metric.key);
+        const scoreValue = protpmMissing ? "ND" : formatMatchScore(score);
+        const rank = metric.key === "protpm" ? getProtpmRank(matchPlayers, player) : getMatchMetricRank(matchPlayers, player, metric.key);
         const isActive = activeMetrics.has(metric.key);
         const activeClass = isActive ? " score-metric-active" : "";
 
@@ -2370,7 +2371,7 @@ function renderMetricBreakdown(player, matchPlayers){
             <div class="context-stat-card score-metric-card${activeClass}">
                 <span class="context-stat-label">${metric.label}</span>
                 <strong class="score-metric-value">${scoreValue}</strong>
-                ${renderMetricRank(rank)}
+                ${metric.key === "protpm" ? (rank.rank ? `<span class="context-stat-rank">#${rank.rank} de ${rank.count}</span>` : `<span class="context-stat-rank">Sin medición</span>`) : renderMetricRank(rank)}
             </div>
         `;
     }).join("");
@@ -2556,27 +2557,11 @@ function getMatchSortValue(player, key){
     return Number(player[key]) || 0;
 }
 
-function getMatchTier(player){
-    if(player.insufficient_metrics){
-        return 2;
-    }
-    if(isUtilitySupport(player.champion)){
-        return 1;
-    }
-    return 0;
-}
-
 function sortMatchPlayers(players){
     const { key, direction } = matchExplorerSort;
     const multiplier = direction === "asc" ? 1 : -1;
 
     return [...players].sort((a, b) => {
-        const aTier = getMatchTier(a);
-        const bTier = getMatchTier(b);
-        if(aTier !== bTier){
-            return aTier - bTier;
-        }
-
         const left = getMatchSortValue(a, key);
         const right = getMatchSortValue(b, key);
         if(typeof left === "string"){
@@ -2735,11 +2720,7 @@ function renderMatchExplorer(matchId){
                 onkeydown="if(event.key === 'Enter' || event.key === ' '){event.preventDefault();toggleMatchContext('${rowId}');}">
             <td><span class="match-team-badge ${team.className}" title="${escapeHtml(team.title)}" aria-label="${escapeHtml(team.title)}"></span></td>
             <td title="${escapeHtml(formatPlayerName(player.name))}">${escapeHtml(formatPlayerName(player.name))}${renderPentaBadge(player.penta_kills, true)}</td>
-            <td><span class="match-champion-cell"><span>${formatChampionName(player)}${
-                player.insufficient_metrics
-                    ? ' <span class="insufficient-metrics-asterisk" title="Influencia medible insuficiente">*</span>'
-                    : (isUtilitySupport(player.champion) ? ' <span class="utility-support-asterisk" title="Campeón con influencia principal no detectable por el sistema">*</span>' : '')
-            }</span></span></td>
+            <td><span class="match-champion-cell"><span>${formatChampionName(player)}</span></span></td>
             <td class="impact-stat">${formatMatchScore(player.match_impact)}</td>
             <td>${formatMatchRate(getRawMatchMetric(player, "kpm"), 3)}</td>
             <td>${formatMatchRate(getRawMatchMetric(player, "dpm"), 1)}</td>
