@@ -12,7 +12,7 @@ const views = {
 let dashboardData = null;
 let matchExplorerSort = { key: "match_impact", direction: "desc" };
 let splitRankingSort = { key: "global_avg_match_impact", direction: "desc" };
-let winRateSort = { key: "p95r", direction: "desc" };
+let winRateSort = { key: "p95r_mi", direction: "desc" };
 let profileNavStack = [{ view: "ranking" }];
 let matchFromNav = false;
 let currentSplitRanking = null;
@@ -2900,7 +2900,10 @@ function sortWinRateRows(rows, minResolved=50){
     const qualified = rows.filter(r => r.resolved >= minResolved);
     const unqualified = rows.filter(r => r.resolved < minResolved);
     const dir = winRateSort.direction === "asc" ? 1 : -1;
-    qualified.sort((a, b) => (a[winRateSort.key] - b[winRateSort.key]) * dir);
+    const sortValue = row => winRateSort.key === "p95r_mi"
+        ? 10 * (Number(row.p95r) || 0) + (Number(row.mi) || 0)
+        : Number(row[winRateSort.key]) || 0;
+    qualified.sort((a, b) => (sortValue(a) - sortValue(b)) * dir);
     return [...qualified, ...unqualified];
 }
 
