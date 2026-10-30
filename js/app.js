@@ -10,7 +10,7 @@ const views = {
 };
 
 let dashboardData = null;
-let matchExplorerSort = { key: "match_impact", direction: "desc" };
+let matchExplorerSort = { key: "final_note", direction: "desc" };
 let splitRankingSort = { key: "global_avg_match_impact", direction: "desc" };
 let winRateSort = { key: "p95r_mi", direction: "desc" };
 let profileNavStack = [{ view: "ranking" }];
@@ -2388,6 +2388,7 @@ function renderPlayerContext(player, isRemake = false, matchPlayers = []){
                     <span>${escapeHtml(player.champion)}</span>
                     <span class="match-context-meta" title="Meta histórico del campeón">Meta ${formatMatchScore(player.champion_meta || 0)}</span>
                     <span class="match-context-score" title="Score global absoluto de la partida">Score ${formatMatchScore(player.score)}</span>
+                    <span class="match-context-impact" title="Match Impact de la partida">MI ${formatMatchScore(player.match_impact)}</span>
                     <span class="match-context-impact" title="P95R: score relativo al potencial del campeón">P95R ${formatMatchRate(player.p95r, 3)}</span>
                 </div>
             </div>
@@ -2530,6 +2531,19 @@ function renderPentaBadge(count, inline=false){
     return `<span class="${cls}" title="Pentakill${n > 1 ? 's' : ''}"><span class="penta-star">★</span>${countHtml}</span>`;
 }
 
+// Misma formula numerica que Vigia: 50% MI + 50% (P95R x 10).
+// Sin tope superior y sin convertir valores ausentes en cero.
+function matchFinalNote(player){
+    if(player.match_impact === null || player.match_impact === undefined ||
+       player.p95r === null || player.p95r === undefined){ return null; }
+    const mi = Number(player.match_impact);
+    const p95r = Number(player.p95r);
+    if(!Number.isFinite(mi) || !Number.isFinite(p95r) || mi < 0 || mi > 10 || p95r < 0){
+        return null;
+    }
+    return 0.5 * mi + 5 * p95r;
+}
+
 function getMatchSortValue(player, key){
     if(key === "teamId"){ return Number(player.teamId) || 999; }
     if(key === "name" || key === "champion"){
@@ -2537,6 +2551,9 @@ function getMatchSortValue(player, key){
     }
     if(key === "ratio"){
         return matchP95R(player) ?? 0;
+    }
+    if(key === "final_note"){
+        return matchFinalNote(player) ?? -Infinity;
     }
     if(key === "match_impact"){
         return Number(player.match_impact) || 0;
@@ -2674,7 +2691,7 @@ function renderMatchExplorer(matchId){
         ${matchSortHeader("Team", "teamId")}
         ${matchSortHeader("Player", "name")}
         ${matchSortHeader("Champion", "champion")}
-        ${matchSortHeader("MI", "match_impact")}
+        ${matchSortHeader("Nota", "final_note")}
         ${matchSortHeader("KPM", "kpm_score")}
         ${matchSortHeader("DPM", "dpm_score")}
         ${matchSortHeader("KDA", "kda_score")}
@@ -2684,8 +2701,8 @@ function renderMatchExplorer(matchId){
 
     const matchPlayers = (match.players || []).map(player => ({
         ...player,
-        match_impact: Number(player.match_impact) || 0,
-        p95r: matchP95R(player) ?? 0
+        match_impact: player.match_impact,
+        p95r: matchP95R(player)
     }));
 
     const teamGroups = new Map();
@@ -2721,7 +2738,7 @@ function renderMatchExplorer(matchId){
             <td><span class="match-team-badge ${team.className}" title="${escapeHtml(team.title)}" aria-label="${escapeHtml(team.title)}"></span></td>
             <td title="${escapeHtml(formatPlayerName(player.name))}">${escapeHtml(formatPlayerName(player.name))}${renderPentaBadge(player.penta_kills, true)}</td>
             <td><span class="match-champion-cell"><span>${formatChampionName(player)}</span></span></td>
-            <td class="impact-stat">${formatMatchScore(player.match_impact)}</td>
+            <td class="impact-stat">${matchFinalNote(player) === null ? "—" : matchFinalNote(player).toFixed(2)}</td>
             <td>${formatMatchRate(getRawMatchMetric(player, "kpm"), 3)}</td>
             <td>${formatMatchRate(getRawMatchMetric(player, "dpm"), 1)}</td>
             <td>${formatMatchRate(getRawMatchMetric(player, "kda"), 2)}</td>
