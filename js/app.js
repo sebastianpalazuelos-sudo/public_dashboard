@@ -2922,7 +2922,7 @@ function sortWinRateRows(rows, minResolved=50){
     const unqualified = rows.filter(r => r.resolved < minResolved);
     const dir = winRateSort.direction === "asc" ? 1 : -1;
     const sortValue = row => winRateSort.key === "p95r_mi"
-        ? 10 * (Number(row.p95r) || 0) + (Number(row.mi) || 0)
+        ? Number(row.performance) || 0
         : Number(row[winRateSort.key]) || 0;
     qualified.sort((a, b) => (sortValue(a) - sortValue(b)) * dir);
     return [...qualified, ...unqualified];
@@ -2933,6 +2933,18 @@ function getExperimentalMMR(playerName){
     const row = rows[playerName];
     if(!row) return null;
     // Orden explícito: principal / secundaria; nunca sumar ambas cuentas.
+    // La cuenta secundaria Kaballa sigue computando internamente, pero su
+    // MMR no se muestra hasta acumular MAS de 100 partidas oficiales.
+    if(playerName === "AmsterdamK"){
+        const primary = row.accounts?.["AmsterdamK#LAS"];
+        const secondary = row.accounts?.["Kaballa#LAS"];
+        if(primary && secondary){
+            const games = (Number(secondary.riot_wins) || 0) + (Number(secondary.riot_losses) || 0);
+            return `${primary.final} / ${games > 100 ? secondary.final : "*"}`;
+        }
+        // Si el backend no incluye contadores, no revelar el MMR secundario.
+        return row.account_order?.length === 2 ? `${row.accounts?.[row.account_order[0]]?.final ?? "—"} / *` : null;
+    }
     if(typeof row.display === "string" && row.display.trim()) return row.display;
     return Number.isFinite(row.final) ? String(row.final) : null;
 }
@@ -2955,7 +2967,8 @@ function renderPlayersRanking(){
             wr: s.total ? (100 * (s.NW + s.SurrW) / s.total) : null,
             p95r: r.avg_meta_ratio ?? 0,
             mmr: getExperimentalMMR(r.name),
-            mi: r.global_avg_match_impact ?? 0
+            mi: r.global_avg_match_impact ?? 0,
+            performance: 0.5 * (Number(r.global_avg_match_impact) || 0) + 5 * (Number(r.avg_meta_ratio) || 0)
         };
     });
     const allRows = sortWinRateRows(makeRows(allRanking, statsAll), 0);
@@ -2986,12 +2999,13 @@ function renderPlayersRanking(){
                     ${header("mmr", "MMR", "MMR experimental: base fija + victorias Riot - derrotas Riot", "mmr-stat")}
                     ${header("p95r", "P95R", "Meta Ratio normalizado respecto al percentil 95 del campeón", "p95r-stat")}
                     ${header("global_avg_match_impact", "MI", "Match Impact promedio del jugador", "mi-stat")}
+                    ${header("p95r_mi", "P", "Performance: 0,5 × MI + 5 × P95R (criterio de orden predeterminado)", "performance-stat")}
                 </tr></thead><tbody>
         `;
         for(const r of rows){
             if(r.isReference){
                 h += `<tr class="players-ranking-row" data-player="Champion Reference" data-table="all" title="Open opponent champion reference profiles">
-                    <td><strong>‹ Champion Reference ›</strong></td><td colspan="${full ? 8 : 7}">Opponent champion baselines · Browse champions →</td></tr>`;
+                    <td><strong>‹ Champion Reference ›</strong></td><td colspan="${full ? 9 : 8}">Opponent champion baselines · Browse champions →</td></tr>`;
                 continue;
             }
             const absent = full ? absentStats[r.name] : null;
@@ -3009,6 +3023,7 @@ function renderPlayersRanking(){
                     <td class="mmr-stat">${r.mmr == null ? "—" : r.mmr}</td>
                     <td class="p95r-stat">${formatHomeMetric(r.p95r, 3)}</td>
                     <td class="mi-stat"><strong>${formatHomeMetric(r.global_avg_match_impact ?? 0, 2)}</strong></td>
+                    <td class="performance-stat"><strong>${formatHomeMetric(r.performance, 2)}</strong></td>
                 </tr>
             `;
         }
