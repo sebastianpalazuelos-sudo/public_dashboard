@@ -1943,6 +1943,10 @@ function renderPlayerChampionHighlights(elementId, highlights){
                         </div>
                     </div>
 
+                    <div class="home-player-global-avg home-mmr-avg">
+                        <span>MMR</span>
+                        <strong>${getExperimentalMMR(player.player) ?? "—"}</strong>
+                    </div>
                     <div class="home-player-global-avg home-meta-ratio-avg">
                         <span>AVG P95R</span>
                         <strong>${formatHomeMetric(player.avg_meta_ratio || 0, 3)}</strong>
@@ -2924,6 +2928,15 @@ function sortWinRateRows(rows, minResolved=50){
     return [...qualified, ...unqualified];
 }
 
+function getExperimentalMMR(playerName){
+    const rows = dashboardData?.mmr_profiles || {};
+    const row = rows[playerName];
+    if(!row) return null;
+    // Orden explícito: principal / secundaria; nunca sumar ambas cuentas.
+    if(typeof row.display === "string" && row.display.trim()) return row.display;
+    return Number.isFinite(row.final) ? String(row.final) : null;
+}
+
 function renderPlayersRanking(){
     const container = document.getElementById("players-ranking");
     if(!container || !dashboardData) return;
@@ -2941,6 +2954,7 @@ function renderPlayersRanking(){
             games: s.NW + s.NL + s.SurrW + s.SurrL,
             wr: s.total ? (100 * (s.NW + s.SurrW) / s.total) : null,
             p95r: r.avg_meta_ratio ?? 0,
+            mmr: getExperimentalMMR(r.name),
             mi: r.global_avg_match_impact ?? 0
         };
     });
@@ -2969,6 +2983,7 @@ function renderPlayersRanking(){
                     ${header("L", "L", "Derrotas corregidas", "winrate-loss")}
                     ${header("wr", "WR", "Win Rate corregido: W / (W + L)", "ewr-stat")}
                     ${full ? header("wrSin", "WR SIN", "Victorias / partidas Full-Friends en ausencia del perfil") : ""}
+                    ${header("mmr", "MMR", "MMR experimental: base fija + victorias Riot - derrotas Riot", "mmr-stat")}
                     ${header("p95r", "P95R", "Meta Ratio normalizado respecto al percentil 95 del campeón", "p95r-stat")}
                     ${header("global_avg_match_impact", "MI", "Match Impact promedio del jugador", "mi-stat")}
                 </tr></thead><tbody>
@@ -2976,7 +2991,7 @@ function renderPlayersRanking(){
         for(const r of rows){
             if(r.isReference){
                 h += `<tr class="players-ranking-row" data-player="Champion Reference" data-table="all" title="Open opponent champion reference profiles">
-                    <td><strong>‹ Champion Reference ›</strong></td><td colspan="6">Opponent champion baselines · Browse champions →</td></tr>`;
+                    <td><strong>‹ Champion Reference ›</strong></td><td colspan="${full ? 8 : 7}">Opponent champion baselines · Browse champions →</td></tr>`;
                 continue;
             }
             const absent = full ? absentStats[r.name] : null;
@@ -2991,6 +3006,7 @@ function renderPlayersRanking(){
                     <td class="winrate-loss">${r.L}</td>
                     <td class="ewr-stat">${r.wr == null ? "—" : formatHomeMetric(r.wr, 1) + "%"}</td>
                     ${full ? `<td class="ewr-stat">${absentText}</td>` : ""}
+                    <td class="mmr-stat">${r.mmr == null ? "—" : r.mmr}</td>
                     <td class="p95r-stat">${formatHomeMetric(r.p95r, 3)}</td>
                     <td class="mi-stat"><strong>${formatHomeMetric(r.global_avg_match_impact ?? 0, 2)}</strong></td>
                 </tr>

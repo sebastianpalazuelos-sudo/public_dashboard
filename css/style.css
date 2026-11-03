@@ -1978,3 +1978,15 @@ table td {
 .score-metrics-grid{grid-template-columns:repeat(6,minmax(0,1fr));}
 @media(max-width:1100px) and (min-width:761px){.score-metrics-grid{grid-template-columns:repeat(3,minmax(0,1fr));}}
 @media(max-width:760px){.score-metrics-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
+
+/* AKE MMR experimental: indicador adicional a la izquierda de AVG P95R. */
+.home-mmr-avg strong { color: #a5d8ff; }
+.mmr-stat { color: #a5d8ff; font-weight: 700; font-variant-numeric: tabular-nums; }
+@media (max-width: 950px) {
+    .home-player-card-header { flex-wrap: wrap; }
+    .home-player-global-avg { min-width: 72px; }
+}
+
+/* MMR por cuenta: permitir mostrar 262 / 266 sin cortar ni partir valores. */
+.home-mmr-avg { min-width: 122px; }
+.home-mmr-avg strong, .mmr-stat { white-space: nowrap; font-variant-numeric: tabular-nums; }
