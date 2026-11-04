@@ -2365,7 +2365,13 @@ function renderMetricBreakdown(player, matchPlayers){
 
     return metrics.map(metric => {
         const protpmMissing = metric.key === "protpm" && (player.protpm === null || player.protpm === undefined || !Number.isFinite(Number(player.protpm)));
-        const score = protpmMissing ? null : getScoreMetric(player, metric.key);
+        const miKey = metric.key === "tank" ? "tank_share" : metric.key;
+        const miPoints = player.mi_metric_points;
+        const score = protpmMissing ? null : (
+            miPoints && typeof miPoints === "object" && Number.isFinite(Number(miPoints[miKey]))
+                ? Number(miPoints[miKey])
+                : getScoreMetric(player, metric.key)
+        );
         const scoreValue = protpmMissing ? "ND" : formatMatchScore(score);
         const rank = metric.key === "protpm" ? getProtpmRank(matchPlayers, player) : getMatchMetricRank(matchPlayers, player, metric.key);
         const isActive = activeMetrics.has(metric.key);
@@ -2399,7 +2405,7 @@ function renderPlayerContext(player, isRemake = false, matchPlayers = []){
 
 
             <div class="match-context-group match-context-breakdown">
-                <h4>Score Metrics</h4>
+                <h4>Métricas MI (posición + referencia histórica)</h4>
                 <div class="match-context-stats score-metrics-grid">
                     ${renderMetricBreakdown(player, matchPlayers)}
                 </div>
