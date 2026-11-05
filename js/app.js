@@ -2541,17 +2541,18 @@ function renderPentaBadge(count, inline=false){
     return `<span class="${cls}" title="Pentakill${n > 1 ? 's' : ''}"><span class="penta-star">★</span>${countHtml}</span>`;
 }
 
-// Misma formula numerica que Vigia: 50% MI + 50% (P95R x 10).
+// Nota exclusiva del Match Explorer: 70% MI + 30% (P95R x 10).
+// Home y Profiles conservan sus fórmulas y sus columnas actuales.
 // Sin tope superior y sin convertir valores ausentes en cero.
 function matchFinalNote(player){
     if(player.match_impact === null || player.match_impact === undefined ||
        player.p95r === null || player.p95r === undefined){ return null; }
     const mi = Number(player.match_impact);
     const p95r = Number(player.p95r);
-    if(!Number.isFinite(mi) || !Number.isFinite(p95r) || mi < 0 || mi > 10 || p95r < 0){
+    if(!Number.isFinite(mi) || !Number.isFinite(p95r) || mi < 0 || p95r < 0){
         return null;
     }
-    return 0.5 * mi + 5 * p95r;
+    return 0.7 * mi + 3 * p95r;
 }
 
 function getMatchSortValue(player, key){
