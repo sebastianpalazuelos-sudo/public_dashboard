@@ -1224,6 +1224,38 @@ function getGoldPerMinute(item, durationSeconds = 0){
     return 0;
 }
 
+// WR del Champion Reference: victorias del campeón ENEMIGO según el resultado AKE.
+// Se limita a las partidas que componen el baseline mostrado, evitando
+// mezclar otros splits o partidas que no pertenecen a esa referencia.
+function championReferenceWrLabel(profile, championName){
+    const references = Array.isArray(profile?.matches) ? profile.matches : [];
+    const byId = new Map((dashboardData?.match_explorer || []).map(match => [String(match.match_id), match]));
+    let wins = 0;
+    let games = 0;
+    const seen = new Set();
+
+    for(const reference of references){
+        const id = String(reference.match_id ?? "");
+        if(!id || seen.has(id)) continue;
+        seen.add(id);
+        const match = byId.get(id);
+        if(!match || match.is_remake || match.winning_team == null) continue;
+        const friends = (match.players || []).filter(player => player.is_friend);
+        if(!friends.length) continue;
+        const friendTeams = new Set(friends.map(player => Number(player.teamId)));
+        const opponents = (match.players || []).filter(player =>
+            !player.is_friend && player.champion === championName &&
+            !friendTeams.has(Number(player.teamId))
+        );
+        if(opponents.length !== 1) continue;
+        games++;
+        if(Number(opponents[0].teamId) === Number(match.winning_team)) wins++;
+    }
+
+    const pct = games ? `${formatHomeMetric(100 * wins / games, 1)}%` : "—";
+    return `<span class="champion-ewr" title="Victorias del campeón rival según AKE / partidas con resultado AKE válido"><span style="color:#39c9a0;font-weight:700">WR ${pct}</span> <span style="color:#a9b8ca">(${wins}/${games})</span></span>`;
+}
+
 function buildChampionRankingTable(
     championProfile,
     selectedProfileName = null,
@@ -1292,7 +1324,9 @@ function buildChampionRankingTable(
                     <td class="champion-player-cell">
                         <div class="champion-ranking-player-name">
                             ${escapeHtml(displayName)}
-                            ${!isReference ? championEwrLabel(profile.name, championName || profile.champion) : ""}
+                            ${isReference
+                                ? championReferenceWrLabel(profile, championName || profile.champion)
+                                : championEwrLabel(profile.name, championName || profile.champion)}
 
                             ${isSelected ? `
                                 <span class="selected-player-badge">SELECTED PROFILE</span>
@@ -1693,7 +1727,7 @@ function renderPlayerChampionTable(
         html += `
             <tr class="champion-row" data-champion-index="${index}">
                 <td>${index + 1}</td>
-                <td>${escapeHtml(champion.champion)} ${playerName !== "Champion Reference" ? championEwrLabel(playerName, champion.champion, fullFriend) : ""}</td>
+                <td>${escapeHtml(champion.champion)} ${playerName === "Champion Reference" ? championReferenceWrLabel(champion, champion.champion) : championEwrLabel(playerName, champion.champion, fullFriend)}</td>
                 <td>
                     <div class="profile-games-cell">
                         <span>${champion.global_games ?? champion.games ?? 0}</span>
@@ -2365,13 +2399,7 @@ function renderMetricBreakdown(player, matchPlayers){
 
     return metrics.map(metric => {
         const protpmMissing = metric.key === "protpm" && (player.protpm === null || player.protpm === undefined || !Number.isFinite(Number(player.protpm)));
-        const miKey = metric.key === "tank" ? "tank_share" : metric.key;
-        const miPoints = player.mi_metric_points;
-        const score = protpmMissing ? null : (
-            miPoints && typeof miPoints === "object" && Number.isFinite(Number(miPoints[miKey]))
-                ? Number(miPoints[miKey])
-                : getScoreMetric(player, metric.key)
-        );
+        const score = protpmMissing ? null : getScoreMetric(player, metric.key);
         const scoreValue = protpmMissing ? "ND" : formatMatchScore(score);
         const rank = metric.key === "protpm" ? getProtpmRank(matchPlayers, player) : getMatchMetricRank(matchPlayers, player, metric.key);
         const isActive = activeMetrics.has(metric.key);
@@ -2405,7 +2433,7 @@ function renderPlayerContext(player, isRemake = false, matchPlayers = []){
 
 
             <div class="match-context-group match-context-breakdown">
-                <h4>Métricas MI (posición + referencia histórica)</h4>
+                <h4>Score Metrics</h4>
                 <div class="match-context-stats score-metrics-grid">
                     ${renderMetricBreakdown(player, matchPlayers)}
                 </div>
@@ -2541,18 +2569,17 @@ function renderPentaBadge(count, inline=false){
     return `<span class="${cls}" title="Pentakill${n > 1 ? 's' : ''}"><span class="penta-star">★</span>${countHtml}</span>`;
 }
 
-// Nota exclusiva del Match Explorer: 70% MI + 30% (P95R x 10).
-// Home y Profiles conservan sus fórmulas y sus columnas actuales.
+// Misma formula numerica que Vigia: 50% MI + 50% (P95R x 10).
 // Sin tope superior y sin convertir valores ausentes en cero.
 function matchFinalNote(player){
     if(player.match_impact === null || player.match_impact === undefined ||
        player.p95r === null || player.p95r === undefined){ return null; }
     const mi = Number(player.match_impact);
     const p95r = Number(player.p95r);
-    if(!Number.isFinite(mi) || !Number.isFinite(p95r) || mi < 0 || p95r < 0){
+    if(!Number.isFinite(mi) || !Number.isFinite(p95r) || mi < 0 || mi > 10 || p95r < 0){
         return null;
     }
-    return 0.7 * mi + 3 * p95r;
+    return 0.5 * mi + 5 * p95r;
 }
 
 function getMatchSortValue(player, key){
