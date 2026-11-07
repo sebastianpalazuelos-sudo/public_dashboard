@@ -1990,3 +1990,53 @@ table td {
 /* MMR por cuenta: permitir mostrar 262 / 266 sin cortar ni partir valores. */
 .home-mmr-avg { min-width: 122px; }
 .home-mmr-avg strong, .mmr-stat { white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+/* Records: same dark dashboard language, eight category-specific signatures. */
+.records-section{overflow:hidden;background:radial-gradient(ellipse at 85% 0%,rgba(59,130,246,.13),transparent 42%),rgba(31,41,55,.92)}
+.records-heading{display:flex;justify-content:space-between;align-items:end;gap:18px;flex-wrap:wrap;margin-bottom:24px}
+.records-heading h2{border:0;padding:0;margin:5px 0;font-size:34px;letter-spacing:-.055em;font-weight:900}
+.records-heading p{color:#9ca3af;margin:0;font-size:13px}
+.records-kicker{color:#60a5fa;letter-spacing:.23em;font-size:10px;font-weight:800}
+.records-population{color:#94a3b8;font-size:11px;letter-spacing:.12em;font-weight:700;padding-bottom:5px}
+.records-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}
+.record-card{position:relative;isolation:isolate;min-width:0;overflow:hidden;border:1px solid rgba(148,163,184,.22);border-top:2px solid var(--record-color);border-radius:15px;padding:19px 17px 14px;background:radial-gradient(ellipse at 92% 3%,color-mix(in srgb,var(--record-color) 18%,transparent),transparent 56%),linear-gradient(150deg,#111827,#0b1220 85%);box-shadow:0 14px 25px rgba(0,0,0,.2);transition:transform .2s,border-color .2s}
+.record-card:hover{transform:translateY(-3px);border-color:var(--record-color)}
+.record-card-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.record-number{font-size:11px;font-weight:900;letter-spacing:.12em;color:#94a3b8}
+.record-icon{font-size:26px;color:var(--record-color);text-shadow:0 0 20px var(--record-color);line-height:1}
+.record-crown{font-size:9px;font-weight:900;letter-spacing:.08em;color:var(--record-color)}
+.record-title{font-size:12px;letter-spacing:.16em;font-weight:800;color:#e2e8f0;margin-top:19px}
+.record-main{font-size:clamp(27px,3vw,40px);font-weight:900;letter-spacing:-.06em;color:#fff;margin-top:8px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.record-unit{font-size:10px;font-weight:800;letter-spacing:.12em;color:var(--record-color);margin-top:2px}
+.record-owner{display:flex;align-items:center;gap:10px;margin-top:24px;border-top:1px solid rgba(148,163,184,.17);padding-top:15px;min-width:0}
+.record-avatar{width:35px;height:35px;flex:0 0 35px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:color-mix(in srgb,var(--record-color) 17%,#0b1220);color:var(--record-color);font-size:20px}
+.record-owner>div{min-width:0}.record-player{font-size:13px;font-weight:800;overflow-wrap:anywhere}.record-champion{font-size:12px;color:#94a3b8;margin-top:3px}
+.record-raw{display:flex;justify-content:space-between;gap:8px;margin-top:14px;font-size:11px;color:#94a3b8}.record-raw strong{font-size:13px;color:#f8fafc;font-variant-numeric:tabular-nums}
+.record-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:18px;padding-top:11px;border-top:1px solid rgba(148,163,184,.12);font-size:10px;color:#64748b}
+.record-match-link{font:inherit;color:#93c5fd;border:0;background:none;cursor:pointer;padding:2px;text-align:right}.record-match-link:hover{text-decoration:underline}
+@media(max-width:1150px){.records-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){.records-grid{grid-template-columns:1fr}.record-main{font-size:38px}}
+
+/* RECORDS — podio histórico, un máximo por identidad de perfil. */
+.records-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.record-card{padding:20px 20px 22px}
+.record-title{font-size:17px;margin-top:12px}
+.record-podium{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:end;gap:9px;margin-top:23px}
+.record-podium-place{min-width:0;display:flex;flex-direction:column;align-items:center;text-align:center;gap:7px;padding:13px 7px 12px;border:1px solid rgba(148,163,184,.2);border-radius:11px;background:rgba(2,6,23,.42);overflow-wrap:anywhere}
+.record-place-1{order:2;min-height:222px;border-color:rgba(251,191,36,.6);background:linear-gradient(180deg,rgba(251,191,36,.13),rgba(2,6,23,.5));box-shadow:0 0 22px rgba(251,191,36,.07)}
+.record-place-2{order:1;min-height:190px;border-color:rgba(203,213,225,.35)}
+.record-place-3{order:3;min-height:176px;border-color:rgba(205,127,50,.35)}
+.record-medal{font-size:24px;font-weight:900;color:#e2e8f0}
+.record-place-1 .record-medal{color:#fbbf24;font-size:30px}
+.record-place-3 .record-medal{color:#cd7f32}
+.record-podium-value{font-size:clamp(17px,2vw,27px);font-weight:900;letter-spacing:-.05em;color:#f8fafc;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.record-place-1 .record-podium-value{color:#fde68a}
+.record-podium-player{font-size:12px;font-weight:800;color:#f8fafc;overflow-wrap:anywhere}
+.record-podium-champion{font-size:11px;color:#94a3b8}
+.record-podium-raw{font-size:10px;color:#94a3b8;line-height:1.45}
+.record-podium-raw strong{display:block;color:#e2e8f0;font-size:12px}
+.record-podium-date{font-size:10px;color:#64748b;margin-top:auto}
+.record-podium-place .record-match-link{font-size:10px;overflow-wrap:anywhere;text-align:center}
+.record-empty{font-size:10px;color:#64748b}
+@media(max-width:1100px){.records-grid{grid-template-columns:1fr}}
+@media(max-width:540px){.record-card{padding:14px 9px}.record-podium{gap:5px}.record-podium-place{padding:10px 4px}.record-podium-value{font-size:16px}.record-podium-player{font-size:11px}}

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>ARAM Engine Dashboard</title>
-<link rel="stylesheet" href="css/style.css?v=kda-universal-v5.0">
+<link rel="stylesheet" href="css/style.css?v=records-v1">
 </head>
 <body>
 <header>
@@ -16,6 +16,7 @@
     <button class="tab-button" data-view="champions">CHAMPIONS</button>
     <button class="tab-button" data-view="synergies">SYNERGIES</button>
     <button class="tab-button" data-view="matches">MATCHES</button>
+    <button class="tab-button" data-view="records">RECORDS</button>
     <button class="tab-button" data-view="splits">SPLITS</button>
     <button class="tab-button tab-right" data-view="methodology">METODOLOGIA</button>
     <button class="tab-button" data-view="changelog">CHANGELOG</button>
@@ -154,6 +155,13 @@
 
 </section>
 
+</div>
+
+<div id="view-records" class="app-view">
+<section class="records-section">
+  <div class="records-heading"><div><div class="records-kicker">AKE // HALL OF FAME</div><h2>RECORDS</h2><p>Los máximos históricos. Sin filtros, sin divisiones.</p></div><div id="records-population" class="records-population"></div></div>
+  <div id="records-grid" class="records-grid"><p>Cargando récords...</p></div>
+</section>
 </div>
 
 <div id="view-synergies" class="app-view">
@@ -298,6 +306,6 @@
 
 </main>
 
-<script src="js/app.js?v=kda-universal-v5.0"></script>
+<script src="js/app.js?v=records-v1"></script>
 </body>
 </html>

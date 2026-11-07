@@ -4,6 +4,7 @@ const views = {
     champions: document.getElementById("view-champions"),
     synergies: document.getElementById("view-synergies"),
     matches: document.getElementById("view-matches"),
+    records: document.getElementById("view-records"),
     methodology: document.getElementById("view-methodology"),
     splits: document.getElementById("view-splits"),
     changelog: document.getElementById("view-changelog"),
@@ -114,7 +115,7 @@ function showView(viewName){
         resetViewState(activeViewName);
     }
 
-    Object.values(views).forEach(view => {
+    Object.values(views).filter(Boolean).forEach(view => {
         view.classList.remove("active-view");
     });
 
@@ -122,6 +123,7 @@ function showView(viewName){
         button.classList.remove("active");
     });
 
+    if(!views[viewName]){ console.error("Vista no disponible:", viewName); return; }
     views[viewName].classList.add("active-view");
 
     document
@@ -132,6 +134,10 @@ function showView(viewName){
         renderPlayersRanking();
         showPlayersRanking();
         resetProfileNav();
+    }
+
+    if(viewName === "records"){
+        renderRecords();
     }
 
     if(viewName === "changelog"){
@@ -160,6 +166,7 @@ async function loadDashboard(){
     const data=await response.json();
     dashboardData = data;
     championEwrCache = null;
+    akeTitleCountsCache = null;
     renderPlayerChampionHighlights(
         "home-player-champion-highlights",
         data.player_champion_highlights
@@ -1224,38 +1231,6 @@ function getGoldPerMinute(item, durationSeconds = 0){
     return 0;
 }
 
-// WR del Champion Reference: victorias del campeón ENEMIGO según el resultado AKE.
-// Se limita a las partidas que componen el baseline mostrado, evitando
-// mezclar otros splits o partidas que no pertenecen a esa referencia.
-function championReferenceWrLabel(profile, championName){
-    const references = Array.isArray(profile?.matches) ? profile.matches : [];
-    const byId = new Map((dashboardData?.match_explorer || []).map(match => [String(match.match_id), match]));
-    let wins = 0;
-    let games = 0;
-    const seen = new Set();
-
-    for(const reference of references){
-        const id = String(reference.match_id ?? "");
-        if(!id || seen.has(id)) continue;
-        seen.add(id);
-        const match = byId.get(id);
-        if(!match || match.is_remake || match.winning_team == null) continue;
-        const friends = (match.players || []).filter(player => player.is_friend);
-        if(!friends.length) continue;
-        const friendTeams = new Set(friends.map(player => Number(player.teamId)));
-        const opponents = (match.players || []).filter(player =>
-            !player.is_friend && player.champion === championName &&
-            !friendTeams.has(Number(player.teamId))
-        );
-        if(opponents.length !== 1) continue;
-        games++;
-        if(Number(opponents[0].teamId) === Number(match.winning_team)) wins++;
-    }
-
-    const pct = games ? `${formatHomeMetric(100 * wins / games, 1)}%` : "—";
-    return `<span class="champion-ewr" title="Victorias del campeón rival según AKE / partidas con resultado AKE válido"><span style="color:#39c9a0;font-weight:700">WR ${pct}</span> <span style="color:#a9b8ca">(${wins}/${games})</span></span>`;
-}
-
 function buildChampionRankingTable(
     championProfile,
     selectedProfileName = null,
@@ -1324,9 +1299,7 @@ function buildChampionRankingTable(
                     <td class="champion-player-cell">
                         <div class="champion-ranking-player-name">
                             ${escapeHtml(displayName)}
-                            ${isReference
-                                ? championReferenceWrLabel(profile, championName || profile.champion)
-                                : championEwrLabel(profile.name, championName || profile.champion)}
+                            ${!isReference ? championEwrLabel(profile.name, championName || profile.champion) : ""}
 
                             ${isSelected ? `
                                 <span class="selected-player-badge">SELECTED PROFILE</span>
@@ -1727,7 +1700,7 @@ function renderPlayerChampionTable(
         html += `
             <tr class="champion-row" data-champion-index="${index}">
                 <td>${index + 1}</td>
-                <td>${escapeHtml(champion.champion)} ${playerName === "Champion Reference" ? championReferenceWrLabel(champion, champion.champion) : championEwrLabel(playerName, champion.champion, fullFriend)}</td>
+                <td>${escapeHtml(champion.champion)} ${playerName !== "Champion Reference" ? championEwrLabel(playerName, champion.champion, fullFriend) : ""}</td>
                 <td>
                     <div class="profile-games-cell">
                         <span>${champion.global_games ?? champion.games ?? 0}</span>
@@ -2576,10 +2549,70 @@ function matchFinalNote(player){
        player.p95r === null || player.p95r === undefined){ return null; }
     const mi = Number(player.match_impact);
     const p95r = Number(player.p95r);
-    if(!Number.isFinite(mi) || !Number.isFinite(p95r) || mi < 0 || mi > 10 || p95r < 0){
+    if(!Number.isFinite(mi) || !Number.isFinite(p95r) || mi < 0 || p95r < 0){
         return null;
     }
     return 0.5 * mi + 5 * p95r;
+}
+
+// AKE performance titles: use unrounded per-match performance, not the profile mean.
+// Keep synchronized with ake.config.ENCHANTER_SUPPORT_CHAMPIONS.
+const AKE_TITLE_ENCHANTERS = new Set([
+    "Soraka", "Sona", "Nami", "Yuumi", "Milio", "Janna", "Lulu",
+    "Karma", "Seraphine", "Renata Glasc", "Senna", "Taric", "Ivern", "Bard"
+]);
+const AKE_CONO_THRESHOLD = 4.718;
+let akeTitleCountsCache = null;
+
+function akeTitleKind(player){
+    const note = matchFinalNote(player);
+    if(note === null || player.insufficient_metrics) return null;
+    if(note > 10) return "god";
+    if(note >= AKE_CONO_THRESHOLD) return null;
+    if(AKE_TITLE_ENCHANTERS.has(player.champion)){
+        // A recorded zero is valid; absent/invalid protection is not.
+        if(player.protpm === null || player.protpm === undefined || player.protpm === "") return null;
+        const protection = Number(player.protpm);
+        if(!Number.isFinite(protection) || protection < 0) return null;
+    }
+    return "cono";
+}
+
+function akeTitleBadge(kind, count=1, inline=false){
+    if(!count) return "";
+    const god = kind === "god";
+    const title = god ? "God: puntaje final > 10" : "Cono: puntaje final < 4.718 (enchanters requieren PROTPM válido)";
+    const shape = god
+        ? `<svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><path d="M4 9 3 2l6 4a9 9 0 0 1 6 0l6-4-1 7a9 9 0 1 1-16 0Z" fill="#e65b62" stroke="#842c43" stroke-width="1.1"/><path d="M7 12h2m6 0h2" stroke="#321a25" stroke-width="2" stroke-linecap="round"/><path d="M9 16q3 3 6 0" fill="none" stroke="#321a25" stroke-width="1.4" stroke-linecap="round"/></svg>`
+        : `<svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><path d="M7.5 11.5 12 22l4.5-10.5Z" fill="#d9a36a" stroke="#98633c" stroke-width="1" stroke-linejoin="round"/><path d="m9 15 5 3m1-3-5 3" stroke="#a9784e" stroke-width=".8"/><path d="M5.5 10.5a4 4 0 0 1 3.2-4.1 4.1 4.1 0 0 1 7.5 0 4 4 0 0 1 2.3 4.1c0 2-1.5 3-3.2 3H8.7c-1.7 0-3.2-1-3.2-3Z" fill="#f7c9dc" stroke="#b96b91" stroke-width="1"/><path d="M8.2 10.5c2 1 5.7 1 7.6 0" fill="none" stroke="#fff0f5" stroke-width="1.2" stroke-linecap="round"/><circle cx="12" cy="4.2" r="1.5" fill="#d84858"/></svg>`;
+    return `<span class="ake-title-badge" title="${title}" aria-label="${title}" style="display:inline-flex;align-items:center;vertical-align:middle;margin-left:4px;gap:1px;white-space:nowrap">${shape}${count>1?`<span style="font-size:11px;font-weight:700">${count}</span>`:""}</span>`;
+}
+function akeTitleBadges(player, inline=false){
+    const kind = akeTitleKind(player);
+    return kind ? akeTitleBadge(kind, 1, inline) : "";
+}
+function akeTitleCounts(fullFriend=false){
+    const cacheKey = fullFriend ? "full" : "all";
+    if(!akeTitleCountsCache) akeTitleCountsCache = {};
+    if(akeTitleCountsCache[cacheKey]) return akeTitleCountsCache[cacheKey];
+    const result = {};
+    for(const match of (dashboardData?.match_explorer || [])){
+        if(match.is_remake || (fullFriend && !isEligibleFullFriendMatch(match))) continue;
+        for(const p of (match.players || [])){
+            if(!p.is_friend) continue;
+            const kind = akeTitleKind(p);
+            if(!kind) continue;
+            const identity = canonicalPlayerName(p.identity || p.name);
+            const row = result[identity] || (result[identity] = {god:0, cono:0});
+            row[kind] += 1;
+        }
+    }
+    akeTitleCountsCache[cacheKey] = result;
+    return result;
+}
+function akeProfileTitleBadges(name, fullFriend=false){
+    const counts = akeTitleCounts(fullFriend)[canonicalPlayerName(name)] || {};
+    return akeTitleBadge("god", counts.god || 0) + akeTitleBadge("cono", counts.cono || 0);
 }
 
 function getMatchSortValue(player, key){
@@ -2774,7 +2807,7 @@ function renderMatchExplorer(matchId){
                 onclick="toggleMatchContext('${rowId}')"
                 onkeydown="if(event.key === 'Enter' || event.key === ' '){event.preventDefault();toggleMatchContext('${rowId}');}">
             <td><span class="match-team-badge ${team.className}" title="${escapeHtml(team.title)}" aria-label="${escapeHtml(team.title)}"></span></td>
-            <td title="${escapeHtml(formatPlayerName(player.name))}">${escapeHtml(formatPlayerName(player.name))}${renderPentaBadge(player.penta_kills, true)}</td>
+            <td title="${escapeHtml(formatPlayerName(player.name))}">${escapeHtml(formatPlayerName(player.name))}${renderPentaBadge(player.penta_kills, true)}${akeTitleBadges(player, true)}</td>
             <td><span class="match-champion-cell"><span>${formatChampionName(player)}</span></span></td>
             <td class="impact-stat">${matchFinalNote(player) === null ? "—" : matchFinalNote(player).toFixed(2)}</td>
             <td>${formatMatchRate(getRawMatchMetric(player, "kpm"), 3)}</td>
@@ -3048,7 +3081,7 @@ function renderPlayersRanking(){
                 : `${formatHomeMetric(absent.pct, 1)}%`;
             h += `
                 <tr class="players-ranking-row" data-player="${escapeHtml(r.name)}" data-table="${tableKey}">
-                    <td>${escapeHtml(formatPlayerName(r.name))}${renderPentaBadge(r.total_pentakills)}</td>
+                    <td>${escapeHtml(formatPlayerName(r.name))}${renderPentaBadge(r.total_pentakills)}${akeProfileTitleBadges(r.name, full)}</td>
                     <td>${r.games}</td>
                     <td class="winrate-win">${r.W}</td>
                     <td class="winrate-loss">${r.L}</td>
@@ -3179,3 +3212,72 @@ function navigateBackFromMatch(){
 }
 
 loadDashboard();
+
+
+// RECORDS: independent all-history data published from match_store.json.
+const AKE_RECORD_DEFS = [
+    {key:"total_dmgpm", title:"TOTAL DAMAGE", unit:"DMG / MIN", raw:"Total raw", accent:"flame", icon:"◆", hue:"#f97316"},
+    {key:"magic_dmgpm", title:"MAGIC DAMAGE", unit:"MAGIC / MIN", raw:"Daño mágico raw", accent:"arcane", icon:"✦", hue:"#a78bfa"},
+    {key:"physical_dmgpm", title:"PHYSICAL DAMAGE", unit:"PHYSICAL / MIN", raw:"Daño físico raw", accent:"steel", icon:"⚔", hue:"#fb7185"},
+    {key:"tankpm", title:"TANK", unit:"TANK / MIN", raw:"Daño recibido + mitigado", accent:"fortress", icon:"⬡", hue:"#38bdf8"},
+    {key:"tank_pct", title:"TANK SHARE", unit:"% DEL TANK DEL EQUIPO", raw:"Tank raw", accent:"shield", icon:"◈", hue:"#2dd4bf"},
+    {key:"ccpm", title:"CROWD CONTROL", unit:"CC / MIN", raw:"CC total (s)", accent:"frost", icon:"❄", hue:"#93c5fd"},
+    {key:"kda", title:"KDA", unit:"KDA", raw:null, accent:"crown", icon:"♛", hue:"#fbbf24"},
+    {key:"protpm", title:"PROTECTION", unit:"PROT / MIN", raw:"Ally heal + shield raw", accent:"aura", icon:"✚", hue:"#4ade80"}
+];
+let akeRecordsCache = null;
+let akeRecordsPromise = null;
+function akeRecordNumber(value, decimals=1){
+    return Number(value).toLocaleString("es-AR", {maximumFractionDigits:decimals, minimumFractionDigits:decimals});
+}
+async function renderRecords(){
+    const grid = document.getElementById("records-grid");
+    const pop = document.getElementById("records-population");
+    if(!grid) return;
+    if(!akeRecordsPromise){
+        akeRecordsPromise = fetch("records_data.json").then(r=>{
+            if(!r.ok) throw new Error("No se encontró records_data.json. Ejecutá FULL o REBUILD con el motor actualizado.");
+            return r.json();
+        }).then(data => (akeRecordsCache=data)).catch(err=>{akeRecordsPromise=null;throw err;});
+    }
+    try{
+        const data=await akeRecordsPromise;
+        if(pop) pop.textContent = `${akeRecordNumber(data.eligible_matches,0)} PARTIDAS EVALUADAS · ALL TIME`;
+        grid.innerHTML = AKE_RECORD_DEFS.map((def,index)=>{
+            const podium = data.records?.[def.key];
+            const entries = Array.isArray(podium) ? podium : (podium ? [podium] : []);
+            const slots = [1,0,2].map(i=>{
+                const rec=entries[i];
+                const rank=i+1;
+                if(!rec) return `<div class="record-podium-place record-place-${rank} record-place-empty"><div class="record-medal">${["Ⅰ","Ⅱ","Ⅲ"][i]}</div><div class="record-empty">SIN MARCA</div></div>`;
+                const date=rec.timestamp ? new Date(Number(rec.timestamp)).toLocaleDateString("es-AR") : "—";
+                const main=akeRecordNumber(rec.value,def.key==="kda"?2:1)+(def.key==="tank_pct"?"%":"");
+                const raw=def.raw && rec.raw_total!==null && rec.raw_total!==undefined ? `<div class="record-podium-raw">${escapeHtml(def.raw)} <strong>${akeRecordNumber(rec.raw_total,0)}</strong></div>` : "";
+                return `<div class="record-podium-place record-place-${rank}">
+                    <div class="record-medal">${["Ⅰ","Ⅱ","Ⅲ"][i]}</div>
+                    <div class="record-podium-value">${main}</div>
+                    <div class="record-podium-player">${escapeHtml(rec.player)}</div>
+                    <div class="record-podium-champion">${escapeHtml(rec.champion)}</div>
+                    ${raw}
+                    <div class="record-podium-date">${date}</div>
+                    <button type="button" class="record-match-link" data-record-match="${escapeHtml(rec.match_id)}">MATCH #${escapeHtml(rec.match_id)} ↗</button>
+                </div>`;
+            }).join("");
+            return `<article class="record-card record-${def.accent}" style="--record-color:${def.hue}">
+                <div class="record-card-top"><span class="record-number">0${index+1}</span><span class="record-icon">${def.icon}</span><span class="record-crown">ALL-TIME TOP 3</span></div>
+                <div class="record-title">${def.title}</div>
+                <div class="record-unit">${def.unit}</div>
+                <div class="record-podium">${slots}</div>
+            </article>`;
+        }).join("");
+        grid.querySelectorAll("[data-record-match]").forEach(btn=>btn.addEventListener("click",()=>{
+            const id=btn.dataset.recordMatch;
+            showView("matches");
+            const select=document.getElementById("match-select");
+            if(select){select.value=id;}
+            const search=document.getElementById("match-search-input");
+            if(search){search.value=id;}
+            renderMatchExplorer(id);
+        }));
+    }catch(e){grid.innerHTML=`<p class="error">${escapeHtml(e.message)}</p>`;}
+}
