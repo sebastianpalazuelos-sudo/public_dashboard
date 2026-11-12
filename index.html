@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <title>ARAM Engine Dashboard</title>
 <link rel="stylesheet" href="css/style.css?v=records-v1">
+<link rel="stylesheet" href="css/compositions.css?v=3">
 </head>
 <body>
 <header>
@@ -15,6 +16,7 @@
     <button class="tab-button" data-view="players">PROFILES</button>
     <button class="tab-button" data-view="champions">CHAMPIONS</button>
     <button class="tab-button" data-view="synergies">SYNERGIES</button>
+    <button class="tab-button" data-view="compositions">COMPOSICIONES</button>
     <button class="tab-button" data-view="matches">MATCHES</button>
     <button class="tab-button" data-view="records">RECORDS</button>
     <button class="tab-button" data-view="splits">SPLITS</button>
@@ -304,8 +306,10 @@
 </section>
 </div>
 
+<div id="view-compositions" class="app-view"><section><h2>Composiciones</h2><p class="comps-intro">Siete perfiles y planificación estratégica de equipos con recomendaciones contextuales.</p><div id="comps-root"></div></section></div>
 </main>
 
 <script src="js/app.js?v=records-v1"></script>
+<script src="js/compositions.js?v=3"></script>
 </body>
 </html>

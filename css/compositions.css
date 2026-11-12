@@ -1,0 +1,20 @@
+#view-compositions{--comp-border:rgba(140,155,170,.24)}
+.comps-intro{opacity:.78;line-height:1.55}
+.comps-profiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:14px;margin:16px 0 28px}
+.comps-profile{display:flex;align-items:flex-start;gap:16px;padding:18px;border:1px solid var(--comp-border);border-radius:12px;background:rgba(120,140,160,.05);min-width:0}
+.comps-profile img{width:76px;height:76px;object-fit:cover;border-radius:9px;flex-shrink:0}
+.comps-profile-body{min-width:0;flex:1}
+.comps-profile h4{margin:0 0 4px;font-size:1.05rem;font-weight:650}
+.comps-profile p{margin:9px 0;line-height:1.5;font-size:.94rem}
+.comps-profile p b{font-weight:650}
+.comps-profile .comps-type{opacity:.75;font-size:.9rem;margin:0 0 12px}
+@media(max-width:480px){.comps-profile{gap:12px;padding:14px}.comps-profile img{width:54px;height:54px}}
+/* Planificador de composiciones */
+#ake-comp-engine{margin-top:28px;color:inherit}
+#ake-comp-engine button{font:inherit;color:inherit;cursor:pointer}
+.ake-engine-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:18px 0}.ake-engine-head h3{margin:0 0 4px}.ake-engine-head p{margin:0;opacity:.7;font-size:.88rem}
+.ake-switch{display:flex;gap:5px}.ake-switch button,.ake-mini{border:1px solid var(--comp-border);border-radius:8px;padding:8px 12px;background:transparent}.ake-switch .ake-active,.ake-comp-tabs .ake-active{background:rgba(93,145,194,.16);border-color:rgba(115,166,219,.7)}
+.ake-comp-tabs{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:9px;margin:14px 0}.ake-comp-tabs button{display:flex;flex-direction:column;gap:5px;text-align:left;background:rgba(120,140,160,.04);border:1px solid var(--comp-border);border-radius:10px;padding:12px}.ake-comp-tabs small{opacity:.65;font-size:.72rem}.ake-comp-tabs b{font-size:.9rem}
+.ake-comp-main{border:1px solid var(--comp-border);border-radius:13px;padding:18px;background:rgba(120,140,160,.03)}.ake-comp-main header h3{margin:0 0 5px}.ake-comp-main header p{margin:0 0 20px;opacity:.78}.ake-comp-columns{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(250px,1fr);gap:18px}.ake-comp-columns h4{margin:12px 0}
+.ake-slot,.ake-sub-card,.ake-eval,.ake-rule{border:1px solid var(--comp-border);border-radius:10px;margin:9px 0;padding:11px}.ake-slot-head{border:0;background:none;display:flex;align-items:center;gap:12px;text-align:left;width:100%;padding:0}.ake-slot-head>span:nth-child(2){flex:1}.ake-slot-head small,.ake-role-card small{display:block;opacity:.7;font-size:.8rem;margin-top:3px}.ake-slot-num{width:32px;height:32px;display:grid;place-items:center;border-radius:8px;background:rgba(120,140,160,.14);font-weight:700}.ake-slot-body{margin-top:12px}.ake-subhead{font-size:.82rem;font-weight:650;margin:12px 0 7px}.ake-champs,.ake-sub-actions{display:flex;flex-wrap:wrap;gap:6px}.ake-champ{border:1px solid var(--comp-border);border-radius:8px;background:transparent;padding:8px 10px;text-align:left}.ake-champ small{display:block;font-size:.72rem;opacity:.72;margin-top:3px}.ake-champ.ake-selected{border-color:#75a8d9;background:rgba(93,145,194,.14)}.ake-explanation{background:rgba(120,140,160,.08);border-radius:8px;padding:12px;margin-top:12px;font-size:.86rem;line-height:1.5}.ake-explanation p{margin:6px 0 0}.ake-sub-card p,.ake-eval p{margin:8px 0;font-size:.86rem}.ake-eval small{opacity:.65}.ake-eval ul{padding-left:18px;font-size:.84rem}.ake-good{color:#75bd9d}.ake-rule{font-size:.9rem;line-height:1.55}.ake-notice{padding:12px;border:1px solid #c39a62;border-radius:8px}.ake-eligibility{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:12px}.ake-role-card{border:1px solid var(--comp-border);border-radius:10px;padding:15px}.ake-role-card p{border-top:1px solid var(--comp-border);padding-top:9px;font-size:.85rem}
+@media(max-width:850px){.ake-comp-columns{grid-template-columns:1fr}}@media(max-width:480px){.ake-comp-main{padding:11px}.ake-comp-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}.ake-engine-head{align-items:flex-start}}

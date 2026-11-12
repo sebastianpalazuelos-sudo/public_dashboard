@@ -3,6 +3,7 @@ const views = {
     players: document.getElementById("view-players"),
     champions: document.getElementById("view-champions"),
     synergies: document.getElementById("view-synergies"),
+    compositions: document.getElementById("view-compositions"),
     matches: document.getElementById("view-matches"),
     records: document.getElementById("view-records"),
     methodology: document.getElementById("view-methodology"),
@@ -135,6 +136,8 @@ function showView(viewName){
         showPlayersRanking();
         resetProfileNav();
     }
+
+    if(viewName === "compositions" && typeof renderCompositions === "function"){renderCompositions();}
 
     if(viewName === "records"){
         renderRecords();
@@ -853,7 +856,7 @@ function renderChampionTendencies(metricName){
     el.innerHTML = html;
 }
 
-function getPlayerChampionProfile(playerName, fullFriend=false){
+function getStoredPlayerChampionProfile(playerName, fullFriend=false){
     const key = fullFriend
         ? "player_champion_profiles_full_friend"
         : "player_champion_profiles";
@@ -877,6 +880,50 @@ function getPlayerChampionProfile(playerName, fullFriend=false){
         key => String(key).trim().toLowerCase() === normalized
     );
     return matchedKey ? profiles[matchedKey] : null;
+}
+
+// Use the same match universe for friend champion rows, match lists and AKE WR.
+const akeFriendChampionCache = new Map();
+function getPlayerChampionProfile(playerName, fullFriend=false){
+    const identity = canonicalPlayerName(playerName);
+    const key = JSON.stringify([identity,Boolean(fullFriend)]);
+    if(akeFriendChampionCache.has(key)) return akeFriendChampionCache.get(key);
+    const stored = getStoredPlayerChampionProfile(playerName,fullFriend) || [];
+    const byChampion = new Map(stored.map(c=>[c.champion,c]));
+    const groups = new Map();
+    for(const match of (dashboardData?.match_explorer || [])){
+        if(match.is_remake || match.winning_team == null) continue;
+        if(fullFriend && !isEligibleFullFriendMatch(match)) continue;
+        if((match.players || []).filter(p=>p.is_friend).length < 2) continue;
+        for(const p of (match.players || [])){
+            if(!p.is_friend || canonicalPlayerName(p.identity || p.name) !== identity) continue;
+            if(!groups.has(p.champion)) groups.set(p.champion,[]);
+            groups.get(p.champion).push({player:p,match});
+        }
+    }
+    const average = (rows,field) => {
+        const nums=rows.map(x=>Number(x.player[field])).filter(Number.isFinite);
+        return nums.length?nums.reduce((a,b)=>a+b,0)/nums.length:null;
+    };
+    const profiles=[];
+    for(const [champion,rows] of groups){
+        const old=byChampion.get(champion)||{};
+        const n=rows.length;
+        const value=(field,fallback=0)=>average(rows,field)??fallback;
+        profiles.push({
+            ...old,name:identity,champion,global_games:n,games:n,context_games:n,
+            global_avg:value("score"),
+            global_avg_kpm_score:value("kpm_score"),global_avg_dpm_score:value("dpm_score"),
+            global_avg_kda_score:value("kda_score"),global_avg_ccpm_score:value("ccpm_score"),
+            global_avg_tank_score:value("tank_score"),avg_p95r:value("p95r"),
+            avg_kpm:value("kpm"),avg_dpm:value("dpm"),avg_kda:value("kda"),avg_ccpm:value("ccpm"),
+            matches:rows.map(({player,match})=>({match_id:match.match_id,timestamp:match.timestamp,
+                player:player.name,score:player.score,total_score:player.score,kda:player.kda,
+                kpm:player.kpm,dpm:player.dpm,ccpm:player.ccpm,tank_share:player.tank_share}))
+        });
+    }
+    akeFriendChampionCache.set(key,profiles);
+    return profiles;
 }
 
 function getChampionPerformance(championName, fullFriend=false){
@@ -1056,6 +1103,69 @@ function formatProfileMatchDate(timestamp){
     }).format(new Date(value));
 }
 
+// Profile Champion History: calculate performance and titles strictly from the
+// match IDs belonging to the selected profile universe (all / full-friends).
+let profileHistoryMatchIndex = null;
+function profileHistoryMatchLookup(matchId){
+    if(!profileHistoryMatchIndex){
+        profileHistoryMatchIndex = new Map((dashboardData?.match_explorer || []).map(m => [String(m.match_id), m]));
+    }
+    return profileHistoryMatchIndex.get(String(matchId));
+}
+function profileHistoryPlayer(match, profile){
+    if(!match) return null;
+    const champion = profile?.champion;
+    if(profile?.name === "Champion Reference" || profile?.name === "Champion Baseline"){
+        const entry = (profile?.matches || []).find(m => String(m.match_id) === String(match.match_id));
+        return (match.players || []).find(p => !p.is_friend && p.champion === champion &&
+            (!entry?.player || p.name === entry.player)) || null;
+    }
+    const identity = canonicalPlayerName(profile?.name || "");
+    return (match.players || []).find(p =>
+        p.is_friend && p.champion === champion &&
+        canonicalPlayerName(p.identity || p.name) === identity
+    ) || null;
+}
+function profileHistoryTitles(matchId, profile){
+    const match = profileHistoryMatchLookup(matchId);
+    if(!match || match.is_remake) return {penta:0, god:0, cono:0};
+    const player = profileHistoryPlayer(match, profile);
+    if(!player) return {penta:0, god:0, cono:0};
+    const kind = akeTitleKind(player);
+    return {
+        penta: Math.max(0, Number(player.penta_kills) || 0),
+        god: kind === "god" ? 1 : 0,
+        cono: kind === "cono" ? 1 : 0
+    };
+}
+function profileHistorySummary(profile){
+    const matches = Array.isArray(profile?.matches) ? profile.matches : [];
+    let pTotal=0, pCount=0, miTotal=0, miCount=0;
+    const titles={penta:0,god:0,cono:0};
+    for(const entry of matches){
+        const match=profileHistoryMatchLookup(entry.match_id);
+        const player=profileHistoryPlayer(match, profile);
+        if(!player || match.is_remake) continue;
+        const mi=Number(player.match_impact);
+        if(player.match_impact != null && Number.isFinite(mi) && mi >= 0){
+            miTotal+=mi; miCount++;
+        }
+        const note=matchFinalNote(player);
+        if(note !== null && !player.insufficient_metrics){
+            pTotal+=note; pCount++;
+        }
+        const t=profileHistoryTitles(entry.match_id,profile);
+        titles.penta+=t.penta; titles.god+=t.god; titles.cono+=t.cono;
+    }
+    return {p:pCount?pTotal/pCount:null,mi:miCount?miTotal/miCount:null,titles};
+}
+function profileHistoryBadges(t){
+    return renderPentaBadge(t.penta, true) + akeTitleBadge("god",t.god,true) + akeTitleBadge("cono",t.cono,true);
+}
+function profileHistoryMetric(value){
+    return value == null ? "—" : formatHomeMetric(value,2);
+}
+
 function buildProfileMatchesPanel(profile, options = {}){
     const matches = Array.isArray(profile?.matches) ? profile.matches : [];
     const showPlayer = Boolean(options.showPlayer);
@@ -1072,6 +1182,7 @@ function buildProfileMatchesPanel(profile, options = {}){
             </div>
             <div class="profile-match-list">
                 ${matches.map(match => {
+                    const titles = profileHistoryTitles(match.match_id, profile);
                     const playerText = showPlayer && match.player
                         ? `<span class="profile-match-player">${escapeHtml(formatMatchPlayerName(match.player))}</span>`
                         : "";
@@ -1085,6 +1196,7 @@ function buildProfileMatchesPanel(profile, options = {}){
                             title="Abrir partida ${escapeHtml(match.match_id)} en Match Explorer"
                         >
                             <span class="profile-match-id">${escapeHtml(match.match_id)}</span>
+                            <span class="profile-match-titles">${profileHistoryBadges(titles)}</span>
                             ${playerText}
                             <span class="profile-match-score">${Number(match.score || 0)}</span>
                             ${dateText ? `<span class="profile-match-date">${dateText}</span>` : ""}
@@ -1421,6 +1533,70 @@ function renderChampionProfile(championName){
     attachChampionRankingInteractions(tableContainer);
 }
 
+// Champion Reference: one non-friend participation per match/champion.
+// Build from match_explorer so all/full universes, AKE victories and P/MI agree.
+const akeReferenceCache = new Map();
+function getAkeChampionReference(fullFriend=false){
+    const key = fullFriend ? "full" : "all";
+    if(akeReferenceCache.has(key)) return akeReferenceCache.get(key);
+    const groups = new Map();
+    let games=0, wins=0;
+    for(const match of (dashboardData?.match_explorer || [])){
+        if(match.is_remake || match.winning_team == null) continue;
+        if(fullFriend && !isEligibleFullFriendMatch(match)) continue;
+        for(const p of (match.players || [])){
+            if(p.is_friend || !p.champion) continue;
+            const champion = p.champion;
+            if(!groups.has(champion)) groups.set(champion, []);
+            groups.get(champion).push({player:p,match});
+            games++;
+            if(Number(p.teamId) === Number(match.winning_team)) wins++;
+        }
+    }
+    const profiles = {};
+    const mean = (rows, field) => {
+        const vals = rows.map(x=>Number(x.player[field])).filter(Number.isFinite);
+        return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
+    };
+    for(const [champion, rows] of groups){
+        const baseline = dashboardData?.champion_engine?.champion_baseline?.[champion] || {};
+        const n = rows.length;
+        const entries = rows.map(({player,match})=>({
+            match_id:match.match_id, timestamp:match.timestamp, player:player.name,
+            score:player.score, total_score:player.score,
+            kda:player.kda,kpm:player.kpm,dpm:player.dpm,ccpm:player.ccpm,
+            tank_share:player.tank_share,
+            ake_win:Number(player.teamId) === Number(match.winning_team)
+        }));
+        const average = field => mean(rows,field);
+        const valid = (value, fallback=0) => value == null ? fallback : value;
+        const p95 = average("p95r");
+        profiles[champion] = {
+            ...baseline, name:"Champion Reference", champion,
+            games:n,global_games:n,context_games:n,sample_size:n,
+            matches:entries,
+            ake_wins:entries.filter(x=>x.ake_win).length,
+            ake_games:n,
+            global_avg:valid(average("score")),
+            global_avg_kpm_score:valid(average("kpm_score")),
+            global_avg_dpm_score:valid(average("dpm_score")),
+            global_avg_kda_score:valid(average("kda_score")),
+            global_avg_ccpm_score:valid(average("ccpm_score")),
+            global_avg_tank_score:valid(average("tank_score")),
+            avg_p95r:valid(p95),
+            avg_kpm:valid(average("kpm")),avg_dpm:valid(average("dpm")),
+            avg_kda:valid(average("kda")),avg_ccpm:valid(average("ccpm"))
+        };
+    }
+    const miRows = [...groups.values()].flat().map(x=>Number(x.player.match_impact)).filter(Number.isFinite);
+    const p95Rows = [...groups.values()].flat().map(x=>Number(x.player.p95r)).filter(Number.isFinite);
+    const result={profiles,games,wins,wr:games?100*wins/games:null,
+        mi:miRows.length?miRows.reduce((a,b)=>a+b,0)/miRows.length:null,
+        p95r:p95Rows.length?p95Rows.reduce((a,b)=>a+b,0)/p95Rows.length:null};
+    akeReferenceCache.set(key,result);
+    return result;
+}
+
 function renderPlayerProfile(playerName, context="all"){
 
     const fullFriend = context === "full" || context === true;
@@ -1436,10 +1612,7 @@ function renderPlayerProfile(playerName, context="all"){
 
     if(isChampionReference){
 
-        playerProfile =
-            dashboardData
-                .champion_engine
-                .champion_baseline;
+        playerProfile = getAkeChampionReference(fullFriend).profiles;
 
         profileTitle =
             "CHAMPION REFERENCE";
@@ -1514,11 +1687,12 @@ function renderPlayerProfile(playerName, context="all"){
         ? avgMetaRatio
         : (officialRankingRow?.avg_meta_ratio ?? avgMetaRatio);
 
+    const referenceStats = isChampionReference ? getAkeChampionReference(fullFriend) : null;
     const profileWinStats = isChampionReference ? null : getPlayerWinRateStats(playerName, fullFriend);
     const absentWinStats = fullFriend && !isChampionReference
         ? computeFullFriendAbsentWinRates([playerName])[playerName]
         : null;
-    const gamesValue = isChampionReference ? "—" : (profileWinStats.NW + profileWinStats.NL + profileWinStats.SurrW + profileWinStats.SurrL);
+    const gamesValue = isChampionReference ? referenceStats.games : (profileWinStats.NW + profileWinStats.NL + profileWinStats.SurrW + profileWinStats.SurrL);
     const absentStatValue = absentWinStats?.games
         ? `${formatHomeMetric(absentWinStats.pct, 1)}%`
         : "—";
@@ -1532,8 +1706,8 @@ function renderPlayerProfile(playerName, context="all"){
             ${isChampionReference
                 ? `
                     <p class="champion-reference-description">
-                        Average performance of all observed opposing players for each champion.
-                        Used as the reference baseline.
+                        Participaciones de jugadores no amigos (${contextTitle});
+                        victorias calculadas según el equipo ganador de AKE.
                     </p>
                 `
                 : `<h3>${contextTitle} · ${escapeHtml(formatPlayerName(playerName))} profile</h3>`}
@@ -1564,7 +1738,7 @@ function renderPlayerProfile(playerName, context="all"){
                         WR
                     </div>
                     <div class="summary-value">
-                        ${formatHomeMetric(profileWinStats?.ewr, 1)}%
+                        ${isChampionReference ? (referenceStats.wr == null ? "—" : formatHomeMetric(referenceStats.wr, 1) + "%") : formatHomeMetric(profileWinStats?.ewr, 1) + "%"}
                     </div>
                 </div>
 
@@ -1579,7 +1753,7 @@ function renderPlayerProfile(playerName, context="all"){
                         P95R
                     </div>
                     <div class="summary-value">
-                        ${formatHomeMetric(getPlayerWinRateStats(playerName, fullFriend).p95r, 3)}
+                        ${formatHomeMetric(isChampionReference ? referenceStats.p95r : profileWinStats.p95r, 3)}
                     </div>
                 </div>
 
@@ -1588,7 +1762,7 @@ function renderPlayerProfile(playerName, context="all"){
                         Avg MI
                     </div>
                     <div class="summary-value">
-                        ${formatHomeMetric(getPlayerWinRateStats(playerName, fullFriend).mi, 2)}
+                        ${formatHomeMetric(isChampionReference ? referenceStats.mi : profileWinStats.mi, 2)}
                     </div>
                 </div>
             </div>
@@ -1620,8 +1794,8 @@ function renderPlayerChampionTable(
 
         const sortedPlayerProfile = [...playerProfile].sort((a, b) => {
             if(activeSortKey === "score"){
-                const scoreA = Number(a.global_avg) || 0;
-                const scoreB = Number(b.global_avg) || 0;
+                const scoreA = profileHistorySummary(a).p ?? -Infinity;
+                const scoreB = profileHistorySummary(b).p ?? -Infinity;
 
                 return activeSortDirection === "asc"
                     ? scoreA - scoreB
@@ -1669,7 +1843,7 @@ function renderPlayerChampionTable(
                         class="sortable ${activeSortKey === "score" ? `sort-${activeSortDirection}` : ""}"
                         data-sort="score"
                     >
-                        Score${activeSortKey === "score"
+                        P${activeSortKey === "score"
                             ? (activeSortDirection === "asc" ? " ▲" : " ▼")
                             : " ↕"}
                     </th>
@@ -1679,7 +1853,7 @@ function renderPlayerChampionTable(
                     <th>KDA</th>
                     <th>CCPM</th>
                     <th>Tank</th>
-                    <th class="meta-stat">META</th>
+                    <th class="meta-stat">MI</th>
 
                     <th
                         class="ratio-stat sortable ${activeSortKey === "ratio" ? `sort-${activeSortDirection}` : ""}"
@@ -1695,15 +1869,16 @@ function renderPlayerChampionTable(
     `;
 
     sortedPlayerProfile.forEach((champion, index) => {
+        const history = profileHistorySummary(champion);
         const matchesRowId = `player-champion-matches-${index}`;
 
         html += `
             <tr class="champion-row" data-champion-index="${index}">
                 <td>${index + 1}</td>
-                <td>${escapeHtml(champion.champion)} ${playerName !== "Champion Reference" ? championEwrLabel(playerName, champion.champion, fullFriend) : ""}</td>
+                <td>${escapeHtml(champion.champion)} ${championEwrLabel(playerName, champion.champion, fullFriend)} <span class="profile-champion-titles">${profileHistoryBadges(history.titles)}</span></td>
                 <td>
                     <div class="profile-games-cell">
-                        <span>${champion.global_games ?? champion.games ?? 0}</span>
+                        <span>${getChampionEwr(playerName, champion.champion, fullFriend)?.games ?? champion.global_games ?? champion.games ?? 0}</span>
                         <button
                             class="profile-matches-toggle"
                             type="button"
@@ -1714,14 +1889,14 @@ function renderPlayerChampionTable(
                     </div>
                 </td>
                 <td>
-                    <strong>${formatHomeMetric(champion.global_avg)}</strong>
+                    <strong>${profileHistoryMetric(history.p)}</strong>
                 </td>
                 <td>${formatHomeMetric(getScoreMetric(champion, "kpm"))}</td>
                 <td>${formatHomeMetric(getScoreMetric(champion, "dpm"))}</td>
                 <td>${formatHomeMetric(getScoreMetric(champion, "kda"))}</td>
                 <td>${formatHomeMetric(getScoreMetric(champion, "ccpm"))}</td>
                 <td>${formatHomeMetric(getScoreMetric(champion, "tank"))}</td>
-                <td class="meta-stat">${formatHomeMetric(champion.champion_meta || 0)}</td>
+                <td class="meta-stat">${profileHistoryMetric(history.mi)}</td>
                 <td class="ratio-stat">${formatHomeMetric(championAvgP95R(champion), 3)}</td>
             </tr>
             <tr id="${matchesRowId}" class="profile-matches-row" hidden>
@@ -2946,7 +3121,13 @@ function computeFullFriendAbsentWinRates(playerNames){
 // Uses the effective winner persisted in match_explorer, never the raw Riot win flag.
 let championEwrCache = null;
 function getChampionEwr(playerName, championName, fullFriend=false){
-    if(!playerName || !championName || playerName === "Champion Reference" || playerName === "Champion Baseline") return null;
+    if(!playerName || !championName || playerName === "Champion Baseline") return null;
+    if(playerName === "Champion Reference"){
+        const reference = getAkeChampionReference(fullFriend).profiles[championName];
+        if(!reference) return {wins:0,games:0,pct:null};
+        return {wins:reference.ake_wins,games:reference.ake_games,
+            pct:reference.ake_games ? 100*reference.ake_wins/reference.ake_games : null};
+    }
     if(!championEwrCache) championEwrCache = new Map();
     const identity = canonicalPlayerName(playerName);
     const key = JSON.stringify([identity, championName, Boolean(fullFriend)]);
@@ -2955,6 +3136,7 @@ function getChampionEwr(playerName, championName, fullFriend=false){
     for(const match of (dashboardData?.match_explorer || [])){
         if(match.is_remake || match.winning_team == null) continue;
         if(fullFriend && !isEligibleFullFriendMatch(match)) continue;
+        if((match.players || []).filter(p=>p.is_friend).length < 2) continue;
         const row = (match.players || []).find(p =>
             p.is_friend && canonicalPlayerName(p.identity || p.name) === identity && p.champion === championName
         );
@@ -3071,8 +3253,8 @@ function renderPlayersRanking(){
         `;
         for(const r of rows){
             if(r.isReference){
-                h += `<tr class="players-ranking-row" data-player="Champion Reference" data-table="all" title="Open opponent champion reference profiles">
-                    <td><strong>‹ Champion Reference ›</strong></td><td colspan="${full ? 9 : 8}">Opponent champion baselines · Browse champions →</td></tr>`;
+                h += `<tr class="players-ranking-row" data-player="Champion Reference" data-table="${tableKey}" title="Open champion reference profiles">
+                    <td><strong>‹ Champion Reference ›</strong></td><td colspan="${full ? 9 : 8}">Non-friend champion reference · Browse champions →</td></tr>`;
                 continue;
             }
             const absent = full ? absentStats[r.name] : null;
@@ -3100,7 +3282,7 @@ function renderPlayersRanking(){
 
     const referenceRow = { name: "Champion Reference", isReference: true };
     container.innerHTML = tableHTML([...allRows, referenceRow], "All-Matches Ranking", 50, "all")
-        + tableHTML(fullRows, "Full-Friends Team Ranking · since 15/10/2026", 0, "full");
+        + tableHTML([...fullRows, referenceRow], "Full-Friends Team Ranking · since 15/10/2026", 0, "full");
 
     container.querySelectorAll(".players-ranking-row").forEach(row => {
         row.addEventListener("click", () => {
@@ -3223,7 +3405,9 @@ const AKE_RECORD_DEFS = [
     {key:"tank_pct", title:"TANK SHARE", unit:"% DEL TANK DEL EQUIPO", raw:"Tank raw", accent:"shield", icon:"◈", hue:"#2dd4bf"},
     {key:"ccpm", title:"CROWD CONTROL", unit:"CC / MIN", raw:"CC total (s)", accent:"frost", icon:"❄", hue:"#93c5fd"},
     {key:"kda", title:"KDA", unit:"KDA", raw:null, accent:"crown", icon:"♛", hue:"#fbbf24"},
-    {key:"protpm", title:"PROTECTION", unit:"PROT / MIN", raw:"Ally heal + shield raw", accent:"aura", icon:"✚", hue:"#4ade80"}
+    {key:"protpm", title:"PROTECTION", unit:"PROT / MIN", raw:"Ally heal + shield raw", accent:"aura", icon:"✚", hue:"#4ade80"},
+    {key:"kpm", title:"KILLS", unit:"KILLS / MIN", raw:"Kills raw", accent:"slayer", icon:"✹", hue:"#facc15"},
+    {key:"kills_raw", title:"MOST KILLS", unit:"KILLS RAW", raw:"Kills totales", accent:"slayer", icon:"✹", hue:"#fb7185"}
 ];
 let akeRecordsCache = null;
 let akeRecordsPromise = null;
@@ -3235,7 +3419,7 @@ async function renderRecords(){
     const pop = document.getElementById("records-population");
     if(!grid) return;
     if(!akeRecordsPromise){
-        akeRecordsPromise = fetch("records_data.json").then(r=>{
+        akeRecordsPromise = fetch("records_data.json?ake_records_v=10", {cache:"no-store"}).then(r=>{
             if(!r.ok) throw new Error("No se encontró records_data.json. Ejecutá FULL o REBUILD con el motor actualizado.");
             return r.json();
         }).then(data => (akeRecordsCache=data)).catch(err=>{akeRecordsPromise=null;throw err;});
