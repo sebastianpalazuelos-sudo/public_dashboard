@@ -723,8 +723,8 @@ function renderChampionRepresentatives(metricName){
         <table class="champion-representative-table">
             <thead>
                 <tr>
-                    <th>#</th>
-                    <th>Champion</th>
+                    <th class="sortable" data-sort="games"># ↕</th>
+                    <th class="sortable ${activeSortKey === "name" ? `sort-${activeSortDirection}` : ""}" data-sort="name">Champion${activeSortKey === "name" ? (activeSortDirection === "asc" ? " ▲" : " ▼") : " ↕"}</th>
                     <th>Profile</th>
                     <th>Games</th>
                     <th class="${activeClass("kda")}">KDA</th>
@@ -1187,6 +1187,12 @@ function buildProfileMatchesPanel(profile, options = {}){
                         ? `<span class="profile-match-player">${escapeHtml(formatMatchPlayerName(match.player))}</span>`
                         : "";
                     const dateText = formatProfileMatchDate(match.timestamp);
+                    const matchData = profileHistoryMatchLookup(match.match_id);
+                    const matchPlayer = profileHistoryPlayer(matchData, profile);
+                    const officialWin = typeof matchPlayer?.win === "boolean" ? matchPlayer.win :
+                        (matchData?.actual_winning_team != null && matchPlayer?.teamId != null
+                            ? Number(matchPlayer.teamId) === Number(matchData.actual_winning_team) : null);
+                    const resultBadge = officialWin == null ? "" : `<span class="profile-match-result ${officialWin ? "profile-match-win" : "profile-match-loss"}" title="Resultado oficial de Riot">${officialWin ? "W" : "L"}</span>`;
 
                     return `
                         <button
@@ -1195,6 +1201,7 @@ function buildProfileMatchesPanel(profile, options = {}){
                             data-match-id="${escapeHtml(match.match_id)}"
                             title="Abrir partida ${escapeHtml(match.match_id)} en Match Explorer"
                         >
+                            ${resultBadge}
                             <span class="profile-match-id">${escapeHtml(match.match_id)}</span>
                             <span class="profile-match-titles">${profileHistoryBadges(titles)}</span>
                             ${playerText}
@@ -1346,8 +1353,27 @@ function getGoldPerMinute(item, durationSeconds = 0){
 function buildChampionRankingTable(
     championProfile,
     selectedProfileName = null,
-    championName = null
+    championName = null,
+    activeSortKey = "p",
+    activeSortDirection = "desc"
 ){
+    const sortValue = (item, key) => {
+        const reference = item.name === "Champion Baseline";
+        const wr = reference ? null : getChampionEwr(item.name, championName || item.champion);
+        if(key === "name") return reference ? "Champion Reference" : formatPlayerName(item.name);
+        if(key === "games") return Number(item.global_games ?? item.games ?? 0);
+        if(key === "wr") return wr?.pct ?? -Infinity;
+        if(key === "p") return profileHistorySummary(item).p ?? -Infinity;
+        if(key === "mi") return profileHistorySummary(item).mi ?? -Infinity;
+        if(key === "ratio") return championAvgP95R(item);
+        return 0;
+    };
+    const orderedProfiles = [...championProfile].sort((a,b) => {
+        const va=sortValue(a,activeSortKey), vb=sortValue(b,activeSortKey);
+        const diff=typeof va === "string" ? va.localeCompare(vb) : va-vb;
+        return (activeSortDirection === "asc" ? 1 : -1) * diff;
+    });
+    const heading = (label,key) => `<th class="sortable ${activeSortKey===key ? `sort-${activeSortDirection}` : ""}" data-ranking-sort="${key}" role="button" tabindex="0">${label}${activeSortKey===key ? (activeSortDirection==="asc" ? " ▲" : " ▼") : " ↕"}</th>`;
     let html = `
         <h3>Champion Ranking</h3>
 
@@ -1355,23 +1381,19 @@ function buildChampionRankingTable(
         <table class="champion-ranking-table champion-ranking-table-g4">
         <thead>
             <tr>
-                <th>#</th>
-                <th>Player</th>
-                <th>Games</th>
-                <th class="score-stat">Score</th>
-                <th>KPM</th>
-                <th>DPM</th>
-                <th>KDA</th>
-                <th>CCPM</th>
-                <th>Tank</th>
+                ${heading("#","p")}
+                ${heading("Player","name")}
+                ${heading("Games","games")}
+                ${heading("WR","wr")}
+                ${heading("P","p")}
+                ${heading("MI","mi")}
+                ${heading("P95R","ratio")}
             </tr>
         </thead>
         <tbody>
     `;
 
-    [...championProfile]
-        .sort((a, b) => Number(b.global_avg || 0) - Number(a.global_avg || 0))
-        .forEach((profile, index) => {
+    orderedProfiles.forEach((profile, index) => {
 
             const isReference = profile.name === "Champion Baseline";
             const displayName = isReference
@@ -1411,7 +1433,7 @@ function buildChampionRankingTable(
                     <td class="champion-player-cell">
                         <div class="champion-ranking-player-name">
                             ${escapeHtml(displayName)}
-                            ${!isReference ? championEwrLabel(profile.name, championName || profile.champion) : ""}
+                            ${isReference ? "" : championEwrCountLabel(profile.name, championName || profile.champion)}
 
                             ${isSelected ? `
                                 <span class="selected-player-badge">SELECTED PROFILE</span>
@@ -1436,22 +1458,20 @@ function buildChampionRankingTable(
                         </div>
                     </td>
 
-                    <td class="score-stat">${formatHomeMetric(profile.global_avg)}</td>
-                    <td>${formatHomeMetric(getScoreMetric(profile, "kpm"))}</td>
-                    <td>${formatHomeMetric(getScoreMetric(profile, "dpm"))}</td>
-                    <td>${formatHomeMetric(getScoreMetric(profile, "kda"))}</td>
-                    <td>${formatHomeMetric(getScoreMetric(profile, "ccpm"))}</td>
-                    <td>${formatHomeMetric(getScoreMetric(profile, "tank"))}</td>
+                    <td>${isReference ? "—" : profileHistoryWrText(profile.name, championName || profile.champion)}</td>
+                    <td><strong>${profileHistoryMetric(profileHistorySummary(profile).p)}</strong></td>
+                    <td class="meta-stat">${profileHistoryMetric(profileHistorySummary(profile).mi)}</td>
+                    <td class="ratio-stat">${formatHomeMetric(championAvgP95R(profile), 3)}</td>
                 </tr>
 
                 <tr id="${rowKey}-matches" class="profile-matches-row" hidden>
-                    <td colspan="9">
+                    <td colspan="7">
                         ${buildProfileMatchesPanel(profile, {showPlayer: isReference})}
                     </td>
                 </tr>
 
                 <tr id="${rowKey}" class="champion-history-row" hidden>
-                    <td colspan="9">
+                    <td colspan="7">
                         ${buildChampionHistoryPanel(profile)}
                     </td>
                 </tr>
@@ -1473,6 +1493,24 @@ function attachChampionRankingInteractions(container){
     }
 
     attachProfileMatchInteractions(container);
+
+    container.querySelectorAll("[data-ranking-sort]").forEach(header => {
+        const sort = () => {
+            const table = header.closest(".champion-ranking-table");
+            const parent = table?.parentElement;
+            if(!parent) return;
+            const key = header.dataset.rankingSort;
+            const direction = header.classList.contains("sort-asc") ? "desc" : "asc";
+            const ctx = parent.__akeRankingContext;
+            if(!ctx) return;
+            parent.outerHTML = buildChampionRankingTable(ctx.profiles, ctx.selected, ctx.champion, key, direction).replace('<h3>Champion Ranking</h3>', '');
+            const newParent = container.querySelector(".champion-ranking-wrap");
+            if(newParent) newParent.__akeRankingContext = ctx;
+            attachChampionRankingInteractions(container);
+        };
+        header.addEventListener("click",sort);
+        header.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();sort();}});
+    });
 
     container.querySelectorAll(".champion-history-toggle").forEach(row => {
         const toggle = () => {
@@ -1530,6 +1568,7 @@ function renderChampionProfile(championName){
 
     const tableContainer = document.getElementById("champions-player-table");
     tableContainer.innerHTML = buildChampionRankingTable(championProfile, null, championName);
+    tableContainer.querySelector(".champion-ranking-wrap").__akeRankingContext = {profiles:championProfile,selected:null,champion:championName};
     attachChampionRankingInteractions(tableContainer);
 }
 
@@ -1793,6 +1832,16 @@ function renderPlayerChampionTable(
     }
 
         const sortedPlayerProfile = [...playerProfile].sort((a, b) => {
+            if(activeSortKey === "name"){
+                const diff=String(a.champion||"").localeCompare(String(b.champion||""));
+                return activeSortDirection === "asc" ? diff : -diff;
+            }
+            if(activeSortKey === "wr" || activeSortKey === "mi"){
+                const val = item => activeSortKey === "wr"
+                    ? (getChampionEwr(playerName,item.champion,fullFriend)?.pct ?? -Infinity)
+                    : (profileHistorySummary(item).mi ?? -Infinity);
+                return activeSortDirection === "asc" ? val(a)-val(b) : val(b)-val(a);
+            }
             if(activeSortKey === "score"){
                 const scoreA = profileHistorySummary(a).p ?? -Infinity;
                 const scoreB = profileHistorySummary(b).p ?? -Infinity;
@@ -1848,12 +1897,8 @@ function renderPlayerChampionTable(
                             : " ↕"}
                     </th>
 
-                    <th>KPM</th>
-                    <th>DPM</th>
-                    <th>KDA</th>
-                    <th>CCPM</th>
-                    <th>Tank</th>
-                    <th class="meta-stat">MI</th>
+                    <th class="sortable ${activeSortKey === "wr" ? `sort-${activeSortDirection}` : ""}" data-sort="wr">WR${activeSortKey === "wr" ? (activeSortDirection === "asc" ? " ▲" : " ▼") : " ↕"}</th>
+                    <th class="meta-stat sortable ${activeSortKey === "mi" ? `sort-${activeSortDirection}` : ""}" data-sort="mi">MI${activeSortKey === "mi" ? (activeSortDirection === "asc" ? " ▲" : " ▼") : " ↕"}</th>
 
                     <th
                         class="ratio-stat sortable ${activeSortKey === "ratio" ? `sort-${activeSortDirection}` : ""}"
@@ -1875,7 +1920,7 @@ function renderPlayerChampionTable(
         html += `
             <tr class="champion-row" data-champion-index="${index}">
                 <td>${index + 1}</td>
-                <td>${escapeHtml(champion.champion)} ${championEwrLabel(playerName, champion.champion, fullFriend)} <span class="profile-champion-titles">${profileHistoryBadges(history.titles)}</span></td>
+                <td>${escapeHtml(champion.champion)} ${championEwrCountLabel(playerName,champion.champion,fullFriend)} <span class="profile-champion-titles">${profileHistoryBadges(history.titles)}</span></td>
                 <td>
                     <div class="profile-games-cell">
                         <span>${getChampionEwr(playerName, champion.champion, fullFriend)?.games ?? champion.global_games ?? champion.games ?? 0}</span>
@@ -1891,16 +1936,12 @@ function renderPlayerChampionTable(
                 <td>
                     <strong>${profileHistoryMetric(history.p)}</strong>
                 </td>
-                <td>${formatHomeMetric(getScoreMetric(champion, "kpm"))}</td>
-                <td>${formatHomeMetric(getScoreMetric(champion, "dpm"))}</td>
-                <td>${formatHomeMetric(getScoreMetric(champion, "kda"))}</td>
-                <td>${formatHomeMetric(getScoreMetric(champion, "ccpm"))}</td>
-                <td>${formatHomeMetric(getScoreMetric(champion, "tank"))}</td>
+                <td>${profileHistoryWrText(playerName, champion.champion, fullFriend)}</td>
                 <td class="meta-stat">${profileHistoryMetric(history.mi)}</td>
                 <td class="ratio-stat">${formatHomeMetric(championAvgP95R(champion), 3)}</td>
             </tr>
             <tr id="${matchesRowId}" class="profile-matches-row" hidden>
-                <td colspan="11">${buildProfileMatchesPanel(champion)}</td>
+                <td colspan="7">${buildProfileMatchesPanel(champion)}</td>
             </tr>
         `;
     });
@@ -2013,6 +2054,8 @@ function renderPlayerChampionDetail(champion, playerName, fullFriend=false){
             navigateBack();
         });
 
+    const rankingWrap = detailContainer.querySelector(".champion-ranking-wrap");
+    if(rankingWrap) rankingWrap.__akeRankingContext = {profiles:championProfile,selected:playerName,champion:championName};
     attachChampionRankingInteractions(detailContainer);
 }
 
@@ -3147,6 +3190,14 @@ function getChampionEwr(playerName, championName, fullFriend=false){
     const result = {wins, games, pct: games ? 100 * wins / games : null};
     championEwrCache.set(key, result);
     return result;
+}
+function championEwrCountLabel(playerName,championName,fullFriend=false){
+    const result=getChampionEwr(playerName,championName,fullFriend);
+    return result ? `<span class="champion-ewr" style="color:#a9b8ca;font-size:.85em">(${result.wins}/${result.games})</span>` : "";
+}
+function profileHistoryWrText(playerName, championName, fullFriend=false){
+    const result = getChampionEwr(playerName, championName, fullFriend);
+    return result?.pct == null ? "—" : `${formatHomeMetric(result.pct, 1)}%`;
 }
 function championEwrLabel(playerName, championName, fullFriend=false){
     const result = getChampionEwr(playerName, championName, fullFriend);
