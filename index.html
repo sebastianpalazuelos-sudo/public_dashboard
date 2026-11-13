@@ -229,71 +229,64 @@
 
 
 <div class="methodology-section">
-
   <h3>Cómo funciona el sistema</h3>
-
-  <p>AKE evalúa el rendimiento de cada jugador mediante cinco métricas:</p>
-
+  <p>AKE evalúa el rendimiento de cada jugador mediante seis métricas:</p>
   <ul>
     <li><strong>KPM:</strong> asesinatos por minuto.</li>
     <li><strong>DPM:</strong> daño a campeones por minuto.</li>
     <li><strong>KDA:</strong> relación entre asesinatos, asistencias y muertes.</li>
     <li><strong>CCPM:</strong> control de masas aplicado por minuto.</li>
     <li><strong>Tank%:</strong> proporción del daño soportado por el equipo que absorbió el jugador.</li>
+    <li><strong>PROTPM:</strong> suma de curación y escudos otorgados a aliados por minuto.</li>
   </ul>
-
-  <p>Cada métrica se convierte en una puntuación de <strong>0 a 10</strong> utilizando referencias históricas generales.</p>
+  <p>Cada métrica se convierte en una puntuación de rendimiento utilizando referencias históricas.</p>
 
   <h3>Score — Rendimiento</h3>
-
-  <p>Mide qué tan bien rindió un jugador en las métricas más relevantes para su campeón.</p>
-
-  <p>La puntuación de cada métrica se calcula comparando su rendimiento con referencias históricas de todos los campeones:</p>
-
+  <p>Mide el rendimiento del jugador en sus tres métricas mejor puntuadas durante la partida.</p>
+  <p>Cada métrica se compara con referencias históricas generales:</p>
   <ul>
     <li><strong>P10:</strong> 1 punto.</li>
     <li><strong>P50:</strong> 5 puntos.</li>
     <li><strong>P95:</strong> 10 puntos.</li>
   </ul>
-
-  <p>Entre estas referencias, la puntuación aumenta de forma lineal.</p>
-
-  <p>Para cada campeón se seleccionan hasta <strong>tres métricas principales</strong>, según su rendimiento histórico habitual. Si un jugador destaca extraordinariamente en otra métrica, esta puede incorporarse cuando supera el <strong>90% de los registros históricos de ese campeón (P90)</strong>.</p>
-
-  <p>El Score combina las métricas seleccionadas.</p>
+  <p>Entre estas referencias, la puntuación aumenta linealmente.</p>
+  <p>Se seleccionan las tres métricas que obtienen las puntuaciones más altas y se combinan para calcular el Score.</p>
 
   <h3>MI — Impacto en la partida</h3>
-
-  <p>Mide cuánto destacó un jugador frente a los otros nueve participantes en las métricas relevantes para su campeón.</p>
-
-  <p>En cada métrica activa, el primer puesto recibe <strong>10 puntos</strong>, el segundo 9 y así sucesivamente hasta el décimo, que recibe 1.</p>
-
-  <p>El MI es el promedio de esas puntuaciones.</p>
+  <p>Mide cuánto destacó un jugador frente a los otros nueve participantes, considerando tanto su posición en cada métrica activa como la magnitud de su rendimiento.</p>
+  <p>Cada posición establece un intervalo de un punto: el décimo puesto recibe de 0 a menos de 1; el noveno, de 1 a menos de 2; y así sucesivamente hasta el primer puesto, de 9 a 10.</p>
+  <p>La ubicación dentro de cada intervalo depende del rendimiento alcanzado respecto a la referencia histórica de esa métrica para esa posición. Un primer puesto puede superar los 10 puntos cuando excede el P95 histórico correspondiente.</p>
+  <p>El MI combina los resultados de las métricas activas.</p>
 
   <h3>P95R — Rendimiento respecto al campeón</h3>
+  <p>Compara el rendimiento global de una partida con el nivel alcanzado históricamente por ese mismo campeón.</p>
+  <p>Se suman las puntuaciones de todas las métricas evaluables y se dividen por el <strong>percentil 95 histórico</strong> de esa suma para el campeón.</p>
+  <p>A diferencia del Score, el P95R considera todas las métricas, no solamente las tres seleccionadas.</p>
 
-  <p>Compara el rendimiento total de una partida con el nivel alcanzado históricamente por ese mismo campeón.</p>
+  <h3>WR y WR SIN — Resultados</h3>
+  <p><strong>WR (Win Rate):</strong> porcentaje de partidas ganadas por un perfil. AKE aplica una corrección propia: las derrotas por rendición forzada cuando el equipo se encontraba en ventaja pueden contabilizarse como victorias para sus estadísticas internas.</p>
+  <p><strong>WR SIN:</strong> porcentaje de partidas que ganan los demás jugadores del grupo cuando el perfil analizado no está presente.</p>
+  <p>WR describe los resultados del jugador; WR SIN permite estudiar cómo cambian los resultados del grupo en su ausencia. Esta comparación no demuestra por sí sola una relación causal.</p>
 
-  <p>Se suman las puntuaciones de las cinco métricas y se dividen por el <strong>percentil 95 histórico</strong> de esa suma para el campeón.</p>
+  <h3>Campeones con influencia difícil de medir</h3>
+  <p><strong>Renata Glasc, Zilean y Pyke</strong> presentan mecanismos de influencia que las métricas convencionales pueden representar de forma incompleta.</p>
+  <p>Se propone identificarlos con un asterisco (<span class="insufficient-metrics-asterisk">*</span>) y la aclaración <strong>«Influencia no medible»</strong>, ubicándolos al final de las clasificaciones del overlay postpartida y Match Explorer.</p>
 
-  <p>A diferencia del Score, el P95R considera las cinco métricas, no solamente las seleccionadas.</p>
+  <h3>Puntuación postpartida</h3>
+  <p>La puntuación final de una partida combina <strong>70% MI</strong> (impacto respecto a los participantes de la partida) y <strong>30% P95R</strong> (rendimiento respecto a las referencias históricas del campeón).</p>
+  <p>De esta manera, AKE prioriza el impacto dentro de la partida sin dejar de considerar el rendimiento característico del campeón.</p>
 
-  <h3>EWR — Victorias corregidas</h3>
+  <h3>P — Rendimiento histórico del perfil</h3>
+  <p>Resume el rendimiento acumulado de un jugador combinando <strong>50% P95R histórico</strong> y <strong>50% MI histórico</strong>.</p>
+  <p>Permite evaluar su trayectoria utilizando tanto el rendimiento respecto a los campeones como el impacto frente a los participantes de sus partidas.</p>
 
-  <p>Es el porcentaje de victorias ajustado para contemplar rendiciones que no reflejan el resultado real de la partida.</p>
-
-  <p>La corrección considera el impacto general de los equipos y el daño causado a estructuras.</p>
-
-  <h3>Campeones con influencia no medible</h3>
-
-  <p>Yuumi, Sona, Lulu, Janna, Soraka, Nami, Milio, Seraphine, Renata Glasc e Ivern dependen especialmente de la curación y los escudos otorgados a sus aliados.</p>
-
-  <p>Mientras AKE no disponga de suficientes datos de estas contribuciones, su rendimiento individual no se considera evaluable de manera representativa y se identifica con <span class="insufficient-metrics-asterisk">*</span>.</p>
+  <h3>MMR — Indicador competitivo propio</h3>
+  <p>AKE construye un indicador de evolución competitiva a partir de las victorias y derrotas oficiales registradas por Riot.</p>
+  <p>Su propósito es estudiar la trayectoria de resultados de cada perfil y explorar posibles diferencias en el nivel de oposición al que se enfrenta.</p>
 
   <h3>Resumen</h3>
-
-  <p><strong>Score</strong> mide el rendimiento en las fortalezas del campeón; <strong>MI</strong>, cuánto destacó frente a los demás jugadores; <strong>P95R</strong>, qué tan cerca estuvo de los mejores registros históricos de su campeón; y <strong>EWR</strong>, el porcentaje de victorias corregido.</p>
-
+  <p><strong>Score</strong> identifica las métricas de mayor rendimiento; <strong>MI</strong> mide el impacto relativo en la partida; <strong>P95R</strong> compara el rendimiento con el histórico del campeón; <strong>WR</strong> y <strong>WR SIN</strong> describen los resultados propios y del grupo; <strong>P</strong> resume el rendimiento histórico; y <strong>MMR</strong> registra una evolución competitiva interna basada en resultados oficiales.</p>
+  <p>La <strong>puntuación postpartida</strong> combina MI y P95R con una ponderación de 70/30.</p>
 </div>
 
 
